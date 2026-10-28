@@ -6,71 +6,51 @@
 <title>AXIOM LOGS</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    :root { 
-        --bg: #0b0e14; --panel: #11151f; --border: #1e2433; 
-        --text: #ffffff; --dim: #8b93a3; --green: #4ade80; 
-        --blue: #3b82f6; --red: #ef4444; 
-    }
-    
+    :root { --bg: #0b0e14; --panel: #11151f; --border: #1e2433; --text: #ffffff; --dim: #8b93a3; --green: #4ade80; --blue: #3b82f6; --red: #ef4444; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 20px; }
     .container { max-width: 1400px; margin: 0 auto; }
-    
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--panel); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); }
     .license-box { display: flex; flex-direction: column; gap: 4px; }
     .license-key { font-size: 18px; font-weight: bold; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); }
     .btn { background: var(--border); color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 500; border: none; font-family: inherit; }
+    .btn-admin { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); margin-right: 10px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: var(--panel); padding: 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; }
+    .stat-title { font-size: 12px; color: var(--dim); text-transform: uppercase; font-weight: 600; }
+    .stat-value { font-size: 20px; font-weight: 700; color: #fff; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.blue { color: var(--blue); }
+    .stat-value.red { color: var(--red); }
     
     table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
     th { text-align: left; padding: 16px; color: var(--dim); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
     td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
     
+    .acc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .acc-name { font-weight: 600; color: var(--text); font-size: 15px; }
-    .acc-pc { font-size: 12px; color: var(--dim); margin-top: 4px; }
+    .acc-pc { font-size: 12px; color: var(--dim); }
     
-    /* ======= تصميم الأيقونات الجديد (زي الصورة بالضبط) ======= */
-    .skills-row { 
-        display: flex; 
-        gap: 16px; 
-        flex-wrap: wrap; 
-        max-width: 280px; /* عشان يجبر المهارات تنزل تحت بعض زي الصورة */
-    }
+    .status-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;}
+    .status-badge.online { background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+    .status-badge.offline { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
     
-    .skill-box { 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        font-size: 15px; 
-        font-weight: 600; 
-        color: #fff; /* الأرقام بيضاء */
-    }
+    .skills-row { display: flex; gap: 12px; flex-wrap: wrap; max-width: 250px; }
+    .skill-box { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: #fff; }
+    .skill-box svg { width: 18px; height: 18px; stroke-width: 2.5; fill: none; }
     
-    /* الأيقونات الخطية النظيفة */
-    .skill-box svg { 
-        width: 22px; 
-        height: 22px; 
-        stroke-width: 2.5; 
-        fill: none; 
-    }
-    
-    /* ألوان الأيقونات (بدون إطارات) */
-    .skill-fishing svg { stroke: #38bdf8; } /* أزرق */
-    .skill-shelf svg { stroke: #fbbf24; } /* أصفر */
-    .skill-stamina svg { stroke: #fb7185; } /* وردي */
-    .skill-farming svg { stroke: #4ade80; } /* أخضر */
-    .skill-janitor svg { stroke: #a78bfa; } /* بنفسجي */
-    .skill-cook svg { stroke: #f87171; } /* أحمر */
-    .skill-swiper svg { stroke: #2dd4bf; } /* تركوازي */
-    .skill-default svg { stroke: #94a3b8; } /* رمادي */
-    /* ==================================================== */
+    .skill-fishing svg { stroke: #38bdf8; }
+    .skill-shelf svg { stroke: #fbbf24; }
+    .skill-stamina svg { stroke: #fb7185; }
+    .skill-farming svg { stroke: #4ade80; }
+    .skill-janitor svg { stroke: #a78bfa; }
+    .skill-cook svg { stroke: #f87171; }
+    .skill-swiper svg { stroke: #2dd4bf; }
+    .skill-default svg { stroke: #94a3b8; }
     
     .money-main { font-size: 16px; font-weight: bold; color: #fff; }
     .money-sub { font-size: 12px; color: var(--dim); margin-top: 4px; }
     .hourly { color: var(--green); font-size: 13px; font-weight: 600; background: rgba(74,222,128,0.1); padding: 4px 8px; border-radius: 6px; }
-    
-    .status { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--green); }
-    .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
-    .status-dot.off { background: var(--red); box-shadow: 0 0 8px var(--red); }
     
     .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.2s; }
     .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
@@ -83,8 +63,33 @@
             <span style="font-size:12px; color:var(--dim);">YOUR LICENSE KEY</span>
             <span class="license-key">{{ my_key }}</span>
         </div>
-        <a href="/logout" class="btn">Logout</a>
+        <div>
+            {% if is_admin %}
+                <a href="/admin" class="btn btn-admin">Admin Panel</a>
+            {% endif %}
+            <a href="/logout" class="btn">Logout</a>
+        </div>
     </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-title">Total Accounts</span>
+            <span class="stat-value">{{ stats.total }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-title">Online / Offline</span>
+            <span class="stat-value"><span class="green">{{ stats.online }}</span> <span style="color:var(--dim); font-size:14px;">/</span> <span class="red">{{ stats.offline }}</span></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-title">Total Cash</span>
+            <span class="stat-value green">${{ "{:,.0f}".format(stats.total_cash) }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-title">Total Bank</span>
+            <span class="stat-value blue">${{ "{:,.0f}".format(stats.total_bank) }}</span>
+        </div>
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -93,66 +98,71 @@
                 <th>Skills</th>
                 <th>Money</th>
                 <th>Δ (1h)</th>
-                <th>Status</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody id="table-body">
             {% for name, a in accounts.items() %}
-            <tr>
-                <td><div class="acc-name">{{ name }}</div><div class="acc-pc">{{ a.pc }}</div></td>
-                <td><span style="background:#1e2433; padding:4px 10px; border-radius:6px; font-weight:bold; color:#cbd5e1;">{{ a.total_level }}</span></td>
-                <td>
-                    <div class="skills-row">
-                        {% for s in a.skills %}
-                            <div class="skill-box 
-                                {% if s.name == 'fishing' %}skill-fishing
-                                {% elif s.name == 'shelf stocker' %}skill-shelf
-                                {% elif s.name == 'stamina' %}skill-stamina
-                                {% elif s.name == 'farming' %}skill-farming
-                                {% elif s.name == 'janitor' %}skill-janitor
-                                {% elif s.name == 'cook' %}skill-cook
-                                {% elif s.name == 'swiper' %}skill-swiper
-                                {% else %}skill-default{% endif %}">
-                                
-                                {% if s.name == 'fishing' %}
-                                    <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
-                                {% elif s.name == 'shelf stocker' %}
-                                    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                                {% elif s.name == 'stamina' %}
-                                    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                {% elif s.name == 'farming' %}
-                                    <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
-                                {% elif s.name == 'janitor' %}
-                                    <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
-                                {% elif s.name == 'cook' %}
-                                    <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
-                                {% elif s.name == 'swiper' %}
-                                    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                                {% else %}
-                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-                                {% endif %}
-                                
-                                {{ s.level }}
-                            </div>
-                        {% endfor %}
-                    </div>
-                </td>
-                <td>
-                    <div class="money-main">${{ "{:,.0f}".format(a.total_money) }}</div>
-                    <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash) }} | Bank: ${{ "{:,.0f}".format(a.bank) }}</div>
-                </td>
-                <td><span class="hourly">↑ +${{ "{:,.0f}".format(a.hourly) }}/h</span></td>
-                <td>
-                    <div class="status">
-                        <span class="status-dot {{ '' if a.online else 'off' }}"></span>
-                        {{ "just now" if a.online else "offline" }}
-                    </div>
-                </td>
-                <td>
-                    <button class="btn-delete" onclick="deleteAcc('{{ name }}')">Delete</button>
-                </td>
-            </tr>
+                {% if is_admin or a.key == my_key %}
+                <tr>
+                    <td>
+                        <div class="acc-header">
+                            <span class="acc-name">{{ name }}</span>
+                            {% if a.online %}
+                                <span class="status-badge online">Online</span>
+                            {% else %}
+                                <span class="status-badge offline">Offline</span>
+                            {% endif %}
+                        </div>
+                        <div class="acc-pc">{{ a.pc }}</div>
+                    </td>
+                    <td><span style="background:#1e2433; padding:4px 10px; border-radius:6px; font-weight:bold; color:#cbd5e1;">{{ a.total_level }}</span></td>
+                    <td>
+                        <div class="skills-row">
+                            {% for s in a.skills %}
+                                <div class="skill-box 
+                                    {% if s.name == 'fishing' %}skill-fishing
+                                    {% elif s.name == 'shelf stocker' %}skill-shelf
+                                    {% elif s.name == 'stamina' %}skill-stamina
+                                    {% elif s.name == 'farming' %}skill-farming
+                                    {% elif s.name == 'janitor' %}skill-janitor
+                                    {% elif s.name == 'cook' %}skill-cook
+                                    {% elif s.name == 'swiper' %}skill-swiper
+                                    {% else %}skill-default{% endif %}">
+                                    
+                                    {% if s.name == 'fishing' %}
+                                        <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
+                                    {% elif s.name == 'shelf stocker' %}
+                                        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                    {% elif s.name == 'stamina' %}
+                                        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                    {% elif s.name == 'farming' %}
+                                        <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
+                                    {% elif s.name == 'janitor' %}
+                                        <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
+                                    {% elif s.name == 'cook' %}
+                                        <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
+                                    {% elif s.name == 'swiper' %}
+                                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                    {% else %}
+                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                                    {% endif %}
+                                    
+                                    {{ s.level }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="money-main">${{ "{:,.0f}".format(a.total_money) }}</div>
+                        <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash) }} | Bank: ${{ "{:,.0f}".format(a.bank) }}</div>
+                    </td>
+                    <td><span class="hourly">↑ +${{ "{:,.0f}".format(a.hourly) }}/h</span></td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteAcc('{{ name }}')">Delete</button>
+                    </td>
+                </tr>
+                {% endif %}
             {% endfor %}
         </tbody>
     </table>
