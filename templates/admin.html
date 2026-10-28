@@ -3,31 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Panel</title>
+<title>ADMIN | OVERSEER</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body { margin: 0; background: #0b0e14; color: #fff; font-family: 'Inter', sans-serif; padding: 20px; }
-    .container { max-width: 800px; margin: 0 auto; }
-    .card { background: #11151f; padding: 20px; border-radius: 12px; border: 1px solid #1e2433; }
-    h2 { margin-top: 0; }
-    ul { list-style: none; padding: 0; }
-    li { background: #0b0e14; padding: 12px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #1e2433; display: flex; justify-content: space-between; }
-    .btn { background: #3b82f6; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; display: inline-block; margin-bottom: 20px;}
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    :root { --bg: #080a10; --text: #ffffff; --dim: #8b93a3; --green: #10b981; --red: #ef4444; --border: #1c2130; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 40px 20px; }
+    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; }
+    h1 { margin: 0; font-size: 24px; font-weight: 900; color: var(--red); }
+    .btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 700; transition: 0.3s; }
+    .btn:hover { background: rgba(255,255,255,0.1); }
+    .section-title { font-size: 18px; font-weight: 800; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; background: #0d0f16; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    th { text-align: left; padding: 16px; color: var(--dim); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    tr:last-child td { border-bottom: none; }
+    .badge { background: rgba(59,130,246,0.1); color: #3b82f6; padding: 4px 8px; border-radius: 6px; font-family: monospace; }
+    .pass-text { color: var(--red); font-family: monospace; font-weight: bold; }
 </style>
 </head>
 <body>
 <div class="container">
-    <a href="/" class="btn">← Back to Dashboard</a>
-    <div class="card">
-        <h2>Registered Users (Admin Only)</h2>
-        <ul>
-            {% for user in users %}
-                <li>
-                    <span style="font-weight:bold;">{{ user }}</span>
-                    <span style="color: #8b93a3; font-size: 13px;">Key / Username</span>
-                </li>
-            {% endfor %}
-        </ul>
+    <div class="top-bar">
+        <h1>⚠️ Admin Control Panel</h1>
+        <a href="/" class="btn">← Back to Dashboard</a>
+    </div>
+    <div>
+        <div class="section-title">Registered Users (Usernames & Passwords)</div>
+        <table>
+            <thead><tr><th>Username (License)</th><th>Password</th></tr></thead>
+            <tbody>
+                {% for username, password in users.items() %}
+                <tr>
+                    <td><span class="badge">{{ username }}</span></td>
+                    <td><span class="pass-text">{{ password }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <div class="section-title">Game Accounts Logged by Users</div>
+        <table>
+            <thead><tr><th>Account Name</th><th>License Used</th><th>PC Name</th><th>Cash</th><th>Bank</th><th>Level</th></tr></thead>
+            <tbody>
+                {% for acc in accounts %}
+                <tr>
+                    <td style="font-weight:bold;">{{ acc.name }}</td>
+                    <td>{{ acc.key }}</td>
+                    <td>{{ acc.pc }}</td>
+                    <td style="color:var(--green);">${{ "{:,.0f}".format(acc.cash) }}</td>
+                    <td style="color:var(--green);">${{ "{:,.0f}".format(acc.bank) }}</td>
+                    <td>{{ acc.total_level }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 </body>
