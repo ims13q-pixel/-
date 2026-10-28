@@ -6,7 +6,7 @@ app.secret_key = "super_secret_blockspin_key_123"
 
 users = {}
 accounts = {}
-licenses = {} # تخزين المفاتيح
+licenses = {}
 
 def hash_pass(pw): return hashlib.sha256(pw.encode()).hexdigest()
 
@@ -22,7 +22,6 @@ def register():
             return jsonify({"error": "اسم المستخدم موجود"}), 400
             
         users[username] = hash_pass(data["password"])
-        # توليد مفتاح خاص للمستخدم
         licenses[username] = f"AX-{uuid.uuid4().hex[:12].upper()}"
         session["user"] = username
         return jsonify({"ok": True})
@@ -53,16 +52,17 @@ def index():
     for name, a in accounts.items():
         a["online"] = (now - a.get("last_seen", 0)) < 120
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
-        a["hourly"] = a.get("hourly", 0)
+        # تأمين القيمة لو ما حسبت بعد
+        if "hourly" not in a:
+            a["hourly"] = 0
     
-    # نمرر مفتاح المستخدم الحالي للواجهة عشان يشوفه
     user_license = licenses.get(session["user"], "Not Found")
     return render_template("index.html", accounts=accounts, my_license=user_license)
 
 @app.route("/api/verify", methods=["POST"])
 def verify():
     data = request.get_json(force=True, silent=True)
-    if data.get("license") in licenses.values():
+    if data and data.get("license") in licenses.values():
         return jsonify({"ok": True})
     return jsonify({"error": "invalid"}), 401
 
@@ -73,14 +73,34 @@ def report():
         return jsonify({"error": "unauthorized"}), 401
     
     name = data["name"]
+    now = time.time()
+    
+    current_money = data.get("cash", 0) + data.get("bank", 0)
+    hourly = 0
+    
+    # حساب الأرباح في الساعة
+    if name in accounts:
+        old_data = accounts[name]
+        time_diff = now - old_data.get("last_seen", now)
+        money_diff = current_money - old_data.get("total_money", current_money)
+        
+        # إذا مر وقت كافي، نحسب الأرباح
+        if time_diff > 10: 
+            hourly = (money_diff / time_diff) * 3600
+            # تخفيف التذبذب (نأخذ المتوسط)
+            old_hourly = old_data.get("hourly", 0)
+            hourly = (hourly + old_hourly) / 2
+    
     accounts[name] = {
         "license": data.get("license"),
         "pc": data.get("pc_name", "Unknown"),
         "cash": data.get("cash", 0),
         "bank": data.get("bank", 0),
+        "total_money": current_money,
+        "hourly": hourly,
         "total_level": data.get("total_level", 0),
         "skills": data.get("skills", []),
-        "last_seen": time.time()
+        "last_seen": now
     }
     return jsonify({"ok": True})
 
