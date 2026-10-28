@@ -2,11 +2,11 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 import time, hashlib
 
 app = Flask(__name__)
-app.secret_key = "axiom_blockspin_secret_123"
+app.secret_key = "axiom_overseer_secret_key_2024"
 
-# تخزين في الذاكرة (Vercel يمسحها إذا طفى السيرفر)
+# قاعدة بيانات في الذاكرة (Vercel يمسحها إذا طفى السيرفر)
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
-passwords = {"admin": "admin"} # نحفظ الباسورد العادي عشان الأدمن يشوفه
+passwords = {"admin": "admin"} 
 accounts = {}
 
 @app.route("/register", methods=["GET", "POST"])
@@ -24,7 +24,7 @@ def register():
             return jsonify({"error": "الاسم موجود مسبقاً"}), 400
             
         users[username] = hashlib.sha256(password.encode()).hexdigest()
-        passwords[username] = password
+        passwords[username] = password # نحفظ الباسورد العادي للأدمن
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -56,54 +56,40 @@ def index():
     is_admin = (my_key == "admin")
     now = time.time()
     
-    total_accounts = 0
-    online_count = 0
-    offline_count = 0
-    total_cash_all = 0
-    total_bank_all = 0
     all_accounts = []
 
     for name, a in accounts.items():
+        # إذا مو أدمن، يشوف بس الحسابات اللي مفتاحها يطابق اسمه
         if not is_admin and a.get("key") != my_key:
             continue
             
-        total_accounts += 1
+        # حساب الأونلاين (إذا مرت 15 ثانية بدون تحديث يعتبر أوفلاين)
         is_online = (now - a.get("last_seen", 0)) < 15 
         a["online"] = is_online
         
+        # حساب وقت التشغيل
         if is_online: 
-            online_count += 1
-            if "login_time" not in a: a["login_time"] = now
+            if "login_time" not in a: 
+                a["login_time"] = now
             a["uptime"] = int(now - a["login_time"])
         else: 
-            offline_count += 1
             a["uptime"] = 0
             a["login_time"] = now
             
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
-        if "hourly" not in a: a["hourly"] = 0
-        
-        total_cash_all += a.get("cash", 0)
-        total_bank_all += a.get("bank", 0)
+        if "hourly" not in a: 
+            a["hourly"] = 0
         
         acc_copy = a.copy()
         acc_copy["name"] = name
         all_accounts.append(acc_copy)
         
-    stats = {
-        "total": total_accounts,
-        "online": online_count,
-        "offline": offline_count,
-        "total_cash": total_cash_all,
-        "total_bank": total_bank_all
-    }
-        
-    return render_template("index.html", accounts=all_accounts, my_key=my_key, stats=stats, is_admin=is_admin)
+    return render_template("index.html", accounts=all_accounts, my_key=my_key, is_admin=is_admin)
 
 @app.route("/admin")
 def admin_panel():
     if session.get("user") != "admin":
-        return "Access Denied", 403
+        return "Access Denied. You are not the admin.", 403
     
     game_accounts = []
     for name, a in accounts.items():
@@ -125,42 +111,50 @@ def delete_account():
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
+    
+    # استقبال المفتاح (اسم المستخدم) من السكربت المضغوط
     username_key = data.get("k")
     if not username_key or username_key not in users:
         return jsonify({"error": "Unauthorized"}), 401
     
     name = data.get("n", "Unknown")
+    pc_name = data.get("pc", "DESKTOP")
     now = time.time()
     
+    # استقبال الأرقام
     cash = int(data.get("c", 0) or 0)
     bank = int(data.get("b", 0) or 0)
     current_money = cash + bank
     level = int(data.get("l", 0) or 0)
     
+    # استقبال المهارات
     raw_skills = data.get("s", [])
     skills = [{"name": sk.get("name"), "level": int(sk.get("level", 0))} for sk in raw_skills]
     
+    # حساب الأرباح في الساعة
     hourly = 0
     if name in accounts and (now - accounts[name].get("last_seen", now)) > 10:
         old_money = accounts[name].get("total_money", current_money)
         time_diff = now - accounts[name]["last_seen"]
-        hourly = ((current_money - old_money) / time_diff) * 3600
+        if time_diff > 0:
+            hourly = ((current_money - old_money) / time_diff) * 3600
 
     if name not in accounts:
         accounts[name] = {"login_time": now, "total_money": current_money}
 
     accounts[name].update({
         "key": username_key,
-        "pc": data.get("pc", "DESKTOP"),
+        "pc": pc_name,
         "cash": cash,
         "bank": bank,
         "total_money": current_money,
         "hourly": hourly,
         "total_level": level,
         "skills": skills,
-        "last_seen": now
+        "last_seen": now # تحديث النبض عشان يظل أونلاين
     })
+    
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000, debug=True)
