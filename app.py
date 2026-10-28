@@ -2,12 +2,11 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 import time, hashlib
 
 app = Flask(__name__)
-app.secret_key = "axiom_blockspin_secret_key_123"
+app.secret_key = "axiom_blockspin_secret_123"
 
-# مخازن بسيطة
-users = {"admin": hashlib.sha256("123".encode()).hexdigest()}
-licenses = {"admin": "AX-ADMIN-123"}
-accounts = {}
+# قاعدة بيانات وهمية في الذاكرة
+users = {}      # يخزن (اسم المستخدم : الباسورد المشفر)
+accounts = {}   # يخزن بيانات اللعبة
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -15,14 +14,13 @@ def register():
         data = request.get_json(force=True, silent=True) or {}
         username = data.get("username")
         password = data.get("password")
+        
         if not username or not password:
             return jsonify({"error": "أدخل اسم وكلمة مرور"}), 400
-        
         if username in users:
-            return jsonify({"error": "الاسم موجود"}), 400
+            return jsonify({"error": "الاسم موجود مسبقاً"}), 400
             
         users[username] = hashlib.sha256(password.encode()).hexdigest()
-        licenses[username] = f"AX-{username[:4].upper()}-{int(time.time())}"
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -33,6 +31,7 @@ def login():
         data = request.get_json(force=True, silent=True) or {}
         username = data.get("username")
         password = data.get("password")
+        
         if users.get(username) == hashlib.sha256(password.encode()).hexdigest():
             session["user"] = username
             return jsonify({"ok": True})
@@ -49,28 +48,37 @@ def index():
     if "user" not in session:
         return redirect(url_for("login"))
     
-    my_license = licenses.get(session["user"], "NOT_FOUND")
-    now = time.time()
+    # المفتاح هو اسم المستخدم
+    my_key = session["user"]
     
+    now = time.time()
     for name, a in accounts.items():
         a["online"] = (now - a.get("last_seen", 0)) < 120
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
-        # تأمين القيمة عشان ما ينهار الموقع
         if "hourly" not in a: a["hourly"] = 0
         
-    return render_template("index.html", accounts=accounts, my_license=my_license)
+    return render_template("index.html", accounts=accounts, my_key=my_key)
 
+# --- استقبال البيانات من السكربت ---
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
-    if data.get("license") not in licenses.values():
-        return jsonify({"error": "unauthorized"}), 401
+    
+    # السكربت يرسل اسم المستخدم كـ "key"
+    username_key = data.get("key")
+    if not username_key:
+        return jsonify({"error": "No key provided"}), 401
+
+    # التحقق: هل المفتاح (اسم المستخدم) موجود في قائمة المسجلين؟
+    if username_key not in users:
+        return jsonify({"error": "Unauthorized"}), 401
     
     name = data.get("name", "Unknown")
     now = time.time()
     current_money = data.get("cash", 0) + data.get("bank", 0)
     hourly = 0
     
+    # حساب الأرباح
     if name in accounts and (now - accounts[name].get("last_seen", now)) > 10:
         old_money = accounts[name].get("total_money", current_money)
         time_diff = now - accounts[name]["last_seen"]
