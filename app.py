@@ -65,7 +65,9 @@ def index():
             continue
             
         total_accounts += 1
-        is_online = (now - a.get("last_seen", 0)) < 120
+        
+        # 🔴 هنا التعديل: 10 ثواني بس عشان ينقلب أوفلاين بسرعة
+        is_online = (now - a.get("last_seen", 0)) < 10 
         a["online"] = is_online
         
         if is_online: 
@@ -76,19 +78,17 @@ def index():
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
         if "hourly" not in a: a["hourly"] = 0
         
-        # حساب وقت التشغيل
         if is_online:
             if "login_time" not in a:
                 a["login_time"] = now
             a["uptime"] = int(now - a["login_time"])
         else:
             a["uptime"] = 0
-            a["login_time"] = now # تصفير العداد لما يطلع أوفلاين
+            a["login_time"] = now
         
         total_cash_all += a.get("cash", 0)
         total_bank_all += a.get("bank", 0)
         
-        # نجهز نسخة للفرز والبحث
         acc_copy = a.copy()
         acc_copy["name"] = name
         all_accounts.append(acc_copy)
