@@ -1,94 +1,82 @@
--- blockspin_final.lua
-local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
-local player = Players.LocalPlayer
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+import time
+import hashlib
 
-local WEBHOOK = "https://YOUR-VERCEL-URL.vercel.app/api/report"
-local requestFunc = request or http_request or (syn and syn.request) or (krnl and krnl.request)
+app = Flask(__name__)
+app.secret_key = "super_secret_blockspin_key_123"
 
--- ربط أسماء المهارات بأيقونات FontAwesome
-local icons = {
-    ["fishing"] = "fa-fish",
-    ["stamina"] = "fa-bolt",
-    ["shelf stocker"] = "fa-box",
-    ["janitor"] = "fa-broom",
-    ["swiper"] = "fa-credit-card",
-    ["farming"] = "fa-seedling",
-    ["cook"] = "fa-fire",
-    ["total level"] = "fa-star"
-}
+users = {}
+accounts = {}
 
-local function getIcon(skillName)
-    local lower = skillName:lower()
-    for k, v in pairs(icons) do
-        if lower:find(k) then return v end
-    end
-    return "fa-gamepad" -- أيقونة افتراضية لأي مهارة ثانية
-end
+def hash_pass(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
-local function sendReport()
-    local statsData = {
-        name = player.Name,
-        cash = 0,
-        bank = 0,
-        total_level = 0,
-        skills = {}
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        data = request.get_json(force=True, silent=True)
+        if not data or not data.get("username") or not data.get("password"):
+            return jsonify({"error": "معلومات ناقصة"}), 400
+        
+        username = data["username"]
+        if username in users:
+            return jsonify({"error": "اسم المستخدم موجود مسبقاً"}), 400
+            
+        users[username] = hash_pass(data["password"])
+        session["user"] = username # يسجل دخولك فوراً
+        return jsonify({"ok": True, "message": "تم التسجيل بنجاح"})
+    return render_template("auth.html", mode="register")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        data = request.get_json(force=True, silent=True)
+        if not data or not data.get("username") or not data.get("password"):
+            return jsonify({"error": "معلومات ناقصة"}), 400
+        
+        username = data["username"]
+        password_hash = hash_pass(data["password"])
+        
+        if users.get(username) == password_hash:
+            session["user"] = username
+            return jsonify({"ok": True})
+        return jsonify({"error": "اسم المستخدم أو كلمة المرور غلط"}), 401
+    return render_template("auth.html", mode="login")
+
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect(url_for("login"))
+
+@app.route("/")
+def index():
+    if "user" not in session:
+        return redirect(url_for("login"))
+    
+    now = time.time()
+    for name, a in accounts.items():
+        a["online"] = (now - a.get("last_seen", 0)) < 120
+        a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
+        
+    return render_template("index.html", accounts=accounts)
+
+@app.route("/api/report", methods=["POST"])
+def report():
+    data = request.get_json(force=True, silent=True)
+    if not data or "name" not in data:
+        return jsonify({"error": "missing data"}), 400
+    
+    name = data["name"]
+    
+    # نحدث البيانات ونحتفظ بالمهارات
+    accounts[name] = {
+        "cash": data.get("cash", 0),
+        "bank": data.get("bank", 0),
+        "total_level": data.get("total_level", 0),
+        "skills": data.get("skills", []),
+        "last_seen": time.time(),
     }
+    return jsonify({"ok": True})
 
-    local gui = player:FindFirstChild("PlayerGui")
-    if gui then
-        for _, obj in ipairs(gui:GetDescendants()) do
-            if obj:IsA("TextLabel") or obj:IsA("TextButton") then
-                local text = obj.Text
-                
-                -- الفلوس
-                local bankMatch = text:match("Bank Balance:%s*%$(%d+)")
-                if bankMatch then statsData.bank = tonumber(bankMatch) end
-                
-                local handMatch = text:match("Hand Balance:%s*%$(%d+)")
-                if handMatch then statsData.cash = tonumber(handMatch) end
-
-                -- اللفل الكلي
-                local totalLvlMatch = text:match("Total Level:%s*(%d+)") or text:match("LevelText")
-                if totalLvlMatch and tonumber(totalLvlMatch) then
-                    statsData.total_level = tonumber(totalLvlMatch)
-                end
-
-                -- المهارات
-                local skillName, skillLevel = text:match("([%a%s]+):%s*(%d+)")
-                if skillName and skillLevel then
-                    skillName = skillName:gsub("^%s+", ""):gsub("%s+$", "")
-                    if skillName ~= "Total Level" and skillName ~= "Character Level" and #skillName > 2 then
-                        statsData.skills[skillName] = tonumber(skillLevel)
-                    end
-                end
-            end
-        end
-    end
-
-    -- إضافة الأيقونة لكل مهارة
-    local skillsWithIcons = {}
-    for name, lvl in pairs(statsData.skills) do
-        table.insert(skillsWithIcons, { name = name, level = lvl, icon = getIcon(name) })
-    end
-    statsData.skills = skillsWithIcons
-
-    -- الإرسال
-    pcall(function()
-        requestFunc({
-            Url = WEBHOOK,
-            Method = "POST",
-            Headers = { ["Content-Type"] = "application/json" },
-            Body = HttpService:JSONEncode(statsData)
-        })
-    end)
-end
-
-task.spawn(sendReport)
-task.spawn(function()
-    while task.wait(15) do
-        sendReport()
-    end
-end)
-
-print("[*] Final Hook Started for " .. player.Name)
+if __name__ == "__main__":
+    app.run(port=5000, debug=True)
