@@ -2,69 +2,151 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Login - Blockspin Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AXIOM LOGS</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    :root { --bg: #0b0e14; --panel: #11151f; --border: #1e2433; --text: #ffffff; --dim: #8b93a3; --btn: #3b82f6; --btn-hover: #2563eb; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    .card { background: var(--panel); padding: 40px; border-radius: 12px; border: 1px solid var(--border); width: 100%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    h2 { margin-top: 0; text-align: center; font-weight: 600; }
-    input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--bg); border: 1px solid var(--border); color: white; border-radius: 8px; box-sizing: border-box; font-family: inherit; outline: none; transition: border 0.2s; }
-    input:focus { border-color: var(--btn); }
-    button { width: 100%; padding: 12px; background: var(--btn); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit; font-size: 14px; }
-    button:hover { background: var(--btn-hover); }
-    .link { text-align: center; margin-top: 20px; font-size: 13px; color: var(--dim); }
-    .link a { color: var(--btn); text-decoration: none; }
-    .error { color: #ef4444; text-align: center; font-size: 13px; margin-bottom: 10px; display: none; }
+    :root { 
+        --bg: #0b0e14; --panel: #11151f; --border: #1e2433; 
+        --text: #ffffff; --dim: #8b93a3; --green: #4ade80; 
+        --blue: #3b82f6; --red: #ef4444;
+    }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--panel); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); }
+    .license-box { display: flex; flex-direction: column; gap: 4px; }
+    .license-title { font-size: 12px; color: var(--dim); text-transform: uppercase; }
+    .license-key { font-size: 18px; font-weight: bold; color: var(--blue); letter-spacing: 1px; background: rgba(59, 130, 246, 0.1); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); }
+    
+    .btn { background: var(--border); border: 1px solid var(--border); color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-refresh { color: var(--green); border-color: rgba(74, 222, 128, 0.3); background: transparent; }
+    .btn-logout { color: var(--red); border-color: rgba(239, 68, 68, 0.3); background: transparent; }
+    
+    table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    th { text-align: left; padding: 16px; color: var(--dim); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(255,255,255,0.02); }
+    
+    .acc-info { display: flex; flex-direction: column; gap: 4px; }
+    .acc-name { font-weight: 600; color: var(--text); font-size: 15px; display: flex; align-items: center; gap: 8px;}
+    .acc-pc { font-size: 12px; color: var(--dim); }
+    .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(74, 222, 128, 0.1); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.2); }
+    
+    /* المهارات */
+    .skills-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
+    .skill-box { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; color: #cbd5e1; }
+    .skill-box img { width: 20px; height: 20px; object-fit: contain; opacity: 0.8; }
+    
+    .money-col { display: flex; flex-direction: column; gap: 4px; }
+    .money-main { font-size: 16px; font-weight: bold; color: var(--text); }
+    .money-sub { font-size: 12px; color: var(--dim); display: flex; justify-content: space-between; gap: 15px; }
+    .hourly { color: var(--green); font-size: 12px; font-weight: 600; background: rgba(74,222,128,0.1); padding: 2px 6px; border-radius: 4px; display: inline-block; }
+    .hourly.neg { color: var(--red); background: rgba(239,68,68,0.1); }
+    
+    .status { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--green); }
+    .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
+    .status-dot.off { background: var(--red); box-shadow: 0 0 8px var(--red); }
 </style>
 </head>
 <body>
-    <div class="card">
-        <h2>{{ "Register" if mode == "register" else "Login" }}</h2>
-        <div id="error" class="error"></div>
-        <form id="authForm">
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit">{{ "Create Account" if mode == "register" else "Sign In" }}</button>
-        </form>
-        <div class="link">
-            {% if mode == "register" %}
-                Already have an account? <a href="/login">Login</a>
-            {% else %}
-                Don't have an account? <a href="/register">Register</a>
-            {% endif %}
+<div class="container">
+    <div class="top-bar">
+        <div class="license-box">
+            <span class="license-title">Your License Key</span>
+            <span class="license-key">{{ my_license }}</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button onclick="location.reload()" class="btn btn-refresh">↻ Refresh</button>
+            <a href="/logout" class="btn btn-logout">Logout</a>
         </div>
     </div>
-    <script>
-        document.getElementById('authForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const btn = document.querySelector('button');
-            const err = document.getElementById('error');
-            btn.disabled = true; btn.textContent = '...'; err.style.display = 'none';
-            
-            try {
-                const res = await fetch(window.location.href, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        username: document.getElementById('username').value,
-                        password: document.getElementById('password').value
-                    })
-                });
-                const data = await res.json();
-                
-                if (res.ok) {
-                    window.location.href = '/';
-                } else {
-                    err.textContent = data.error;
-                    err.style.display = 'block';
-                }
-            } catch (e) {
-                err.textContent = 'Connection error';
-                err.style.display = 'block';
-            }
-            btn.disabled = false; btn.textContent = 'Submit';
-        };
-    </script>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Account</th>
+                <th>Server</th>
+                <th>Level</th>
+                <th>Skills</th>
+                <th>Money</th>
+                <th>Δ (1h)</th>
+                <th>Last Update</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+            {% for name, a in accounts.items() %}
+            <tr>
+                <td>
+                    <div class="acc-info">
+                        <span class="acc-name">{{ name }} <span class="badge">Online</span></span>
+                        <span class="acc-pc">{{ a.pc }}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="acc-info">
+                        <span class="acc-name" style="font-size:13px; color: var(--dim);">Server 1</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="badge" style="background: #1e2433; color: white; font-size: 14px; font-weight: bold;">{{ a.total_level }}</div>
+                </td>
+                <td>
+                    <div class="skills-row">
+                        {% for s in a.skills %}
+                            <div class="skill-box">
+                                {% if s.name == 'fishing' %}<img src="https://img.icons8.com/color/48/fishing-pole.png">
+                                {% elif s.name == 'stamina' %}<img src="https://img.icons8.com/color/48/battery.png">
+                                {% elif s.name == 'shelf stocker' %}<img src="https://img.icons8.com/color/48/package.png">
+                                {% elif s.name == 'janitor' %}<img src="https://img.icons8.com/color/48/broom.png">
+                                {% elif s.name == 'swiper' %}<img src="https://img.icons8.com/color/48/bank-card-back-side.png">
+                                {% elif s.name == 'farming' %}<img src="https://img.icons8.com/color/48/plant-under-sun.png">
+                                {% elif s.name == 'cook' %}<img src="https://img.icons8.com/color/48/steak.png">
+                                {% endif %}
+                                {{ s.level }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    <div class="money-col">
+                        <span class="money-main">${{ "{:,.2f}".format(a.total_money / 1000000) }}M</span>
+                        <div class="money-sub">
+                            <span>H ${{ "{:,.0f}".format(a.cash / 1000) }}K</span>
+                            <span>B ${{ "{:,.0f}".format(a.bank / 1000) }}K</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="hourly {{ 'neg' if a.hourly < 0 else '' }}">
+                        {{ '↑' if a.hourly >= 0 else '↓' }} +${{ "{:,.1f}".format(a.hourly / 1000) }}K/h
+                    </span>
+                    <div class="acc-pc" style="margin-top: 5px;">Rising</div>
+                </td>
+                <td>
+                    <div class="status">
+                        <span class="status-dot {{ '' if a.online else 'off' }}"></span>
+                        {{ "just now" if a.online else "offline" }}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // تحديث تلقائي كل 5 ثواني
+    setInterval(() => {
+        fetch(window.location.href)
+            .then(res => res.text())
+            .then(html => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
+            })
+            .catch(e => console.log("Auto-refresh failed", e));
+    }, 5000);
+</script>
 </body>
 </html>
