@@ -3,133 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Blockspin Dashboard</title>
+<title>AXIOM LOGS</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    :root { --bg: #0b0e14; --panel: #11151f; --border: #1e2433; --text: #ffffff; --dim: #8b93a3; --green: #4ade80; --btn: #3b82f6; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .actions { display: flex; gap: 10px; align-items: center; }
-    .btn { background: var(--panel); border: 1px solid var(--border); color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
-    .btn-refresh { color: var(--green); border-color: rgba(74, 222, 128, 0.3); }
-    .btn-logout { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th { text-align: left; padding: 12px 16px; color: var(--dim); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
-    
-    .player-info { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-    .player-name { font-weight: 700; font-size: 16px; }
-    .total-level { background: #1a2235; color: #cbd5e1; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 5px;}
-    
-    .money-box { background: #111827; padding: 12px; border-radius: 8px; border: 1px solid var(--border); display: inline-block; min-width: 160px; }
-    .money-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
-    .money-row.total { border-top: 1px solid var(--border); padding-top: 6px; margin-top: 6px; font-weight: bold; color: var(--green); }
-    
-    /* تصميم المهارات (أيقونة + رقم فقط) */
-    .skills-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-    
-    .skill-item { 
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
-        background: rgba(255,255,255,0.03); 
-        padding: 8px 12px; 
-        border-radius: 8px; 
-        border: 1px solid rgba(255,255,255,0.05); 
-    }
-    
-    /* حجم الأيقونات */
-    .skill-icon {
-        width: 28px;
-        height: 28px;
-        object-fit: contain;
-    }
-    
-    .skill-level { 
-        color: #cbd5e1; 
-        font-weight: 700; 
-        font-size: 18px; 
-        font-family: 'Inter', sans-serif;
-    }
-    
+    :root { --bg: #0b0e14; --panel: #11151f; --border: #1e2433; --text: #ffffff; --dim: #8b93a3; --green: #4ade80; --blue: #3b82f6; --red: #ef4444; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--panel); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); }
+    .license-box { display: flex; flex-direction: column; gap: 4px; }
+    .license-key { font-size: 18px; font-weight: bold; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .btn { background: var(--border); color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 500; }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+    th { text-align: left; padding: 16px; color: var(--dim); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+    .acc-name { font-weight: 600; color: var(--text); font-size: 15px; }
+    .acc-pc { font-size: 12px; color: var(--dim); }
+    .skills-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .skill-box { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; color: #cbd5e1; }
+    .skill-box img { width: 20px; height: 20px; object-fit: contain; opacity: 0.8; }
+    .money-col { display: flex; flex-direction: column; gap: 4px; }
+    .money-main { font-size: 16px; font-weight: bold; }
+    .hourly { color: var(--green); font-size: 12px; font-weight: 600; background: rgba(74,222,128,0.1); padding: 2px 6px; border-radius: 4px; }
     .status { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--green); }
     .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
-    .status-dot.off { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    .status-dot.off { background: var(--red); box-shadow: 0 0 8px var(--red); }
 </style>
 </head>
 <body>
 <div class="container">
     <div class="top-bar">
-        <h2>Accounts & Logs</h2>
-        <div class="actions">
-            <button onclick="location.reload()" class="btn btn-refresh">↻ Refresh</button>
-            <a href="/logout" class="btn btn-logout">Logout</a>
+        <div class="license-box">
+            <span style="font-size:12px; color:var(--dim);">YOUR LICENSE KEY</span>
+            <span class="license-key">{{ my_license }}</span>
         </div>
+        <a href="/logout" class="btn">Logout</a>
     </div>
     <table>
-        <tr>
-            <th>Player Stats</th>
-            <th>Money</th>
-            <th>Status</th>
-        </tr>
+        <thead>
+            <tr>
+                <th>Account</th>
+                <th>Server</th>
+                <th>Level</th>
+                <th>Skills</th>
+                <th>Money</th>
+                <th>Δ (1h)</th>
+                <th>Last Update</th>
+            </tr>
+        </thead>
         <tbody id="table-body">
             {% for name, a in accounts.items() %}
             <tr>
-                <td style="width: 50%;">
-                    <div class="player-info">
-                        <span class="player-name">{{ name }}</span>
-                        <span class="total-level">⭐ Level {{ a.total_level }}</span>
-                    </div>
-                    
-                    <!-- شبكة المهارات -->
-                    <div class="skills-grid">
-                        {% for skill in a.skills %}
-                            <div class="skill-item">
-                                <!-- استدعاء الأيقونة بناءً على اسم المهارة -->
-                                {% if skill.name == 'fishing' %}
-                                    <img src="https://img.icons8.com/color/48/fishing-pole.png" class="skill-icon">
-                                {% elif skill.name == 'stamina' %}
-                                    <img src="https://img.icons8.com/color/48/battery.png" class="skill-icon">
-                                {% elif skill.name == 'shelf stocker' %}
-                                    <img src="https://img.icons8.com/color/48/package.png" class="skill-icon">
-                                {% elif skill.name == 'janitor' %}
-                                    <img src="https://img.icons8.com/color/48/broom.png" class="skill-icon">
-                                {% elif skill.name == 'swiper' %}
-                                    <img src="https://img.icons8.com/color/48/bank-card-back-side.png" class="skill-icon">
-                                {% elif skill.name == 'farming' %}
-                                    <img src="https://img.icons8.com/color/48/plant-under-sun.png" class="skill-icon">
-                                {% elif skill.name == 'cook' %}
-                                    <img src="https://img.icons8.com/color/48/steak.png" class="skill-icon">
-                                {% else %}
-                                    <img src="https://img.icons8.com/color/48/star.png" class="skill-icon">
+                <td><div class="acc-name">{{ name }}</div><div class="acc-pc">{{ a.pc }}</div></td>
+                <td style="color:var(--dim); font-size:12px;">Server 1</td>
+                <td><span style="background:#1e2433; padding:4px 8px; border-radius:4px; font-weight:bold;">{{ a.total_level }}</span></td>
+                <td>
+                    <div class="skills-row">
+                        {% for s in a.skills %}
+                            <div class="skill-box">
+                                {% if s.name == 'fishing' %}<img src="https://img.icons8.com/color/48/fishing-pole.png">
+                                {% elif s.name == 'stamina' %}<img src="https://img.icons8.com/color/48/battery.png">
+                                {% elif s.name == 'shelf stocker' %}<img src="https://img.icons8.com/color/48/package.png">
+                                {% elif s.name == 'janitor' %}<img src="https://img.icons8.com/color/48/broom.png">
+                                {% elif s.name == 'swiper' %}<img src="https://img.icons8.com/color/48/bank-card-back-side.png">
+                                {% elif s.name == 'farming' %}<img src="https://img.icons8.com/color/48/plant-under-sun.png">
+                                {% elif s.name == 'cook' %}<img src="https://img.icons8.com/color/48/steak.png">
                                 {% endif %}
-                                
-                                <span class="skill-level">{{ skill.level }}</span>
+                                {{ s.level }}
                             </div>
                         {% endfor %}
                     </div>
                 </td>
-                <td style="width: 30%;">
-                    <div class="money-box">
-                        <div class="money-row">
-                            <span class="dim">Hand (Cash):</span>
-                            <span>${{ "{:,}".format(a.cash) }}</span>
-                        </div>
-                        <div class="money-row">
-                            <span class="dim">Bank:</span>
-                            <span>${{ "{:,}".format(a.bank) }}</span>
-                        </div>
-                        <div class="money-row total">
-                            <span>All:</span>
-                            <span>${{ "{:,}".format(a.total_money) }}</span>
-                        </div>
+                <td>
+                    <div class="money-col">
+                        <span class="money-main">${{ "{:,.2f}".format(a.total_money / 1000000) }}M</span>
                     </div>
                 </td>
-                <td style="width: 20%;">
+                <td><span class="hourly">↑ +${{ "{:,.1f}".format(a.hourly / 1000) }}K/h</span></td>
+                <td>
                     <div class="status">
                         <span class="status-dot {{ '' if a.online else 'off' }}"></span>
-                        {{ "Online" if a.online else "Offline" }}
+                        {{ "just now" if a.online else "offline" }}
                     </div>
                 </td>
             </tr>
@@ -137,16 +90,12 @@
         </tbody>
     </table>
 </div>
-
 <script>
     setInterval(() => {
-        fetch(window.location.href)
-            .then(res => res.text())
-            .then(html => {
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
-            })
-            .catch(e => console.log("Auto-refresh failed", e));
+        fetch(window.location.href).then(r => r.text()).then(html => {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
+        });
     }, 5000);
 </script>
 </body>
