@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blockspin Dashboard</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    :root {
+        --bg: #0b0e14; --panel: #11151f; --border: #1e2433;
+        --text: #ffffff; --text-dim: #8b93a3;
+        --green: #4ade80; --blue: #3b82f6;
+    }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { text-align: left; padding: 12px 16px; color: var(--text-dim); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .row-hover:hover { background-color: rgba(255,255,255,0.02); }
+    
+    .level-badge { background: #1a2235; color: #cbd5e1; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-block; }
+    .money { font-weight: 700; font-size: 15px; }
+    .hourly { color: var(--green); background: rgba(74, 222, 128, 0.1); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; }
+    .status { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--green); }
+    .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
+    .status-dot.off { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    .dim { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+    .uptime { display: inline-flex; align-items: center; gap: 6px; background: #111827; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); font-size: 12px; color: #a0aec0; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Accounts</h2>
+    <table>
+        <tr>
+            <th>Level</th>
+            <th>Money</th>
+            <th>Δ (1h)</th>
+            <th>Uptime</th>
+            <th>Last Update</th>
+        </tr>
+        {% for name, a in accounts.items() %}
+        <tr class="row-hover">
+            <td>
+                <span class="level-badge">{{ a.level }}</span>
+            </td>
+            <td>
+                <div class="money">${{ "{:,.2f}".format(a.money / 1000000) }}M</div>
+                <div class="dim">H 0 · B ${{ "{:,.2f}".format(a.money / 1000000) }}M</div>
+            </td>
+            <td>
+                <span class="hourly">↑ +${{ "{:,.0f}".format(a.hourly / 1000) }}K/h</span>
+                <div class="dim">Rising</div>
+            </td>
+            <td>
+                <span class="uptime">⏱ {{ a.uptime }}h {{ (a.uptime % 1 * 60) | int }}m</span>
+            </td>
+            <td>
+                <div class="status">
+                    <span class="status-dot {{ '' if a.online else 'off' }}"></span>
+                    {{ "just now" if a.online else "offline" }}
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>
