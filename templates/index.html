@@ -6,51 +6,73 @@
 <title>AXIOM LOGS</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    :root { --bg: #0b0e14; --panel: #11151f; --border: #1e2433; --text: #ffffff; --dim: #8b93a3; --green: #4ade80; --blue: #3b82f6; --red: #ef4444; --gold: #fbbf24; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 20px; }
-    .container { max-width: 1400px; margin: 0 auto; }
+    
+    :root { 
+        --bg: #0d1017; 
+        --panel: #141822; 
+        --border: #1e2433; 
+        --text: #ffffff; 
+        --dim: #8b93a3; 
+        --green: #4ade80; 
+        --red: #ef4444; 
+        --blue: #3b82f6;
+        --gold: #fbbf24;
+    }
+    
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 1300px; }
     
     /* الشريط العلوي */
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: var(--panel); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); }
     .license-box { display: flex; flex-direction: column; gap: 4px; }
-    .license-key { font-size: 18px; font-weight: bold; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .btn { background: var(--border); color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 500; border: none; font-family: inherit; }
+    .license-key { font-size: 16px; font-weight: bold; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .btn { background: var(--border); color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-decoration: none; font-weight: 500; border: none; font-family: inherit; font-size: 13px; }
+    .btn-admin { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); margin-right: 10px; }
     
-    /* الإحصائيات المفصولة */
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: var(--panel); padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-    .stat-icon { font-size: 24px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.05); }
-    .stat-info { display: flex; flex-direction: column; }
-    .stat-title { font-size: 12px; color: var(--dim); text-transform: uppercase; font-weight: 600; }
-    .stat-value { font-size: 20px; font-weight: 700; }
-    .stat-value.green { color: var(--green); }
-    .stat-value.red { color: var(--red); }
-    .stat-value.blue { color: var(--blue); }
-    .stat-value.gold { color: var(--gold); }
+    /* الإحصائيات */
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--panel); padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+    .stat-title { font-size: 11px; color: var(--dim); text-transform: uppercase; font-weight: 600; }
+    .stat-value { font-size: 18px; font-weight: 700; }
     
     /* شريط البحث */
-    .search-bar { margin-bottom: 20px; }
-    .search-input { width: 100%; padding: 14px 20px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; color: white; font-size: 15px; outline: none; font-family: inherit; }
+    .search-bar { margin-bottom: 15px; }
+    .search-input { width: 100%; padding: 12px 15px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 14px; outline: none; font-family: inherit; }
     .search-input:focus { border-color: var(--blue); }
     
-    /* الجدول */
-    table { width: 100%; border-collapse: collapse; background: var(--panel); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-    th { text-align: left; padding: 16px; color: var(--dim); font-size: 13px; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); cursor: pointer; user-select: none; transition: 0.2s;}
-    th:hover { color: white; background: rgba(255,255,255,0.05); }
-    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+    /* الجدول الاحترافي */
+    .table-container { background: var(--panel); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 14px 16px; color: var(--dim); font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); cursor: pointer; user-select: none; transition: 0.2s;}
+    th:hover { color: white; }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: rgba(255,255,255,0.02); }
     
-    .acc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-    .acc-name { font-weight: 600; color: var(--text); font-size: 15px; }
-    .acc-pc { font-size: 12px; color: var(--dim); }
+    /* خلية الحساب */
+    .acc-cell { display: flex; flex-direction: column; gap: 4px; }
+    .acc-name { font-weight: 600; color: #e2e8f0; font-size: 13px; display: flex; align-items: center; gap: 6px;}
+    .acc-pc { font-size: 11px; color: var(--dim); text-transform: uppercase; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .status-dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red); }
     
-    /* وقت التشغيل المتحرك */
-    .uptime { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--dim); background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; width: fit-content; margin-top: 5px;}
-    .uptime i { color: var(--green); animation: spin 3s linear infinite; }
+    /* وقت التشغيل */
+    .uptime { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--dim); margin-top: 2px;}
+    .uptime svg { width: 12px; height: 12px; stroke: var(--green); animation: spin 3s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
     
-    .skills-row { display: flex; gap: 12px; flex-wrap: wrap; max-width: 250px; }
-    .skill-box { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: #fff; }
-    .skill-box svg { width: 18px; height: 18px; stroke-width: 2.5; fill: none; }
+    /* السيرفر */
+    .server-badge { background: rgba(255,255,255,0.05); border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 12px; display: inline-block; text-align: center; width: 60px;}
+    
+    /* اللفل */
+    .level-badge { background: rgba(59, 130, 246, 0.1); color: var(--blue); padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-block; border: 1px solid rgba(59, 130, 246, 0.2);}
+    
+    /* الأيقونات الصغيرة */
+    .skills-row { display: flex; gap: 10px; flex-wrap: wrap; max-width: 260px; }
+    .skill-box { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
+    .skill-box svg { width: 16px; height: 16px; stroke-width: 2.5; fill: none; }
+    
     .skill-fishing svg { stroke: #38bdf8; }
     .skill-shelf svg { stroke: #fbbf24; }
     .skill-stamina svg { stroke: #fb7185; }
@@ -60,154 +82,158 @@
     .skill-swiper svg { stroke: #2dd4bf; }
     .skill-default svg { stroke: #94a3b8; }
     
-    .money-main { font-size: 16px; font-weight: bold; color: #fff; }
-    .money-sub { font-size: 12px; color: var(--dim); margin-top: 4px; }
-    .hourly { color: var(--green); font-size: 13px; font-weight: 600; background: rgba(74,222,128,0.1); padding: 4px 8px; border-radius: 6px; }
+    /* الفلوس */
+    .money-main { font-size: 15px; font-weight: 700; color: #fff; }
+    .money-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
     
-    .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.2s; }
-    .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
+    /* الأرباح */
+    .hourly { color: var(--green); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px;}
+    .hourly.neg { color: var(--red); }
+    .hourly-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+    
+    /* زر الحذف */
+    .btn-delete { background: transparent; color: var(--dim); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.1); color: var(--red); border-color: rgba(239, 68, 68, 0.3); }
 </style>
 </head>
 <body>
 <div class="container">
     <div class="top-bar">
         <div class="license-box">
-            <span style="font-size:12px; color:var(--dim);">YOUR LICENSE KEY</span>
+            <span style="font-size:11px; color:var(--dim); text-transform:uppercase;">Your License Key</span>
             <span class="license-key">{{ my_key }}</span>
         </div>
         <div>
             {% if is_admin %}
-                <a href="/admin" class="btn" style="background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); margin-right: 10px;">Admin Panel</a>
+                <a href="/admin" class="btn btn-admin">Admin Panel</a>
             {% endif %}
             <a href="/logout" class="btn">Logout</a>
         </div>
     </div>
 
-    <!-- الإحصائيات المفصولة -->
+    <!-- الإحصائيات -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon" style="color: var(--blue);">👥</div>
-            <div class="stat-info">
-                <span class="stat-title">Total Accounts</span>
-                <span class="stat-value blue">{{ stats.total }}</span>
-            </div>
+            <span class="stat-title">Total Accounts</span>
+            <span class="stat-value" style="color: var(--blue);">{{ stats.total }}</span>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="color: var(--green);">🟢</div>
-            <div class="stat-info">
-                <span class="stat-title">Online</span>
-                <span class="stat-value green">{{ stats.online }}</span>
-            </div>
+            <span class="stat-title">Online</span>
+            <span class="stat-value" style="color: var(--green);">{{ stats.online }}</span>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="color: var(--red);">🔴</div>
-            <div class="stat-info">
-                <span class="stat-title">Offline</span>
-                <span class="stat-value red">{{ stats.offline }}</span>
-            </div>
+            <span class="stat-title">Offline</span>
+            <span class="stat-value" style="color: var(--red);">{{ stats.offline }}</span>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="color: var(--green);">💵</div>
-            <div class="stat-info">
-                <span class="stat-title">Total Cash</span>
-                <span class="stat-value green">${{ "{:,.0f}".format(stats.total_cash) }}</span>
-            </div>
+            <span class="stat-title">Total Cash</span>
+            <span class="stat-value" style="color: var(--green);">${{ "{:,.0f}".format(stats.total_cash) }}</span>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="color: var(--blue);">🏦</div>
-            <div class="stat-info">
-                <span class="stat-title">Total Bank</span>
-                <span class="stat-value blue">${{ "{:,.0f}".format(stats.total_bank) }}</span>
-            </div>
+            <span class="stat-title">Total Bank</span>
+            <span class="stat-value" style="color: var(--blue);">${{ "{:,.0f}".format(stats.total_bank) }}</span>
         </div>
     </div>
 
-    <!-- شريط البحث -->
     <div class="search-bar">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search by Account Name...">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by Account Name...">
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Account</th>
-                <th onclick="sortTable('level')" id="th-level">Level ↕</th>
-                <th>Skills</th>
-                <th onclick="sortTable('money')" id="th-money">Money ↕</th>
-                <th>Δ (1h)</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            {% for a in accounts %}
-            <tr class="account-row" data-name="{{ a.name|lower }}">
-                <td>
-                    <div class="acc-header">
-                        <span class="acc-name">{{ a.name }}</span>
-                        {% if a.online %}
-                            <span class="status-badge online" style="font-size:10px; padding:2px 6px; border-radius:4px; background:rgba(74,222,128,0.1); color:var(--green); border:1px solid rgba(74,222,128,0.3);">Online</span>
-                        {% else %}
-                            <span class="status-badge offline" style="font-size:10px; padding:2px 6px; border-radius:4px; background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.3);">Offline</span>
-                        {% endif %}
-                    </div>
-                    <div class="acc-pc">{{ a.pc }}</div>
-                    {% if a.online %}
-                    <div class="uptime"><i>⏱</i> <span class="uptime-val" data-time="{{ a.uptime }}">{{ a.uptime }}s</span> running</div>
-                    {% endif %}
-                </td>
-                <td><span class="level-val" style="background:#1e2433; padding:4px 10px; border-radius:6px; font-weight:bold; color:#cbd5e1;">{{ a.total_level }}</span></td>
-                <td>
-                    <div class="skills-row">
-                        {% for s in a.skills %}
-                            <div class="skill-box 
-                                {% if s.name == 'fishing' %}skill-fishing
-                                {% elif s.name == 'shelf stocker' %}skill-shelf
-                                {% elif s.name == 'stamina' %}skill-stamina
-                                {% elif s.name == 'farming' %}skill-farming
-                                {% elif s.name == 'janitor' %}skill-janitor
-                                {% elif s.name == 'cook' %}skill-cook
-                                {% elif s.name == 'swiper' %}skill-swiper
-                                {% else %}skill-default{% endif %}">
-                                
-                                {% if s.name == 'fishing' %}
-                                    <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
-                                {% elif s.name == 'shelf stocker' %}
-                                    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                                {% elif s.name == 'stamina' %}
-                                    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                {% elif s.name == 'farming' %}
-                                    <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
-                                {% elif s.name == 'janitor' %}
-                                    <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
-                                {% elif s.name == 'cook' %}
-                                    <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
-                                {% elif s.name == 'swiper' %}
-                                    <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                                {% else %}
-                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-                                {% endif %}
-                                
-                                {{ s.level }}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Server</th>
+                    <th onclick="sortTable('level')" id="th-level">Level ↕</th>
+                    <th>Skills</th>
+                    <th onclick="sortTable('money')" id="th-money">Money ↕</th>
+                    <th>Δ (1h)</th>
+                    <th>Last Update</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                {% for a in accounts %}
+                <tr class="account-row" data-name="{{ a.name|lower }}">
+                    <td>
+                        <div class="acc-cell">
+                            <span class="acc-name">
+                                <span class="status-dot {{ 'online' if a.online else 'offline' }}"></span>
+                                {{ a.name }}
+                            </span>
+                            <span class="acc-pc">{{ a.pc }}</span>
+                            {% if a.online %}
+                            <div class="uptime">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span class="uptime-val" data-time="{{ a.uptime }}">{{ a.uptime }}s</span>
                             </div>
-                        {% endfor %}
-                    </div>
-                </td>
-                <td>
-                    <div class="money-main money-val" data-money="{{ a.total_money }}">${{ "{:,.0f}".format(a.total_money) }}</div>
-                    <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash) }} | Bank: ${{ "{:,.0f}".format(a.bank) }}</div>
-                </td>
-                <td><span class="hourly">↑ +${{ "{:,.0f}".format(a.hourly) }}/h</span></td>
-                <td>
-                    <button class="btn-delete" onclick="deleteAcc('{{ a.name }}')">Delete</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td><span class="server-badge">Server 1</span></td>
+                    <td><span class="level-val level-badge">{{ a.total_level }}</span></td>
+                    <td>
+                        <div class="skills-row">
+                            {% for s in a.skills %}
+                                <div class="skill-box 
+                                    {% if s.name == 'fishing' %}skill-fishing
+                                    {% elif s.name == 'shelf stocker' %}skill-shelf
+                                    {% elif s.name == 'stamina' %}skill-stamina
+                                    {% elif s.name == 'farming' %}skill-farming
+                                    {% elif s.name == 'janitor' %}skill-janitor
+                                    {% elif s.name == 'cook' %}skill-cook
+                                    {% elif s.name == 'swiper' %}skill-swiper
+                                    {% else %}skill-default{% endif %}">
+                                    {% if s.name == 'fishing' %}
+                                        <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
+                                    {% elif s.name == 'shelf stocker' %}
+                                        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                    {% elif s.name == 'stamina' %}
+                                        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                    {% elif s.name == 'farming' %}
+                                        <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
+                                    {% elif s.name == 'janitor' %}
+                                        <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
+                                    {% elif s.name == 'cook' %}
+                                        <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
+                                    {% elif s.name == 'swiper' %}
+                                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                    {% else %}
+                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                                    {% endif %}
+                                    {{ s.level }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="money-main money-val" data-money="{{ a.total_money }}">${{ "{:,.2f}".format(a.total_money / 1000000) }}M</div>
+                        <div class="money-sub">H ${{ "{:,.0f}".format(a.cash / 1000) }}K · B ${{ "{:,.0f}".format(a.bank / 1000) }}K</div>
+                    </td>
+                    <td>
+                        <span class="hourly {{ 'neg' if a.hourly < 0 else '' }}">
+                            {{ '↑' if a.hourly >= 0 else '↓' }} +${{ "{:,.1f}".format(a.hourly / 1000) }}K/h
+                        </span>
+                        <div class="hourly-sub">{{ "Rising" if a.hourly >= 0 else "Dropping" }}</div>
+                    </td>
+                    <td>
+                        <span style="color: var(--green); display: flex; align-items: center; gap: 4px;">
+                            <span class="status-dot online"></span> just now
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteAcc('{{ a.name }}')">⋯</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    // --- 1. البحث الفوري ---
+    // البحث
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const val = e.target.value.toLowerCase();
         document.querySelectorAll('.account-row').forEach(row => {
@@ -216,18 +242,14 @@
         });
     });
 
-    // --- 2. الفرز (يضغط مرة يفرز تصاعدي، يضغط ثاني تنازلي) ---
+    // الفرز
     let sortState = { col: null, asc: true };
     function sortTable(col) {
         const tbody = document.getElementById('table-body');
         const rows = Array.from(tbody.querySelectorAll('.account-row'));
         
-        if (sortState.col === col) {
-            sortState.asc = !sortState.asc;
-        } else {
-            sortState.col = col;
-            sortState.asc = true;
-        }
+        if (sortState.col === col) sortState.asc = !sortState.asc;
+        else { sortState.col = col; sortState.asc = true; }
 
         rows.sort((a, b) => {
             let valA, valB;
@@ -244,21 +266,18 @@
         tbody.innerHTML = '';
         rows.forEach(row => tbody.appendChild(row));
         
-        // تحديث الأسهم
         document.getElementById('th-level').innerText = 'Level ' + (sortState.col === 'level' ? (sortState.asc ? '↑' : '↓') : '↕');
         document.getElementById('th-money').innerText = 'Money ' + (sortState.col === 'money' ? (sortState.asc ? '↑' : '↓') : '↕');
     }
 
-    // --- 3. عداد وقت التشغيل (يشتغل مباشرة) ---
+    // العداد
     setInterval(() => {
         document.querySelectorAll('.uptime-val').forEach(el => {
             let sec = parseInt(el.getAttribute('data-time')) + 1;
             el.setAttribute('data-time', sec);
-            
             let h = Math.floor(sec / 3600);
             let m = Math.floor((sec % 3600) / 60);
             let s = sec % 60;
-            
             let text = '';
             if (h > 0) text += h + 'h ';
             if (m > 0) text += m + 'm ';
@@ -267,7 +286,7 @@
         });
     }, 1000);
 
-    // --- 4. تحديث الجدول كل 5 ثواني ---
+    // التحديث
     setInterval(() => {
         fetch(window.location.href)
             .then(res => res.text())
