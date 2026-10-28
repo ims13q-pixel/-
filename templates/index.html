@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AXIOM LOGS</title>
+<title>OVERSEER | Dashboard</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     :root { 
         --bg: #090a0f; 
@@ -18,62 +18,73 @@
         --red: #ef4444; 
         --blue: #3b82f6;
         --purple: #a855f7;
+        --gold: #fbbf24;
     }
     
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 24px; }
     .container { max-width: 1400px; margin: 0 auto; }
     
-    /* الشريط العلوي */
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .license-box { display: flex; flex-direction: column; gap: 4px; }
-    .license-title { font-size: 12px; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;}
-    .license-key { font-size: 18px; font-weight: 700; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2); }
+    /* الشريط العلوي (اللوقو + معلومات الحساب) */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .brand { display: flex; align-items: center; gap: 15px; }
+    .brand img { height: 28px; filter: invert(1); } /* اللوقو */
+    .brand span { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+    
+    .user-info { display: flex; align-items: center; gap: 20px; }
+    .license-box { display: flex; flex-direction: column; gap: 4px; text-align: right; }
+    .license-title { font-size: 11px; color: var(--dim); font-weight: 600; text-transform: uppercase; }
+    .license-key { font-size: 14px; font-weight: 700; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2); }
     .btn { background: var(--panel); border: 1px solid var(--border); color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 13px; transition: 0.2s; }
     .btn:hover { background: var(--panel-hover); }
-    .btn-admin { color: var(--purple); border-color: rgba(168, 85, 247, 0.3); margin-right: 10px; }
+    .btn-admin { color: var(--purple); border-color: rgba(168, 85, 247, 0.3); }
     
-    /* لوحة الإحصائيات (زي الصورة) */
+    /* لوحة الإحصائيات */
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: var(--panel); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
-    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+    .stat-card { background: var(--panel); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; transition: transform 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); border-color: #333a4e; }
+    
+    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; }
+    /* حركة نبض للأيقونات */
+    .pulse { animation: pulse-anim 2.5s infinite; }
+    @keyframes pulse-anim { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+    
     .stat-info { display: flex; flex-direction: column; gap: 4px; }
     .stat-title { font-size: 13px; color: var(--dim); font-weight: 500; }
-    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-value { font-size: 24px; font-weight: 800; }
     
-    /* صناديق الفلوس (زي Item Monitor بالصورة) */
+    /* صندوق الفلوس */
     .money-monitor { background: var(--panel); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 24px; }
-    .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .monitor-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .monitor-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .money-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .money-card { background: var(--bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .money-card { background: var(--bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
     .money-card-icon { font-size: 24px; }
     .money-card-info { display: flex; flex-direction: column; }
-    .money-card-title { font-size: 12px; color: var(--dim); }
-    .money-card-val { font-size: 16px; font-weight: 700; color: #fff; }
+    .money-card-title { font-size: 12px; color: var(--dim); text-transform: uppercase; }
+    .money-card-val { font-size: 18px; font-weight: 700; color: #fff; }
     
     /* الجدول */
     .table-container { background: var(--panel); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-    .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .search-input { padding: 10px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 13px; outline: none; width: 250px; transition: 0.2s; }
+    .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
+    .search-input { padding: 10px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 13px; outline: none; width: 280px; transition: 0.2s; }
     .search-input:focus { border-color: var(--blue); }
     
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 16px; color: var(--dim); font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); cursor: pointer; transition: 0.2s; }
+    th { text-align: left; padding: 16px; color: var(--dim); font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
     th:hover { color: white; }
     td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover { background: var(--panel-hover); }
     
     .acc-cell { display: flex; flex-direction: column; gap: 4px; }
-    .acc-name { font-weight: 600; color: #e2e8f0; font-size: 14px; display: flex; align-items: center; gap: 8px;}
+    .acc-name { font-weight: 600; color: #e2e8f0; font-size: 15px; display: flex; align-items: center; gap: 8px;}
     .acc-pc { font-size: 12px; color: var(--dim); text-transform: uppercase; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; }
     .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
     .status-dot.offline { background: var(--red); box-shadow: 0 0 8px var(--red); }
     
-    .uptime { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--green); background: rgba(74,222,128,0.1); padding: 2px 6px; border-radius: 4px; width: fit-content; margin-top: 4px;}
+    .uptime { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); background: rgba(74,222,128,0.1); padding: 3px 8px; border-radius: 4px; width: fit-content; margin-top: 4px; font-weight: 600;}
     
-    .level-badge { background: rgba(59, 130, 246, 0.1); color: var(--blue); padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block; }
+    .level-badge { background: rgba(59, 130, 246, 0.1); color: var(--blue); padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 15px; display: inline-block; border: 1px solid rgba(59,130,246,0.2);}
     
     .skills-row { display: flex; gap: 12px; flex-wrap: wrap; max-width: 260px; }
     .skill-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
@@ -88,11 +99,10 @@
     .skill-swiper svg { stroke: #2dd4bf; }
     .skill-default svg { stroke: #94a3b8; }
     
-    /* الفلوس بالجدول */
-    .money-main { font-size: 16px; font-weight: 700; color: #fff; }
+    .money-main { font-size: 16px; font-weight: 800; color: #fff; }
     .money-sub { font-size: 12px; color: var(--dim); margin-top: 4px; }
     
-    .hourly { color: var(--green); font-size: 14px; font-weight: 600; background: rgba(74,222,128,0.1); padding: 4px 8px; border-radius: 6px; display: inline-block; }
+    .hourly { color: var(--green); font-size: 13px; font-weight: 700; background: rgba(74,222,128,0.1); padding: 4px 8px; border-radius: 6px; display: inline-block; }
     .hourly.neg { color: var(--red); background: rgba(239,68,68,0.1); }
     
     .btn-delete { background: transparent; color: var(--dim); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.2s; }
@@ -103,75 +113,76 @@
 <div class="container">
     <!-- التوب بار -->
     <div class="top-bar">
-        <div class="license-box">
-            <span class="license-title">Your License Key</span>
-            <span class="license-key">{{ my_key }}</span>
+        <div class="brand">
+            <!-- الشعار -->
+            <span style="font-weight:800; font-size:24px; letter-spacing:-0.5px;">OVERSEER</span>
         </div>
-        <div>
+        <div class="user-info">
+            <div class="license-box">
+                <span class="license-title">Your License</span>
+                <span class="license-key">{{ my_key }}</span>
+            </div>
             {% if is_admin %}
-                <a href="/admin" class="btn btn-admin">Admin Panel</a>
+                <a href="/admin" class="btn btn-admin">Admin</a>
             {% endif %}
             <a href="/logout" class="btn">Logout</a>
         </div>
     </div>
 
-    <!-- الإحصائيات (زي الصورة) -->
+    <!-- الإحصائيات -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(74,222,128,0.1); color: var(--green);">📶</div>
+            <div class="stat-icon pulse" style="background: rgba(74,222,128,0.1); color: var(--green);">📊</div>
             <div class="stat-info">
                 <span class="stat-title">Online</span>
                 <span class="stat-value">{{ stats.online }}</span>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(239,68,68,0.1); color: var(--red);">🔴</div>
+            <div class="stat-icon pulse" style="background: rgba(239,68,68,0.1); color: var(--red);">🔴</div>
             <div class="stat-info">
                 <span class="stat-title">Offline</span>
                 <span class="stat-value">{{ stats.offline }}</span>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(168,85,247,0.1); color: var(--purple);">👥</div>
+            <div class="stat-icon pulse" style="background: rgba(168,85,247,0.1); color: var(--purple);">👥</div>
             <div class="stat-info">
                 <span class="stat-title">Total Accounts</span>
                 <span class="stat-value">{{ stats.total }}</span>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background: rgba(59,130,246,0.1); color: var(--blue);">💎</div>
+            <div class="stat-icon pulse" style="background: rgba(59,130,246,0.1); color: var(--blue);">💎</div>
             <div class="stat-info">
                 <span class="stat-title">Total Value</span>
-                <!-- نجمع الكاش والبنك هنا -->
                 <span class="stat-value">${{ "{:,.0f}".format(stats.total_cash + stats.total_bank) }}</span>
             </div>
         </div>
     </div>
 
-    <!-- صندوق الفلوس (زي Item Monitor) -->
+    <!-- صندوق الفلوس -->
     <div class="money-monitor">
-        <div class="monitor-header">
-            <span class="monitor-title">💵 Money Monitor</span>
-        </div>
+        <div class="monitor-title">💰 Money Monitor</div>
         <div class="money-cards">
             <div class="money-card">
                 <span class="money-card-icon">💵</span>
                 <div class="money-card-info">
-                    <span class="money-card-title">Total Cash</span>
+                    <span class="money-card-title">Cash</span>
                     <span class="money-card-val">${{ "{:,.0f}".format(stats.total_cash) }}</span>
                 </div>
             </div>
             <div class="money-card">
                 <span class="money-card-icon">🏦</span>
                 <div class="money-card-info">
-                    <span class="money-card-title">Total Bank</span>
+                    <span class="money-card-title">Bank</span>
                     <span class="money-card-val">${{ "{:,.0f}".format(stats.total_bank) }}</span>
                 </div>
             </div>
             <div class="money-card">
                 <span class="money-card-icon">💰</span>
                 <div class="money-card-info">
-                    <span class="money-card-title">Total Combined</span>
+                    <span class="money-card-title">Combined</span>
                     <span class="money-card-val">${{ "{:,.0f}".format(stats.total_cash + stats.total_bank) }}</span>
                 </div>
             </div>
@@ -181,14 +192,14 @@
     <!-- الجدول -->
     <div class="table-container">
         <div class="table-header">
-            <span style="font-weight: 600;">Accounts List</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search accounts...">
+            <span style="font-weight: 700; font-size:15px;">Accounts List</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search accounts...">
         </div>
         <table>
             <thead>
                 <tr>
                     <th>Account</th>
-                    <th>Server</th>
+                    <th>Status</th>
                     <th onclick="sortTable('level')" id="th-level">Level ↕</th>
                     <th>Skills</th>
                     <th onclick="sortTable('money')" id="th-money">Money ↕</th>
@@ -206,14 +217,15 @@
                                 {{ a.name }}
                             </span>
                             <span class="acc-pc">{{ a.pc }}</span>
-                            {% if a.online %}
-                            <div class="uptime">
-                                ⏱ <span class="uptime-val" data-time="{{ a.uptime }}">{{ a.uptime }}s</span> running
-                            </div>
-                            {% endif %}
                         </div>
                     </td>
-                    <td><span style="color: var(--dim); font-size: 13px;">Server 1</span></td>
+                    <td>
+                        {% if a.online %}
+                            <div class="uptime">⏱ <span class="uptime-val" data-time="{{ a.uptime }}">{{ a.uptime }}s</span></div>
+                        {% else %}
+                            <span style="color: var(--dim); font-size: 13px;">Offline</span>
+                        {% endif %}
+                    </td>
                     <td><span class="level-val level-badge">{{ a.total_level }}</span></td>
                     <td>
                         <div class="skills-row">
@@ -250,7 +262,6 @@
                         </div>
                     </td>
                     <td>
-                        <!-- عرض الرقم الحقيقي كامل بدون M أو K -->
                         <div class="money-main money-val" data-money="{{ a.total_money }}">${{ "{:,.0f}".format(a.total_money) }}</div>
                         <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash) }}</div>
                     </td>
@@ -270,7 +281,6 @@
 </div>
 
 <script>
-    // البحث
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const val = e.target.value.toLowerCase();
         document.querySelectorAll('.account-row').forEach(row => {
@@ -279,7 +289,6 @@
         });
     });
 
-    // الفرز
     let sortState = { col: null, asc: true };
     function sortTable(col) {
         const tbody = document.getElementById('table-body');
@@ -307,7 +316,6 @@
         document.getElementById('th-money').innerText = 'Money ' + (sortState.col === 'money' ? (sortState.asc ? '↑' : '↓') : '↕');
     }
 
-    // العداد
     setInterval(() => {
         document.querySelectorAll('.uptime-val').forEach(el => {
             let sec = parseInt(el.getAttribute('data-time')) + 1;
@@ -323,7 +331,6 @@
         });
     }, 1000);
 
-    // التحديث التلقائي
     setInterval(() => {
         fetch(window.location.href)
             .then(res => res.text())
