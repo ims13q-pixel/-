@@ -4,10 +4,8 @@ import hashlib
 import os
 
 app = Flask(__name__)
-# مفتاح ثابت عشان الجلسات ما تطير كل ما شغل السيرفر
 app.secret_key = "super_secret_blockspin_key_123"
 
-# مخزن الحسابات في الذاكرة
 users = {}
 accounts = {}
 
@@ -26,7 +24,7 @@ def register():
             return jsonify({"error": "اسم المستخدم موجود مسبقاً"}), 400
             
         users[username] = hash_pass(data["password"])
-        session["user"] = username # يسجل دخولك فوراً
+        session["user"] = username
         return jsonify({"ok": True, "message": "تم التسجيل بنجاح"})
     return render_template("auth.html", mode="register")
 
@@ -58,8 +56,8 @@ def index():
     
     now = time.time()
     for name, a in accounts.items():
-        a["uptime_display"] = round(a.get("uptime", 0), 2)
         a["online"] = (now - a.get("last_seen", 0)) < 120
+        a["total_money"] = a.get("cash", 0) + a.get("bank", 0) # حساب المجموع
     return render_template("index.html", accounts=accounts)
 
 @app.route("/api/report", methods=["POST"])
@@ -75,10 +73,11 @@ def report():
     if name in accounts and (now - accounts[name]["last_seen"]) < 120:
         uptime += (now - accounts[name]["last_seen"]) / 3600
         
+    # نحدث البيانات ونحتفظ بالمهارات
     accounts[name] = {
-        "level": data.get("level", 0),
-        "money": data.get("money", 0),
-        "hourly": data.get("hourly", 0),
+        "cash": data.get("cash", 0),
+        "bank": data.get("bank", 0),
+        "skills": data.get("skills", {}),
         "uptime": uptime,
         "last_seen": now,
     }
