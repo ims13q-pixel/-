@@ -4,9 +4,9 @@ import time, hashlib
 app = Flask(__name__)
 app.secret_key = "axiom_blockspin_secret_123"
 
-# تخزين في الذاكرة (عشان Vercel ما يعطي خطأ لأنه ما يسمح بحفظ الملفات)
-# حساب الأدمن الافتراضي (admin / admin)
+# تخزين في الذاكرة (Vercel يمسحها إذا طفى السيرفر)
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
+passwords = {"admin": "admin"} # نحفظ الباسورد العادي عشان الأدمن يشوفه
 accounts = {}
 
 @app.route("/register", methods=["GET", "POST"])
@@ -16,7 +16,6 @@ def register():
         username = data.get("username", "").strip()
         password = data.get("password", "").strip()
         
-        # شرط: الاسم أكثر من 3 حروف
         if len(username) <= 3:
             return jsonify({"error": "اسم المستخدم يجب أن يكون 4 حروف أو أكثر"}), 400
         if len(password) < 4:
@@ -25,6 +24,7 @@ def register():
             return jsonify({"error": "الاسم موجود مسبقاً"}), 400
             
         users[username] = hashlib.sha256(password.encode()).hexdigest()
+        passwords[username] = password
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -64,25 +64,21 @@ def index():
     all_accounts = []
 
     for name, a in accounts.items():
-        # إذا مو أدمن، يشوف بس الحسابات اللي مفتاحها يطابق اسمه
         if not is_admin and a.get("key") != my_key:
             continue
             
         total_accounts += 1
-        
-        # 🔴 هنا التعديل: 15 ثانية بس عشان ينقلب أوفلاين بسرعة (لأن السكربت يرسل كل 5 ثواني)
         is_online = (now - a.get("last_seen", 0)) < 15 
         a["online"] = is_online
         
         if is_online: 
             online_count += 1
-            if "login_time" not in a:
-                a["login_time"] = now
+            if "login_time" not in a: a["login_time"] = now
             a["uptime"] = int(now - a["login_time"])
         else: 
             offline_count += 1
             a["uptime"] = 0
-            a["login_time"] = now # تصفير العداد لما يطلع أوفلاين
+            a["login_time"] = now
             
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
         if "hourly" not in a: a["hourly"] = 0
@@ -108,7 +104,14 @@ def index():
 def admin_panel():
     if session.get("user") != "admin":
         return "Access Denied", 403
-    return render_template("admin.html", users=list(users.keys()))
+    
+    game_accounts = []
+    for name, a in accounts.items():
+        acc = a.copy()
+        acc["name"] = name
+        game_accounts.append(acc)
+        
+    return render_template("admin.html", users=passwords, accounts=game_accounts)
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
@@ -122,8 +125,6 @@ def delete_account():
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
-    
-    # استقبال البيانات بالحروف المختصرة من السكربت المشفر
     username_key = data.get("k")
     if not username_key or username_key not in users:
         return jsonify({"error": "Unauthorized"}), 401
@@ -136,11 +137,9 @@ def report():
     current_money = cash + bank
     level = int(data.get("l", 0) or 0)
     
-    # معالجة المهارات
     raw_skills = data.get("s", [])
     skills = [{"name": sk.get("name"), "level": int(sk.get("level", 0))} for sk in raw_skills]
     
-    # حساب الأرباح في الساعة
     hourly = 0
     if name in accounts and (now - accounts[name].get("last_seen", now)) > 10:
         old_money = accounts[name].get("total_money", current_money)
@@ -159,9 +158,8 @@ def report():
         "hourly": hourly,
         "total_level": level,
         "skills": skills,
-        "last_seen": now # تحديث النبض عشان يظل أونلاين
+        "last_seen": now
     })
-    
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
