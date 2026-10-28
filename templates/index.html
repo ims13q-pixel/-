@@ -5,90 +5,138 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>OVERSEER | Dashboard</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
     
     :root { 
         --bg: #090a0f; 
-        --panel: #12141c; 
-        --panel-hover: #1a1d27;
-        --border: #232736; 
+        --sidebar-bg: #12141c;
+        --panel: #161922; 
+        --panel-hover: #1f232f;
+        --border: #2a2f3f; 
         --text: #ffffff; 
         --dim: #8b93a3; 
         --green: #4ade80; 
         --red: #ef4444; 
         --blue: #3b82f6;
         --purple: #a855f7;
-        --gold: #fbbf24;
     }
     
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 24px; }
-    .container { max-width: 1400px; margin: 0 auto; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
     
-    /* الشريط العلوي (اللوقو + معلومات الحساب) */
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-    .brand { display: flex; align-items: center; gap: 15px; }
-    .brand img { height: 28px; filter: invert(1); } /* اللوقو */
-    .brand span { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+    /* ===== الشريط الجانبي ===== */
+    .sidebar { width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; position: relative; }
     
-    .user-info { display: flex; align-items: center; gap: 20px; }
-    .license-box { display: flex; flex-direction: column; gap: 4px; text-align: right; }
-    .license-title { font-size: 11px; color: var(--dim); font-weight: 600; text-transform: uppercase; }
-    .license-key { font-size: 14px; font-weight: 700; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2); }
-    .btn { background: var(--panel); border: 1px solid var(--border); color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 13px; transition: 0.2s; }
-    .btn:hover { background: var(--panel-hover); }
-    .btn-admin { color: var(--purple); border-color: rgba(168, 85, 247, 0.3); }
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; padding: 0 10px; }
+    .brand-logo { width: 36px; height: 36px; background: #fff; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #000; font-weight: 900; font-size: 20px; }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-title { font-size: 18px; font-weight: 900; letter-spacing: 0.5px;}
     
-    /* لوحة الإحصائيات */
-    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: var(--panel); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; transition: transform 0.2s; }
-    .stat-card:hover { transform: translateY(-2px); border-color: #333a4e; }
+    .nav-section { font-size: 11px; font-weight: 800; color: var(--dim); text-transform: uppercase; margin-bottom: 10px; padding: 0 10px; margin-top: 20px;}
+    .nav-links { display: flex; flex-direction: column; gap: 4px; }
+    .nav-link { color: #cbd5e1; text-decoration: none; font-weight: 700; font-size: 14px; padding: 10px 12px; border-radius: 8px; transition: 0.2s; display: flex; align-items: center; gap: 12px; }
+    .nav-link:hover, .nav-link.active { background: var(--panel-hover); color: #fff; }
+    .nav-link svg { width: 18px; height: 18px; stroke-width: 2; fill: none; stroke: currentColor; }
     
-    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; }
-    /* حركة نبض للأيقونات */
-    .pulse { animation: pulse-anim 2.5s infinite; }
-    @keyframes pulse-anim { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+    /* حساب المستخدم تحت (القائمة المنسدلة) */
+    .user-container { margin-top: auto; position: relative; }
+    .user-profile { background: var(--panel); padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+    .user-profile:hover { background: var(--panel-hover); }
+    .user-info-wrap { display: flex; align-items: center; gap: 12px; }
+    .user-avatar { width: 36px; height: 36px; background: #334155; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 14px; color: #fff; }
+    .user-info { display: flex; flex-direction: column; }
+    .user-name { font-size: 14px; font-weight: 800; }
+    .user-role { font-size: 11px; color: var(--dim); font-weight: 700; }
+    .chevron { width: 16px; height: 16px; stroke: var(--dim); transition: 0.3s; }
+    .user-container.active .chevron { transform: rotate(180deg); }
     
+    /* قائمة الخروج المنسدلة */
+    .dropdown { position: absolute; bottom: calc(100% + 10px); left: 0; width: 100%; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 5px; display: none; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 10; }
+    .user-container.active .dropdown { display: flex; }
+    .dropdown-item { padding: 10px 12px; border-radius: 8px; color: var(--red); font-weight: 800; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+    .dropdown-item:hover { background: rgba(239,68,68,0.1); }
+    .dropdown-item svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+
+    /* ===== المحتوى الرئيسي ===== */
+    .main-content { flex: 1; padding: 30px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; }
+    .breadcrumbs { display: flex; align-items: center; gap: 10px; color: var(--dim); font-size: 14px; font-weight: 700; }
+    .breadcrumbs span.active { color: #fff; }
+    .page-title { font-size: 22px; font-weight: 900; margin-top: 5px; }
+    
+    .top-actions { display: flex; gap: 15px; align-items: center; }
+    .license-box { display: flex; flex-direction: column; gap: 4px; text-align: right; margin-right: 15px; }
+    .license-title { font-size: 11px; color: var(--dim); font-weight: 800; text-transform: uppercase; }
+    .license-key { font-size: 13px; font-weight: 900; color: var(--blue); background: rgba(59, 130, 246, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2); }
+    
+    .btn-refresh { background: var(--panel); border: 1px solid var(--border); color: white; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+    .btn-refresh:hover { background: var(--panel-hover); }
+    .btn-refresh svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; }
+    .btn-refresh.spinning svg { animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .stat-card { background: var(--panel); padding: 20px; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; transition: 0.3s; }
+    .stat-card:hover { transform: translateY(-2px); border-color: #3b4255; }
+    
+    .stat-icon { width: 54px; height: 54px; border-radius: 14px; display: flex; justify-content: center; align-items: center; position: relative; }
+    .stat-icon svg { width: 24px; height: 24px; fill: none; stroke-width: 2.5; }
+    
+    .neon-green { background: rgba(74,222,128,0.1); color: var(--green); box-shadow: 0 0 15px rgba(74,222,128,0.15); animation: pulse-green 2s infinite; }
+    .neon-green svg { stroke: var(--green); }
+    .neon-red { background: rgba(239,68,68,0.1); color: var(--red); box-shadow: 0 0 15px rgba(239,68,68,0.15); animation: pulse-red 2s infinite; }
+    .neon-red svg { stroke: var(--red); }
+    .neon-purple { background: rgba(168,85,247,0.1); color: var(--purple); box-shadow: 0 0 15px rgba(168,85,247,0.15); }
+    .neon-purple svg { stroke: var(--purple); }
+    .neon-blue { background: rgba(59,130,246,0.1); color: var(--blue); box-shadow: 0 0 15px rgba(59,130,246,0.15); }
+    .neon-blue svg { stroke: var(--blue); }
+    
+    @keyframes pulse-green { 0% { box-shadow: 0 0 10px rgba(74,222,128,0.1); } 50% { box-shadow: 0 0 20px rgba(74,222,128,0.3); } 100% { box-shadow: 0 0 10px rgba(74,222,128,0.1); } }
+    @keyframes pulse-red { 0% { box-shadow: 0 0 10px rgba(239,68,68,0.1); } 50% { box-shadow: 0 0 20px rgba(239,68,68,0.3); } 100% { box-shadow: 0 0 10px rgba(239,68,68,0.1); } }
+
     .stat-info { display: flex; flex-direction: column; gap: 4px; }
-    .stat-title { font-size: 13px; color: var(--dim); font-weight: 500; }
-    .stat-value { font-size: 24px; font-weight: 800; }
+    .stat-title { font-size: 13px; color: var(--dim); font-weight: 800; }
+    .stat-value { font-size: 26px; font-weight: 900; }
     
-    /* صندوق الفلوس */
-    .money-monitor { background: var(--panel); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 24px; }
-    .monitor-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-    .money-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .money-card { background: var(--bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
-    .money-card-icon { font-size: 24px; }
+    .money-monitor { background: var(--panel); padding: 24px; border-radius: 16px; border: 1px solid var(--border); }
+    .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .monitor-title { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+    .money-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .money-card { background: var(--bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
+    .money-card-icon { font-size: 28px; }
     .money-card-info { display: flex; flex-direction: column; }
-    .money-card-title { font-size: 12px; color: var(--dim); text-transform: uppercase; }
-    .money-card-val { font-size: 18px; font-weight: 700; color: #fff; }
+    .money-card-title { font-size: 12px; color: var(--dim); font-weight: 800; }
+    .money-card-val { font-size: 20px; font-weight: 900; color: #fff; }
     
-    /* الجدول */
     .table-container { background: var(--panel); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-    .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
-    .search-input { padding: 10px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: white; font-size: 13px; outline: none; width: 280px; transition: 0.2s; }
-    .search-input:focus { border-color: var(--blue); }
+    .table-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .search-input { padding: 12px 18px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 14px; outline: none; width: 300px; font-weight: 600; transition: 0.2s; }
+    .search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
     
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; padding: 16px; color: var(--dim); font-size: 12px; font-weight: 600; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
+    th { text-align: left; padding: 18px; color: var(--dim); font-size: 12px; font-weight: 900; border-bottom: 1px solid var(--border); text-transform: uppercase; cursor: pointer; }
     th:hover { color: white; }
-    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+    td { padding: 18px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover { background: var(--panel-hover); }
     
-    .acc-cell { display: flex; flex-direction: column; gap: 4px; }
-    .acc-name { font-weight: 600; color: #e2e8f0; font-size: 15px; display: flex; align-items: center; gap: 8px;}
-    .acc-pc { font-size: 12px; color: var(--dim); text-transform: uppercase; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .status-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
-    .status-dot.offline { background: var(--red); box-shadow: 0 0 8px var(--red); }
+    .acc-cell { display: flex; flex-direction: column; gap: 6px; }
+    .acc-name { font-weight: 900; color: #e2e8f0; font-size: 15px; display: flex; align-items: center; gap: 10px;}
+    .acc-pc { font-size: 12px; color: var(--dim); text-transform: uppercase; font-weight: 800;}
     
-    .uptime { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); background: rgba(74,222,128,0.1); padding: 3px 8px; border-radius: 4px; width: fit-content; margin-top: 4px; font-weight: 600;}
+    .status-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; justify-content: center; align-items: center; }
+    .status-icon.online { background: rgba(74,222,128,0.1); }
+    .status-icon.offline { background: rgba(239,68,68,0.1); }
+    .status-icon svg { width: 14px; height: 14px; fill: none; stroke-width: 2.5; }
+    .status-icon.online svg { stroke: var(--green); }
+    .status-icon.offline svg { stroke: var(--red); }
     
-    .level-badge { background: rgba(59, 130, 246, 0.1); color: var(--blue); padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 15px; display: inline-block; border: 1px solid rgba(59,130,246,0.2);}
+    .level-badge { background: rgba(59, 130, 246, 0.1); color: var(--blue); padding: 8px 16px; border-radius: 8px; font-weight: 900; font-size: 16px; display: inline-block; }
     
-    .skills-row { display: flex; gap: 12px; flex-wrap: wrap; max-width: 260px; }
-    .skill-box { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
-    .skill-box svg { width: 18px; height: 18px; stroke-width: 2.5; fill: none; }
+    .skills-row { display: flex; gap: 15px; flex-wrap: wrap; max-width: 280px; }
+    .skill-box { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 900; color: #cbd5e1; }
+    .skill-box svg { width: 20px; height: 20px; stroke-width: 2.5; fill: none; }
     
     .skill-fishing svg { stroke: #38bdf8; }
     .skill-shelf svg { stroke: #fbbf24; }
@@ -99,188 +147,257 @@
     .skill-swiper svg { stroke: #2dd4bf; }
     .skill-default svg { stroke: #94a3b8; }
     
-    .money-main { font-size: 16px; font-weight: 800; color: #fff; }
-    .money-sub { font-size: 12px; color: var(--dim); margin-top: 4px; }
+    .money-main { font-size: 18px; font-weight: 900; color: #fff; }
+    .money-sub { font-size: 13px; color: var(--dim); margin-top: 4px; font-weight: 800;}
     
-    .hourly { color: var(--green); font-size: 13px; font-weight: 700; background: rgba(74,222,128,0.1); padding: 4px 8px; border-radius: 6px; display: inline-block; }
+    .hourly { color: var(--green); font-size: 14px; font-weight: 900; background: rgba(74,222,128,0.1); padding: 6px 10px; border-radius: 6px; display: inline-block; }
     .hourly.neg { color: var(--red); background: rgba(239,68,68,0.1); }
     
-    .btn-delete { background: transparent; color: var(--dim); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+    .btn-delete { background: transparent; color: var(--dim); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; }
     .btn-delete:hover { background: rgba(239, 68, 68, 0.1); color: var(--red); border-color: rgba(239, 68, 68, 0.3); }
 </style>
 </head>
 <body>
-<div class="container">
-    <!-- التوب بار -->
-    <div class="top-bar">
+
+    <div class="sidebar">
         <div class="brand">
-            <!-- الشعار -->
-            <span style="font-weight:800; font-size:24px; letter-spacing:-0.5px;">OVERSEER</span>
-        </div>
-        <div class="user-info">
-            <div class="license-box">
-                <span class="license-title">Your License</span>
-                <span class="license-key">{{ my_key }}</span>
+            <div class="brand-logo">O</div>
+            <div class="brand-text">
+                <span class="brand-title">OVERSEER</span>
             </div>
+        </div>
+        
+        <div class="nav-section">Games</div>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">
+                <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2" ry="2"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/></svg>
+                Block Spin
+            </a>
+        </div>
+
+        <div class="nav-section" style="margin-top: auto;">Tools</div>
+        <div class="nav-links">
             {% if is_admin %}
-                <a href="/admin" class="btn btn-admin">Admin</a>
+            <a href="/admin" class="nav-link">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Admin Panel
+            </a>
             {% endif %}
-            <a href="/logout" class="btn">Logout</a>
         </div>
-    </div>
-
-    <!-- الإحصائيات -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon pulse" style="background: rgba(74,222,128,0.1); color: var(--green);">📊</div>
-            <div class="stat-info">
-                <span class="stat-title">Online</span>
-                <span class="stat-value">{{ stats.online }}</span>
+        
+        <div class="user-container" id="userMenu">
+            <div class="user-profile" onclick="toggleMenu()">
+                <div class="user-info-wrap">
+                    <div class="user-avatar">{{ my_key[:2]|upper }}</div>
+                    <div class="user-info">
+                        <span class="user-name">{{ my_key }}</span>
+                        <span class="user-role">Starter</span>
+                    </div>
+                </div>
+                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon pulse" style="background: rgba(239,68,68,0.1); color: var(--red);">🔴</div>
-            <div class="stat-info">
-                <span class="stat-title">Offline</span>
-                <span class="stat-value">{{ stats.offline }}</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon pulse" style="background: rgba(168,85,247,0.1); color: var(--purple);">👥</div>
-            <div class="stat-info">
-                <span class="stat-title">Total Accounts</span>
-                <span class="stat-value">{{ stats.total }}</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon pulse" style="background: rgba(59,130,246,0.1); color: var(--blue);">💎</div>
-            <div class="stat-info">
-                <span class="stat-title">Total Value</span>
-                <span class="stat-value">${{ "{:,.0f}".format(stats.total_cash + stats.total_bank) }}</span>
+            
+            <div class="dropdown">
+                <a href="/logout" class="dropdown-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Logout
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- صندوق الفلوس -->
-    <div class="money-monitor">
-        <div class="monitor-title">💰 Money Monitor</div>
-        <div class="money-cards">
-            <div class="money-card">
-                <span class="money-card-icon">💵</span>
-                <div class="money-card-info">
-                    <span class="money-card-title">Cash</span>
-                    <span class="money-card-val">${{ "{:,.0f}".format(stats.total_cash) }}</span>
+    <div class="main-content">
+        <div class="top-bar">
+            <div>
+                <div class="breadcrumbs">
+                    <span>Dashboard</span> > <span class="active">Block Spin</span>
                 </div>
+                <div class="page-title">Dashboard Overview</div>
             </div>
-            <div class="money-card">
-                <span class="money-card-icon">🏦</span>
-                <div class="money-card-info">
-                    <span class="money-card-title">Bank</span>
-                    <span class="money-card-val">${{ "{:,.0f}".format(stats.total_bank) }}</span>
+            <div class="top-actions">
+                <div class="license-box">
+                    <span class="license-title">Raised / Goal</span>
+                    <span class="license-key">${{ "{:,.0f}".format(stats.total_cash + stats.total_bank) }} / $10,000B</span>
                 </div>
-            </div>
-            <div class="money-card">
-                <span class="money-card-icon">💰</span>
-                <div class="money-card-info">
-                    <span class="money-card-title">Combined</span>
-                    <span class="money-card-val">${{ "{:,.0f}".format(stats.total_cash + stats.total_bank) }}</span>
-                </div>
+                <button class="btn-refresh" id="refreshBtn" onclick="manualRefresh()">
+                    <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.02 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+                    Refresh
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- الجدول -->
-    <div class="table-container">
-        <div class="table-header">
-            <span style="font-weight: 700; font-size:15px;">Accounts List</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search accounts...">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon neon-green">
+                    <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-title">Online</span>
+                    <span class="stat-value">{{ stats.online }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon neon-red">
+                    <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/><line x1="23" y1="1" x2="1" y2="23"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-title">Offline</span>
+                    <span class="stat-value">{{ stats.offline }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon neon-purple">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-title">Total Accounts</span>
+                    <span class="stat-value">{{ stats.total }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon neon-blue">
+                    <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-title">User Package</span>
+                    <span class="stat-value">Starter</span>
+                </div>
+            </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Account</th>
-                    <th>Status</th>
-                    <th onclick="sortTable('level')" id="th-level">Level ↕</th>
-                    <th>Skills</th>
-                    <th onclick="sortTable('money')" id="th-money">Money ↕</th>
-                    <th>Δ (1h)</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-                {% for a in accounts %}
-                <tr class="account-row" data-name="{{ a.name|lower }}">
-                    <td>
-                        <div class="acc-cell">
-                            <span class="acc-name">
-                                <span class="status-dot {{ 'online' if a.online else 'offline' }}"></span>
-                                {{ a.name }}
-                            </span>
-                            <span class="acc-pc">{{ a.pc }}</span>
-                        </div>
-                    </td>
-                    <td>
-                        {% if a.online %}
-                            <div class="uptime">⏱ <span class="uptime-val" data-time="{{ a.uptime }}">{{ a.uptime }}s</span></div>
-                        {% else %}
-                            <span style="color: var(--dim); font-size: 13px;">Offline</span>
-                        {% endif %}
-                    </td>
-                    <td><span class="level-val level-badge">{{ a.total_level }}</span></td>
-                    <td>
-                        <div class="skills-row">
-                            {% for s in a.skills %}
-                                <div class="skill-box 
-                                    {% if s.name == 'fishing' %}skill-fishing
-                                    {% elif s.name == 'shelf stocker' %}skill-shelf
-                                    {% elif s.name == 'stamina' %}skill-stamina
-                                    {% elif s.name == 'farming' %}skill-farming
-                                    {% elif s.name == 'janitor' %}skill-janitor
-                                    {% elif s.name == 'cook' %}skill-cook
-                                    {% elif s.name == 'swiper' %}skill-swiper
-                                    {% else %}skill-default{% endif %}">
-                                    {% if s.name == 'fishing' %}
-                                        <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
-                                    {% elif s.name == 'shelf stocker' %}
-                                        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                                    {% elif s.name == 'stamina' %}
-                                        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                    {% elif s.name == 'farming' %}
-                                        <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
-                                    {% elif s.name == 'janitor' %}
-                                        <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
-                                    {% elif s.name == 'cook' %}
-                                        <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
-                                    {% elif s.name == 'swiper' %}
-                                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                                    {% else %}
-                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-                                    {% endif %}
-                                    {{ s.level }}
+
+        <div class="money-monitor">
+            <div class="monitor-header">
+                <div class="monitor-title">
+                    <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:var(--dim);stroke-width:2;fill:none;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6"/></svg>
+                    Item Monitor <span style="font-size:12px;color:var(--dim);font-weight:500;margin-left:5px;">3 items total</span>
+                </div>
+            </div>
+            <div class="money-cards">
+                <div class="money-card">
+                    <span class="money-card-icon">💵</span>
+                    <div class="money-card-info">
+                        <span class="money-card-title">Cash</span>
+                        <span class="money-card-val">${{ "{:,.0f}".format(stats.total_cash) }}</span>
+                    </div>
+                </div>
+                <div class="money-card">
+                    <span class="money-card-icon">🏦</span>
+                    <div class="money-card-info">
+                        <span class="money-card-title">Bank</span>
+                        <span class="money-card-val">${{ "{:,.0f}".format(stats.total_bank) }}</span>
+                    </div>
+                </div>
+                <div class="money-card">
+                    <span class="money-card-icon">💰</span>
+                    <div class="money-card-info">
+                        <span class="money-card-title">Total Cash</span>
+                        <span class="money-card-val">${{ "{:,.0f}".format(stats.total_cash + stats.total_bank) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search...">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Status</th>
+                        <th onclick="sortTable('level')" id="th-level">Level ↕</th>
+                        <th>Skills</th>
+                        <th onclick="sortTable('money')" id="th-money">Money ↕</th>
+                        <th>Δ (1h)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% for a in accounts %}
+                    <tr class="account-row" data-name="{{ a.name|lower }}">
+                        <td>
+                            <div class="acc-cell">
+                                <span class="acc-name">{{ a.name }}</span>
+                                <span class="acc-pc">{{ a.pc }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if a.online %}
+                                <div class="status-icon online" title="Online">
+                                    <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
                                 </div>
-                            {% endfor %}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="money-main money-val" data-money="{{ a.total_money }}">${{ "{:,.0f}".format(a.total_money) }}</div>
-                        <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash) }}</div>
-                    </td>
-                    <td>
-                        <span class="hourly {{ 'neg' if a.hourly < 0 else '' }}">
-                            {{ '↑' if a.hourly >= 0 else '↓' }} ${{ "{:,.0f}".format(a.hourly) }}/h
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn-delete" onclick="deleteAcc('{{ a.name }}')">🗑</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                            {% else %}
+                                <div class="status-icon offline" title="Offline">
+                                    <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/><line x1="23" y1="1" x2="1" y2="23"/></svg>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td><span class="level-val level-badge">{{ a.total_level }}</span></td>
+                        <td>
+                            <div class="skills-row">
+                                {% for s in a.skills %}
+                                    <div class="skill-box 
+                                        {% if s.name == 'fishing' %}skill-fishing
+                                        {% elif s.name == 'shelf stocker' %}skill-shelf
+                                        {% elif s.name == 'stamina' %}skill-stamina
+                                        {% elif s.name == 'farming' %}skill-farming
+                                        {% elif s.name == 'janitor' %}skill-janitor
+                                        {% elif s.name == 'cook' %}skill-cook
+                                        {% elif s.name == 'swiper' %}skill-swiper
+                                        {% else %}skill-default{% endif %}">
+                                        {% if s.name == 'fishing' %}
+                                            <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
+                                        {% elif s.name == 'shelf stocker' %}
+                                            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                        {% elif s.name == 'stamina' %}
+                                            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                        {% elif s.name == 'farming' %}
+                                            <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
+                                        {% elif s.name == 'janitor' %}
+                                            <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
+                                        {% elif s.name == 'cook' %}
+                                            <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
+                                        {% elif s.name == 'swiper' %}
+                                            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                                        {% endif %}
+                                        {{ s.level }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="money-main money-val" data-money="{{ a.total_money }}">${{ "{:,.0f}".format(a.total_money) }}</div>
+                            <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash) }}</div>
+                        </td>
+                        <td>
+                            <span class="hourly {{ 'neg' if a.hourly < 0 else '' }}">
+                                {{ '↑' if a.hourly >= 0 else '↓' }} ${{ "{:,.0f}".format(a.hourly) }}/h
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteAcc('{{ a.name }}')">🗑</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
 <script>
+    function toggleMenu() {
+        document.getElementById('userMenu').classList.toggle('active');
+    }
+    window.addEventListener('click', function(e) {
+        const menu = document.getElementById('userMenu');
+        if (!menu.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const val = e.target.value.toLowerCase();
         document.querySelectorAll('.account-row').forEach(row => {
@@ -316,22 +433,7 @@
         document.getElementById('th-money').innerText = 'Money ' + (sortState.col === 'money' ? (sortState.asc ? '↑' : '↓') : '↕');
     }
 
-    setInterval(() => {
-        document.querySelectorAll('.uptime-val').forEach(el => {
-            let sec = parseInt(el.getAttribute('data-time')) + 1;
-            el.setAttribute('data-time', sec);
-            let h = Math.floor(sec / 3600);
-            let m = Math.floor((sec % 3600) / 60);
-            let s = sec % 60;
-            let text = '';
-            if (h > 0) text += h + 'h ';
-            if (m > 0) text += m + 'm ';
-            text += s + 's';
-            el.innerText = text;
-        });
-    }, 1000);
-
-    setInterval(() => {
+    function fetchData() {
         fetch(window.location.href)
             .then(res => res.text())
             .then(html => {
@@ -339,7 +441,16 @@
                 document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
             })
             .catch(e => console.log("Auto-refresh failed", e));
-    }, 5000);
+    }
+
+    setInterval(fetchData, 5000);
+
+    function manualRefresh() {
+        const btn = document.getElementById('refreshBtn');
+        btn.classList.add('spinning');
+        fetchData();
+        setTimeout(() => btn.classList.remove('spinning'), 800);
+    }
 
     function deleteAcc(name) {
         if (!confirm("متأكد تبي تحذف " + name + "؟")) return;
