@@ -1,28 +1,28 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-import time, hashlib, uuid
+import time, hashlib
 
 app = Flask(__name__)
-app.secret_key = "super_secret_blockspin_key_123"
+app.secret_key = "axiom_blockspin_secret_key_123"
 
-users = {}
+# مخازن بسيطة
+users = {"admin": hashlib.sha256("123".encode()).hexdigest()}
+licenses = {"admin": "AX-ADMIN-123"}
 accounts = {}
-licenses = {}
-
-def hash_pass(pw): return hashlib.sha256(pw.encode()).hexdigest()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        data = request.get_json(force=True, silent=True)
-        if not data or not data.get("username") or not data.get("password"):
-            return jsonify({"error": "معلومات ناقصة"}), 400
+        data = request.get_json(force=True, silent=True) or {}
+        username = data.get("username")
+        password = data.get("password")
+        if not username or not password:
+            return jsonify({"error": "أدخل اسم وكلمة مرور"}), 400
         
-        username = data["username"]
         if username in users:
-            return jsonify({"error": "اسم المستخدم موجود"}), 400
+            return jsonify({"error": "الاسم موجود"}), 400
             
-        users[username] = hash_pass(data["password"])
-        licenses[username] = f"AX-{uuid.uuid4().hex[:12].upper()}"
+        users[username] = hashlib.sha256(password.encode()).hexdigest()
+        licenses[username] = f"AX-{username[:4].upper()}-{int(time.time())}"
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -30,17 +30,18 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        data = request.get_json(force=True, silent=True)
-        if not data: return jsonify({"error": "missing"}), 400
-        if users.get(data.get("username")) == hash_pass(data.get("password")):
-            session["user"] = data["username"]
+        data = request.get_json(force=True, silent=True) or {}
+        username = data.get("username")
+        password = data.get("password")
+        if users.get(username) == hashlib.sha256(password.encode()).hexdigest():
+            session["user"] = username
             return jsonify({"ok": True})
         return jsonify({"error": "بيانات غلط"}), 401
     return render_template("auth.html", mode="login")
 
 @app.route("/logout")
 def logout():
-    session.pop("user", None)
+    session.clear()
     return redirect(url_for("login"))
 
 @app.route("/")
@@ -48,52 +49,35 @@ def index():
     if "user" not in session:
         return redirect(url_for("login"))
     
+    my_license = licenses.get(session["user"], "NOT_FOUND")
     now = time.time()
+    
     for name, a in accounts.items():
         a["online"] = (now - a.get("last_seen", 0)) < 120
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
-        # تأمين القيمة لو ما حسبت بعد
-        if "hourly" not in a:
-            a["hourly"] = 0
-    
-    user_license = licenses.get(session["user"], "Not Found")
-    return render_template("index.html", accounts=accounts, my_license=user_license)
-
-@app.route("/api/verify", methods=["POST"])
-def verify():
-    data = request.get_json(force=True, silent=True)
-    if data and data.get("license") in licenses.values():
-        return jsonify({"ok": True})
-    return jsonify({"error": "invalid"}), 401
+        # تأمين القيمة عشان ما ينهار الموقع
+        if "hourly" not in a: a["hourly"] = 0
+        
+    return render_template("index.html", accounts=accounts, my_license=my_license)
 
 @app.route("/api/report", methods=["POST"])
 def report():
-    data = request.get_json(force=True, silent=True)
-    if not data or data.get("license") not in licenses.values():
+    data = request.get_json(force=True, silent=True) or {}
+    if data.get("license") not in licenses.values():
         return jsonify({"error": "unauthorized"}), 401
     
-    name = data["name"]
+    name = data.get("name", "Unknown")
     now = time.time()
-    
     current_money = data.get("cash", 0) + data.get("bank", 0)
     hourly = 0
     
-    # حساب الأرباح في الساعة
-    if name in accounts:
-        old_data = accounts[name]
-        time_diff = now - old_data.get("last_seen", now)
-        money_diff = current_money - old_data.get("total_money", current_money)
-        
-        # إذا مر وقت كافي، نحسب الأرباح
-        if time_diff > 10: 
-            hourly = (money_diff / time_diff) * 3600
-            # تخفيف التذبذب (نأخذ المتوسط)
-            old_hourly = old_data.get("hourly", 0)
-            hourly = (hourly + old_hourly) / 2
-    
+    if name in accounts and (now - accounts[name].get("last_seen", now)) > 10:
+        old_money = accounts[name].get("total_money", current_money)
+        time_diff = now - accounts[name]["last_seen"]
+        hourly = ((current_money - old_money) / time_diff) * 3600
+
     accounts[name] = {
-        "license": data.get("license"),
-        "pc": data.get("pc_name", "Unknown"),
+        "pc": data.get("pc_name", "DESKTOP"),
         "cash": data.get("cash", 0),
         "bank": data.get("bank", 0),
         "total_money": current_money,
@@ -105,4 +89,4 @@ def report():
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    app.run(port=5000)
