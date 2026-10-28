@@ -4,7 +4,8 @@ import time, hashlib, json, os
 app = Flask(__name__)
 app.secret_key = "axiom_blockspin_secret_123"
 
-DB_FILE = "users.json"
+# غيرنا اسم ملف الحفظ عشان نتجنب مشكلة "الاسم موجود مسبقاً"
+DB_FILE = "users_database.json"
 accounts = {}
 
 # تحميل وحفظ المستخدمين في ملف
@@ -29,8 +30,11 @@ def register():
         username = data.get("username", "").strip()
         password = data.get("password", "").strip()
         
+        # شرط: الاسم أكثر من 3 حروف
         if len(username) <= 3:
             return jsonify({"error": "اسم المستخدم يجب أن يكون أكثر من 3 حروف"}), 400
+        if len(password) < 4:
+            return jsonify({"error": "كلمة المرور يجب أن تكون 4 حروف على الأقل"}), 400
         if username in users:
             return jsonify({"error": "الاسم موجود مسبقاً"}), 400
             
