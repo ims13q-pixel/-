@@ -4,7 +4,6 @@ import time, hashlib
 app = Flask(__name__)
 app.secret_key = "axiom_blockspin_secret_123"
 
-# ذاكرة السيرفر (Vercel يمسحها إذا طفى، بس ما تسبب خطأ)
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 accounts = {}
 
@@ -37,7 +36,7 @@ def login():
         if users.get(username) == hashlib.sha256(password.encode()).hexdigest():
             session["user"] = username
             return jsonify({"ok": True})
-        return jsonify({"error": "اسم المستخدم أو كلمة المرور غلط"}), 401
+        return jsonify({"error": "بيانات غلط"}), 401
     return render_template("auth.html", mode="login")
 
 @app.route("/logout")
@@ -59,6 +58,7 @@ def index():
     offline_count = 0
     total_cash_all = 0
     total_bank_all = 0
+    all_accounts = []
 
     for name, a in accounts.items():
         if not is_admin and a.get("key") != my_key:
@@ -68,14 +68,30 @@ def index():
         is_online = (now - a.get("last_seen", 0)) < 120
         a["online"] = is_online
         
-        if is_online: online_count += 1
-        else: offline_count += 1
+        if is_online: 
+            online_count += 1
+        else: 
+            offline_count += 1
             
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
         if "hourly" not in a: a["hourly"] = 0
         
+        # حساب وقت التشغيل
+        if is_online:
+            if "login_time" not in a:
+                a["login_time"] = now
+            a["uptime"] = int(now - a["login_time"])
+        else:
+            a["uptime"] = 0
+            a["login_time"] = now # تصفير العداد لما يطلع أوفلاين
+        
         total_cash_all += a.get("cash", 0)
         total_bank_all += a.get("bank", 0)
+        
+        # نجهز نسخة للفرز والبحث
+        acc_copy = a.copy()
+        acc_copy["name"] = name
+        all_accounts.append(acc_copy)
         
     stats = {
         "total": total_accounts,
@@ -85,7 +101,7 @@ def index():
         "total_bank": total_bank_all
     }
         
-    return render_template("index.html", accounts=accounts, my_key=my_key, stats=stats, is_admin=is_admin)
+    return render_template("index.html", accounts=all_accounts, my_key=my_key, stats=stats, is_admin=is_admin)
 
 @app.route("/admin")
 def admin_panel():
@@ -120,7 +136,10 @@ def report():
         time_diff = now - accounts[name]["last_seen"]
         hourly = ((current_money - old_money) / time_diff) * 3600
 
-    accounts[name] = {
+    if name not in accounts:
+        accounts[name] = {"login_time": now}
+
+    accounts[name].update({
         "key": username_key,
         "pc": data.get("pc_name", "DESKTOP"),
         "cash": data.get("cash", 0),
@@ -130,7 +149,7 @@ def report():
         "total_level": data.get("total_level", 0),
         "skills": data.get("skills", []),
         "last_seen": now
-    }
+    })
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
