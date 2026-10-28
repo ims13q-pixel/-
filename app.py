@@ -4,6 +4,8 @@ import time, hashlib
 app = Flask(__name__)
 app.secret_key = "axiom_blockspin_secret_123"
 
+# تخزين في الذاكرة (عشان Vercel ما يعطي خطأ لأنه ما يسمح بحفظ الملفات)
+# حساب الأدمن الافتراضي (admin / admin)
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 accounts = {}
 
@@ -14,6 +16,7 @@ def register():
         username = data.get("username", "").strip()
         password = data.get("password", "").strip()
         
+        # شرط: الاسم أكثر من 3 حروف
         if len(username) <= 3:
             return jsonify({"error": "اسم المستخدم يجب أن يكون 4 حروف أو أكثر"}), 400
         if len(password) < 4:
@@ -61,30 +64,28 @@ def index():
     all_accounts = []
 
     for name, a in accounts.items():
+        # إذا مو أدمن، يشوف بس الحسابات اللي مفتاحها يطابق اسمه
         if not is_admin and a.get("key") != my_key:
             continue
             
         total_accounts += 1
         
-        # 🔴 هنا التعديل: 10 ثواني بس عشان ينقلب أوفلاين بسرعة
-        is_online = (now - a.get("last_seen", 0)) < 10 
+        # 🔴 هنا التعديل: 15 ثانية بس عشان ينقلب أوفلاين بسرعة (لأن السكربت يرسل كل 5 ثواني)
+        is_online = (now - a.get("last_seen", 0)) < 15 
         a["online"] = is_online
         
         if is_online: 
             online_count += 1
-        else: 
-            offline_count += 1
-            
-        a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
-        if "hourly" not in a: a["hourly"] = 0
-        
-        if is_online:
             if "login_time" not in a:
                 a["login_time"] = now
             a["uptime"] = int(now - a["login_time"])
-        else:
+        else: 
+            offline_count += 1
             a["uptime"] = 0
-            a["login_time"] = now
+            a["login_time"] = now # تصفير العداد لما يطلع أوفلاين
+            
+        a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
+        if "hourly" not in a: a["hourly"] = 0
         
         total_cash_all += a.get("cash", 0)
         total_bank_all += a.get("bank", 0)
@@ -121,35 +122,46 @@ def delete_account():
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
-    username_key = data.get("key")
     
+    # استقبال البيانات بالحروف المختصرة من السكربت المشفر
+    username_key = data.get("k")
     if not username_key or username_key not in users:
         return jsonify({"error": "Unauthorized"}), 401
     
-    name = data.get("name", "Unknown")
+    name = data.get("n", "Unknown")
     now = time.time()
-    current_money = data.get("cash", 0) + data.get("bank", 0)
-    hourly = 0
     
+    cash = int(data.get("c", 0) or 0)
+    bank = int(data.get("b", 0) or 0)
+    current_money = cash + bank
+    level = int(data.get("l", 0) or 0)
+    
+    # معالجة المهارات
+    raw_skills = data.get("s", [])
+    skills = [{"name": sk.get("name"), "level": int(sk.get("level", 0))} for sk in raw_skills]
+    
+    # حساب الأرباح في الساعة
+    hourly = 0
     if name in accounts and (now - accounts[name].get("last_seen", now)) > 10:
         old_money = accounts[name].get("total_money", current_money)
         time_diff = now - accounts[name]["last_seen"]
         hourly = ((current_money - old_money) / time_diff) * 3600
 
     if name not in accounts:
-        accounts[name] = {"login_time": now}
+        accounts[name] = {"login_time": now, "total_money": current_money}
 
     accounts[name].update({
         "key": username_key,
-        "pc": data.get("pc_name", "DESKTOP"),
-        "cash": data.get("cash", 0),
-        "bank": data.get("bank", 0),
+        "pc": data.get("pc", "DESKTOP"),
+        "cash": cash,
+        "bank": bank,
         "total_money": current_money,
         "hourly": hourly,
-        "total_level": data.get("total_level", 0),
-        "skills": data.get("skills", []),
-        "last_seen": now
+        "total_level": level,
+        "skills": skills,
+        "last_seen": now # تحديث النبض عشان يظل أونلاين
     })
+    
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
