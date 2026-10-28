@@ -4,8 +4,9 @@ import time, hashlib
 app = Flask(__name__)
 app.secret_key = "axiom_blockspin_secret_123"
 
-users = {}
-accounts = {}
+# قاعدة بيانات وهمية في الذاكرة
+users = {}      # يخزن (اسم المستخدم : الباسورد المشفر)
+accounts = {}   # يخزن بيانات اللعبة
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -47,9 +48,10 @@ def index():
     if "user" not in session:
         return redirect(url_for("login"))
     
+    # المفتاح هو اسم المستخدم
     my_key = session["user"]
-    now = time.time()
     
+    now = time.time()
     for name, a in accounts.items():
         a["online"] = (now - a.get("last_seen", 0)) < 120
         a["total_money"] = a.get("cash", 0) + a.get("bank", 0)
@@ -57,7 +59,7 @@ def index():
         
     return render_template("index.html", accounts=accounts, my_key=my_key)
 
-# مسار حذف الحساب
+# --- مسار حذف الحساب ---
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
     data = request.get_json(force=True, silent=True) or {}
@@ -67,12 +69,17 @@ def delete_account():
         return jsonify({"ok": True})
     return jsonify({"error": "Not found"}), 404
 
+# --- استقبال البيانات من السكربت ---
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
-    username_key = data.get("key")
     
-    # إذا اسم المستخدم مو موجود في المسجلين، نرفض
+    # السكربت يرسل اسم المستخدم كـ "key"
+    username_key = data.get("key")
+    if not username_key:
+        return jsonify({"error": "No key provided"}), 401
+
+    # التحقق: هل المفتاح (اسم المستخدم) موجود في قائمة المسجلين؟
     if username_key not in users:
         return jsonify({"error": "Unauthorized"}), 401
     
@@ -81,6 +88,7 @@ def report():
     current_money = data.get("cash", 0) + data.get("bank", 0)
     hourly = 0
     
+    # حساب الأرباح في الساعة
     if name in accounts and (now - accounts[name].get("last_seen", now)) > 10:
         old_money = accounts[name].get("total_money", current_money)
         time_diff = now - accounts[name]["last_seen"]
