@@ -4,16 +4,15 @@ import hashlib
 import os
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24) # مفتاح تشفير الجلسات
+# مفتاح ثابت عشان الجلسات ما تطير كل ما شغل السيرفر
+app.secret_key = "super_secret_blockspin_key_123"
 
-# قاعدة بيانات وهمية في الذاكرة
+# مخزن الحسابات في الذاكرة
 users = {}
 accounts = {}
 
 def hash_pass(password):
     return hashlib.sha256(password.encode()).hexdigest()
-
-# --- مسارات الموقع ---
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -27,6 +26,7 @@ def register():
             return jsonify({"error": "اسم المستخدم موجود مسبقاً"}), 400
             
         users[username] = hash_pass(data["password"])
+        session["user"] = username # يسجل دخولك فوراً
         return jsonify({"ok": True, "message": "تم التسجيل بنجاح"})
     return render_template("auth.html", mode="register")
 
@@ -53,7 +53,6 @@ def logout():
 
 @app.route("/")
 def index():
-    # حماية الصفحة: إذا مو مسجل دخول، يوديه للتسجيل
     if "user" not in session:
         return redirect(url_for("login"))
     
@@ -63,7 +62,6 @@ def index():
         a["online"] = (now - a.get("last_seen", 0)) < 120
     return render_template("index.html", accounts=accounts)
 
-# --- API للسكربت حق اللعبة ---
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True)
