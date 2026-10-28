@@ -6,90 +6,54 @@
 <title>OVERSEER | Dashboard</title>
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-    
-    :root { 
-        --bg: #080a10; 
-        --text: #ffffff; 
-        --dim: #8b93a3; 
-        --green: #10b981; 
-        --red: #ef4444; 
-        --blue: #3b82f6;
-        --border: #1c2130;
-    }
-    
+    :root { --bg: #080a10; --text: #ffffff; --dim: #8b93a3; --green: #10b981; --red: #ef4444; --blue: #3b82f6; --border: #1c2130; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 40px 20px; display: flex; justify-content: center; min-height: 100vh; }
-    
     .dashboard-container { width: 100%; max-width: 1400px; }
-    
-    /* الشريط العلوي */
-    .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;}
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-logo { width: 40px; height: 40px; background: #fff; border-radius: 10px; display: flex; justify-content: center; align-items: center; color: #000; font-weight: 900; font-size: 22px; }
     .brand-title { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
-    
-    .user-area { display: flex; align-items: center; gap: 15px; }
-    
-    .btn-action { 
-        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; 
-        padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; 
-        display: flex; align-items: center; gap: 10px; transition: 0.3s; 
-    }
+    .user-area { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .btn-action { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: 0.3s; text-decoration: none;}
     .btn-action:hover { background: rgba(255,255,255,0.1); }
     .btn-action svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; }
-    
     .btn-refresh.spinning svg { animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    /* شريط البحث */
     .toolbar { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px; }
-    .search-box { background: transparent; border: 1px solid var(--border); color: white; padding: 10px 16px; border-radius: 10px; font-size: 14px; width: 300px; outline: none; font-family: inherit; transition: 0.2s;}
+    .search-box { background: transparent; border: 1px solid var(--border); color: white; padding: 10px 16px; border-radius: 10px; font-size: 14px; width: 100%; max-width: 300px; outline: none; font-family: inherit; transition: 0.2s;}
     .search-box:focus { border-color: var(--blue); }
-
-    /* الجدول */
     .table-wrapper { width: 100%; border-top: 1px solid var(--border); }
-    
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; padding: 16px 20px; color: var(--dim); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--border); }
     td { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
     tr:hover td { background: rgba(255,255,255,0.02); }
-    
-    /* عمود الفلوس القابل للضغط */
     .th-sort { cursor: pointer; user-select: none; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
     .th-sort:hover { color: white; }
     .sort-icon { font-size: 14px; color: var(--dim); }
-    
     .acc-cell { display: flex; flex-direction: column; gap: 4px; }
     .acc-name { font-weight: 700; color: #e2e8f0; font-size: 14px; display: flex; align-items: center; gap: 8px;}
     .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
     .status-dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red); }
     .acc-pc { font-size: 11px; color: var(--dim); text-transform: uppercase; font-weight: 600; }
-    
     .server-badge { background: #11141e; border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-block; }
     .level-badge { background: #11141e; border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 14px; display: inline-block; }
-    
     .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 180px; }
     .skill-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #cbd5e1; }
     .skill-item svg { width: 16px; height: 16px; stroke-width: 2.5; fill: none; }
-    
     .money-main { font-size: 15px; font-weight: 800; color: #fff; }
     .money-sub { font-size: 11px; color: var(--dim); margin-top: 4px; font-weight: 600; }
-    
     .hourly { color: var(--green); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
     .hourly.neg { color: var(--red); }
     .hourly-sub { font-size: 11px; color: var(--dim); margin-top: 4px; }
-    
     .uptime-pill { display: inline-flex; align-items: center; gap: 8px; background: #11141e; border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; color: #e2e8f0; }
     .uptime-pill svg { width: 14px; height: 14px; stroke: #8b93a3; fill: none; stroke-width: 2.5;}
-    
     .last-update { display: flex; align-items: center; gap: 6px; color: var(--green); font-size: 13px; font-weight: 600; }
     .last-update.offline-text { color: var(--dim); }
-    
     .actions-cell { display: flex; gap: 8px; }
     .btn-icon { background: #11141e; border: 1px solid var(--border); color: var(--dim); width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; }
     .btn-icon:hover { background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.2); }
     .btn-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
-
     .skill-fishing svg { stroke: #38bdf8; }
     .skill-shelf svg { stroke: #fbbf24; }
     .skill-stamina svg { stroke: #fb7185; }
@@ -98,38 +62,47 @@
     .skill-cook svg { stroke: #f87171; }
     .skill-swiper svg { stroke: #2dd4bf; }
     .skill-default svg { stroke: #94a3b8; }
+
+    @media (max-width: 900px) {
+        table, thead, tbody, th, td, tr { display: block; }
+        thead tr { position: absolute; top: -9999px; left: -9999px; }
+        tr { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 20px; padding: 10px; }
+        td { border: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; text-align: right; }
+        td:last-child { border-bottom: none; }
+        td::before { content: attr(data-label); font-weight: 800; color: var(--dim); font-size: 12px; text-transform: uppercase; text-align: left; margin-right: 15px; }
+        .skills-grid { width: 100%; max-width: 220px; justify-content: flex-end; margin-left: auto;}
+        .user-area { width: 100%; justify-content: space-between; }
+        .search-box { max-width: 100%; }
+    }
 </style>
 </head>
 <body>
-
 <div class="dashboard-container">
     <div class="top-header">
         <div class="brand">
             <div class="brand-logo">O</div>
             <div class="brand-title">OVERSEER</div>
         </div>
-        
         <div class="user-area">
-            <!-- زر نسخ السكربت -->
+            {% if is_admin %}
+            <a href="/admin" class="btn-action" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">
+                👑 Admin Panel
+            </a>
+            {% endif %}
             <button class="btn-action" id="copyBtn" onclick="copyScript()">
                 <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 Copy Script
             </button>
-
             <button class="btn-action btn-refresh" id="refreshBtn" onclick="manualRefresh()">
                 <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.02 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
                 Refresh
             </button>
-            <a href="/logout" style="color: var(--red); text-decoration: none; font-weight: 700; margin-left: 10px;">Logout</a>
+            <a href="/logout" style="color: var(--red); text-decoration: none; font-weight: 700;">Logout</a>
         </div>
     </div>
-
-    <!-- شريط البحث -->
     <div class="toolbar">
         <input type="text" id="searchInput" class="search-box" placeholder="Search account...">
     </div>
-
-    <!-- الجدول -->
     <div class="table-wrapper">
         <table>
             <thead>
@@ -138,11 +111,7 @@
                     <th>Server</th>
                     <th>Level</th>
                     <th>Skills</th>
-                    <th>
-                        <div class="th-sort" onclick="toggleSort()">
-                            Money <span id="sortIcon" class="sort-icon">↕</span>
-                        </div>
-                    </th>
+                    <th><div class="th-sort" onclick="toggleSort()">Money <span id="sortIcon" class="sort-icon">↕</span></div></th>
                     <th>Δ (1h)</th>
                     <th>Uptime</th>
                     <th>Last Update</th>
@@ -152,7 +121,7 @@
             <tbody id="table-body">
                 {% for a in accounts %}
                 <tr class="account-row" data-name="{{ a.name|lower }}">
-                    <td>
+                    <td data-label="Account">
                         <div class="acc-cell">
                             <span class="acc-name">
                                 <span class="status-dot {{ '' if a.online else 'offline' }}"></span>
@@ -161,9 +130,9 @@
                             <span class="acc-pc">{{ a.pc }}</span>
                         </div>
                     </td>
-                    <td><span class="server-badge">Server 1</span></td>
-                    <td><span class="level-val level-badge">{{ a.total_level }}</span></td>
-                    <td>
+                    <td data-label="Server"><span class="server-badge">Server 1</span></td>
+                    <td data-label="Level"><span class="level-val level-badge">{{ a.total_level }}</span></td>
+                    <td data-label="Skills">
                         <div class="skills-grid">
                             {% for s in a.skills %}
                                 <div class="skill-item 
@@ -175,61 +144,38 @@
                                     {% elif s.name == 'cook' %}skill-cook
                                     {% elif s.name == 'swiper' %}skill-swiper
                                     {% else %}skill-default{% endif %}">
-                                    {% if s.name == 'fishing' %}
-                                        <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
-                                    {% elif s.name == 'shelf stocker' %}
-                                        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                                    {% elif s.name == 'stamina' %}
-                                        <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                    {% elif s.name == 'farming' %}
-                                        <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
-                                    {% elif s.name == 'janitor' %}
-                                        <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
-                                    {% elif s.name == 'cook' %}
-                                        <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
-                                    {% elif s.name == 'swiper' %}
-                                        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                                    {% else %}
-                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-                                    {% endif %}
+                                    {% if s.name == 'fishing' %}<svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
+                                    {% elif s.name == 'shelf stocker' %}<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                    {% elif s.name == 'stamina' %}<svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                                    {% elif s.name == 'farming' %}<svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
+                                    {% elif s.name == 'janitor' %}<svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
+                                    {% elif s.name == 'cook' %}<svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
+                                    {% elif s.name == 'swiper' %}<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                                    {% else %}<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>{% endif %}
                                     {{ s.level }}
                                 </div>
                             {% endfor %}
                         </div>
                     </td>
-                    <td>
+                    <td data-label="Money">
                         <div class="money-main money-val" data-money="{{ a.total_money }}">${{ "{:,.0f}".format(a.total_money) }}</div>
                         <div class="money-sub">H ${{ "{:,.0f}".format(a.cash) }} · B ${{ "{:,.0f}".format(a.bank) }}</div>
                     </td>
-                    <td>
-                        <span class="hourly {{ 'neg' if a.hourly < 0 else '' }}">
-                            {{ '↑' if a.hourly >= 0 else '↓' }} +${{ "{:,.0f}".format(a.hourly) }}/h
-                        </span>
-                        <div class="hourly-sub">{{ "Rising" if a.hourly >= 0 else "Dropping" }}</div>
+                    <td data-label="Δ (1h)">
+                        <span class="hourly {{ 'neg' if a.hourly < 0 else '' }}">{{ '↑' if a.hourly >= 0 else '↓' }} +${{ "{:,.0f}".format(a.hourly) }}/h</span>
                     </td>
-                    <td>
+                    <td data-label="Uptime">
                         <span class="uptime-pill">
                             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            {% if a.online %}
-                                <span class="uptime-text" data-time="{{ a.uptime }}">{{ a.uptime }}s</span>
-                            {% else %}
-                                <span class="uptime-text">Offline</span>
-                            {% endif %}
+                            {% if a.online %}<span class="uptime-text" data-time="{{ a.uptime }}">{{ a.uptime }}s</span>{% else %}<span class="uptime-text">Offline</span>{% endif %}
                         </span>
                     </td>
-                    <td>
-                        {% if a.online %}
-                            <div class="last-update">
-                                <span class="status-dot"></span> just now
-                            </div>
-                        {% else %}
-                            <div class="last-update offline-text">
-                                <span class="status-dot offline"></span> offline
-                            </div>
-                        {% endif %}
+                    <td data-label="Update">
+                        {% if a.online %}<div class="last-update"><span class="status-dot"></span> just now</div>
+                        {% else %}<div class="last-update offline-text"><span class="status-dot offline"></span> offline</div>{% endif %}
                     </td>
-                    <td>
-                        <div class="actions-cell">
+                    <td data-label="Actions">
+                        <div class="actions-cell" style="justify-content: flex-end; width: 100%;">
                             <button class="btn-icon" onclick="copyName('{{ a.name }}')" title="Copy Name">
                                 <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                             </button>
@@ -244,37 +190,18 @@
         </table>
     </div>
 </div>
-
 <script>
-    // 1. دالة نسخ السكربت المخصص
     function copyScript() {
-        const currentKey = "{{ my_key }}"; // اسم المستخدم الحالي
-        
-        // تجميع السكربت بالشكل اللي طلبته
-        const script = `repeat task.wait() until game:IsLoaded()
-
-getgenv().OverseerConfig = {
-    ["key"] = "${currentKey}",
-    ["PC_NAME"] = "dwadwa"
-}
-
-loadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n]then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
-
+        const currentKey = "{{ my_key }}"; 
+        const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${currentKey}",\n    ["PC_NAME"] = "dwadwa"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if n:find("fishing|stamina|shelfstocker|janitor|swiper|farming|cook")then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
         navigator.clipboard.writeText(script).then(() => {
             const btn = document.getElementById('copyBtn');
             const originalHtml = btn.innerHTML;
             btn.innerHTML = '✅ Copied!';
             btn.style.color = '#10b981';
-            setTimeout(() => {
-                btn.innerHTML = originalHtml;
-                btn.style.color = 'white';
-            }, 2000);
-        }).catch(err => {
-            alert("فشل النسخ: " + err);
+            setTimeout(() => { btn.innerHTML = originalHtml; btn.style.color = 'white'; }, 2000);
         });
     }
-
-    // 2. دالة البحث
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const val = e.target.value.toLowerCase();
         document.querySelectorAll('.account-row').forEach(row => {
@@ -282,100 +209,50 @@ loadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetSer
             row.style.display = name.includes(val) ? '' : 'none';
         });
     });
-
-    // 3. دالة الفرز (بالضغط على كلمة Money)
     let sortOrder = 'none'; 
     function toggleSort() {
         const tbody = document.getElementById('table-body');
         const rows = Array.from(tbody.querySelectorAll('.account-row'));
         const icon = document.getElementById('sortIcon');
-
-        if (sortOrder === 'none' || sortOrder === 'desc') {
-            sortOrder = 'asc'; 
-            icon.innerText = '↑';
-            icon.style.color = 'var(--green)';
-        } else {
-            sortOrder = 'desc'; 
-            icon.innerText = '↓';
-            icon.style.color = 'var(--red)';
-        }
-
+        if (sortOrder === 'none' || sortOrder === 'desc') { sortOrder = 'asc'; icon.innerText = '↑'; icon.style.color = 'var(--green)'; }
+        else { sortOrder = 'desc'; icon.innerText = '↓'; icon.style.color = 'var(--red)'; }
         rows.sort((a, b) => {
             let valA = parseInt(a.querySelector('.money-val').getAttribute('data-money')) || 0;
             let valB = parseInt(b.querySelector('.money-val').getAttribute('data-money')) || 0;
             return sortOrder === 'asc' ? valA - valB : valB - valA;
         });
-
         tbody.innerHTML = '';
         rows.forEach(row => tbody.appendChild(row));
     }
-
-    // 4. نسخ الاسم
-    function copyName(name) {
-        navigator.clipboard.writeText(name).then(() => {
-            alert("تم نسخ الاسم: " + name);
-        });
-    }
-
-    // 5. حذف الحساب
+    function copyName(name) { navigator.clipboard.writeText(name).then(() => { alert("تم نسخ الاسم: " + name); }); }
     function deleteAcc(name) {
         if (!confirm("متأكد تبي تحذف " + name + "؟")) return;
-        fetch('/api/delete', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name: name })
-        }).then(() => window.location.reload());
+        fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: name }) }).then(() => window.location.reload());
     }
-
-    // 6. تحديث البيانات
     function fetchData() {
-        fetch(window.location.href)
-            .then(res => res.text())
-            .then(html => {
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
-                if(sortOrder !== 'none') {
-                    const currentOrder = sortOrder;
-                    sortOrder = currentOrder === 'asc' ? 'desc' : 'asc'; 
-                    toggleSort();
-                }
-            })
-            .catch(e => console.log("Auto-refresh failed", e));
+        fetch(window.location.href).then(res => res.text()).then(html => {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
+            if(sortOrder !== 'none') { const currentOrder = sortOrder; sortOrder = currentOrder === 'asc' ? 'desc' : 'asc'; toggleSort(); }
+        }).catch(e => console.log("Auto-refresh failed", e));
     }
-
     setInterval(fetchData, 5000);
-
     function manualRefresh() {
         const btn = document.getElementById('refreshBtn');
-        btn.classList.add('spinning');
-        fetchData();
-        setTimeout(() => btn.classList.remove('spinning'), 800);
+        btn.classList.add('spinning'); fetchData(); setTimeout(() => btn.classList.remove('spinning'), 800);
     }
-
-    // 7. عداد الـ Uptime
     function formatUptime(totalSeconds) {
         if (totalSeconds <= 0) return "0s";
-        const d = Math.floor(totalSeconds / 86400);
-        const h = Math.floor((totalSeconds % 86400) / 3600);
-        const m = Math.floor((totalSeconds % 3600) / 60);
-        const s = Math.floor(totalSeconds % 60);
-
+        const d = Math.floor(totalSeconds / 86400); const h = Math.floor((totalSeconds % 86400) / 3600); const m = Math.floor((totalSeconds % 3600) / 60); const s = Math.floor(totalSeconds % 60);
         let parts = [];
-        if (d > 0) parts.push(`${d}d`);
-        if (h > 0) parts.push(`${h}h`);
-        if (m > 0) parts.push(`${m}m`);
-        if (s > 0 || parts.length === 0) parts.push(`${s}s`);
-
+        if (d > 0) parts.push(`${d}d`); if (h > 0) parts.push(`${h}h`); if (m > 0) parts.push(`${m}m`); if (s > 0 || parts.length === 0) parts.push(`${s}s`);
         return parts.join(' ');
     }
-
     setInterval(() => {
         document.querySelectorAll('.uptime-text').forEach(el => {
             let secText = el.getAttribute('data-time');
             if (secText && secText !== 'Offline') {
-                let sec = parseInt(secText) + 1;
-                el.setAttribute('data-time', sec);
-                el.innerText = formatUptime(sec);
+                let sec = parseInt(secText) + 1; el.setAttribute('data-time', sec); el.innerText = formatUptime(sec);
             }
         });
     }, 1000);
