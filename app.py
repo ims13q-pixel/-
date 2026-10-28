@@ -1,27 +1,12 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-import time, hashlib, json, os
+import time, hashlib
 
 app = Flask(__name__)
 app.secret_key = "axiom_blockspin_secret_123"
 
-# غيرنا اسم ملف الحفظ عشان نتجنب مشكلة "الاسم موجود مسبقاً"
-DB_FILE = "users_database.json"
+# ذاكرة السيرفر (Vercel يمسحها إذا طفى، بس ما تسبب خطأ)
+users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 accounts = {}
-
-# تحميل وحفظ المستخدمين في ملف
-def load_users():
-    if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r") as f:
-            return json.load(f)
-    # إنشاء حساب الأدمن الافتراضي إذا الملف مو موجود
-    admin_pass = hashlib.sha256("admin".encode()).hexdigest()
-    return {"admin": admin_pass}
-
-def save_users(users_data):
-    with open(DB_FILE, "w") as f:
-        json.dump(users_data, f)
-
-users = load_users()
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -30,16 +15,14 @@ def register():
         username = data.get("username", "").strip()
         password = data.get("password", "").strip()
         
-        # شرط: الاسم أكثر من 3 حروف
         if len(username) <= 3:
-            return jsonify({"error": "اسم المستخدم يجب أن يكون أكثر من 3 حروف"}), 400
+            return jsonify({"error": "اسم المستخدم يجب أن يكون 4 حروف أو أكثر"}), 400
         if len(password) < 4:
             return jsonify({"error": "كلمة المرور يجب أن تكون 4 حروف على الأقل"}), 400
         if username in users:
             return jsonify({"error": "الاسم موجود مسبقاً"}), 400
             
         users[username] = hashlib.sha256(password.encode()).hexdigest()
-        save_users(users)
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -54,7 +37,7 @@ def login():
         if users.get(username) == hashlib.sha256(password.encode()).hexdigest():
             session["user"] = username
             return jsonify({"ok": True})
-        return jsonify({"error": "بيانات غلط"}), 401
+        return jsonify({"error": "اسم المستخدم أو كلمة المرور غلط"}), 401
     return render_template("auth.html", mode="login")
 
 @app.route("/logout")
@@ -78,7 +61,6 @@ def index():
     total_bank_all = 0
 
     for name, a in accounts.items():
-        # إذا مو أدمن، يشوف بس الحسابات اللي مفتاحها يطابق اسمه
         if not is_admin and a.get("key") != my_key:
             continue
             
@@ -105,14 +87,11 @@ def index():
         
     return render_template("index.html", accounts=accounts, my_key=my_key, stats=stats, is_admin=is_admin)
 
-# مسار خاص بالأدمن عشان يشوف المسجلين
 @app.route("/admin")
 def admin_panel():
     if session.get("user") != "admin":
         return "Access Denied", 403
-    
-    registered_users = list(users.keys())
-    return render_template("admin.html", users=registered_users)
+    return render_template("admin.html", users=list(users.keys()))
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
@@ -126,8 +105,8 @@ def delete_account():
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
-    
     username_key = data.get("key")
+    
     if not username_key or username_key not in users:
         return jsonify({"error": "Unauthorized"}), 401
     
@@ -142,7 +121,7 @@ def report():
         hourly = ((current_money - old_money) / time_diff) * 3600
 
     accounts[name] = {
-        "key": username_key, # نحفظ المفتاح عشان نفلتر في الموقع
+        "key": username_key,
         "pc": data.get("pc_name", "DESKTOP"),
         "cash": data.get("cash", 0),
         "bank": data.get("bank", 0),
