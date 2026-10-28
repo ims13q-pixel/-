@@ -30,9 +30,14 @@
     
     .user-area { display: flex; align-items: center; gap: 15px; }
     
-    .btn-refresh { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
-    .btn-refresh:hover { background: rgba(255,255,255,0.1); }
-    .btn-refresh svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; }
+    .btn-action { 
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; 
+        padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; 
+        display: flex; align-items: center; gap: 10px; transition: 0.3s; 
+    }
+    .btn-action:hover { background: rgba(255,255,255,0.1); }
+    .btn-action svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.5; fill: none; }
+    
     .btn-refresh.spinning svg { animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -105,7 +110,13 @@
         </div>
         
         <div class="user-area">
-            <button class="btn-refresh" id="refreshBtn" onclick="manualRefresh()">
+            <!-- زر نسخ السكربت -->
+            <button class="btn-action" id="copyBtn" onclick="copyScript()">
+                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy Script
+            </button>
+
+            <button class="btn-action btn-refresh" id="refreshBtn" onclick="manualRefresh()">
                 <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.02 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
                 Refresh
             </button>
@@ -113,7 +124,7 @@
         </div>
     </div>
 
-    <!-- شريط البحث فقط -->
+    <!-- شريط البحث -->
     <div class="toolbar">
         <input type="text" id="searchInput" class="search-box" placeholder="Search account...">
     </div>
@@ -127,7 +138,6 @@
                     <th>Server</th>
                     <th>Level</th>
                     <th>Skills</th>
-                    <!-- زر الفرز صار هنا، صغير وبدون كلام -->
                     <th>
                         <div class="th-sort" onclick="toggleSort()">
                             Money <span id="sortIcon" class="sort-icon">↕</span>
@@ -236,7 +246,35 @@
 </div>
 
 <script>
-    // 1. دالة البحث
+    // 1. دالة نسخ السكربت المخصص
+    function copyScript() {
+        const currentKey = "{{ my_key }}"; // اسم المستخدم الحالي
+        
+        // تجميع السكربت بالشكل اللي طلبته
+        const script = `repeat task.wait() until game:IsLoaded()
+
+getgenv().OverseerConfig = {
+    ["key"] = "${currentKey}",
+    ["PC_NAME"] = "dwadwa"
+}
+
+loadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n]then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
+
+        navigator.clipboard.writeText(script).then(() => {
+            const btn = document.getElementById('copyBtn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '✅ Copied!';
+            btn.style.color = '#10b981';
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.style.color = 'white';
+            }, 2000);
+        }).catch(err => {
+            alert("فشل النسخ: " + err);
+        });
+    }
+
+    // 2. دالة البحث
     document.getElementById('searchInput').addEventListener('input', function(e) {
         const val = e.target.value.toLowerCase();
         document.querySelectorAll('.account-row').forEach(row => {
@@ -245,20 +283,19 @@
         });
     });
 
-    // 2. دالة الفرز (بالضغط على كلمة Money)
+    // 3. دالة الفرز (بالضغط على كلمة Money)
     let sortOrder = 'none'; 
-    
     function toggleSort() {
         const tbody = document.getElementById('table-body');
         const rows = Array.from(tbody.querySelectorAll('.account-row'));
         const icon = document.getElementById('sortIcon');
 
         if (sortOrder === 'none' || sortOrder === 'desc') {
-            sortOrder = 'asc'; // من الأقل للأكثر
+            sortOrder = 'asc'; 
             icon.innerText = '↑';
             icon.style.color = 'var(--green)';
         } else {
-            sortOrder = 'desc'; // من الأكثر للأقل
+            sortOrder = 'desc'; 
             icon.innerText = '↓';
             icon.style.color = 'var(--red)';
         }
@@ -273,14 +310,14 @@
         rows.forEach(row => tbody.appendChild(row));
     }
 
-    // 3. نسخ الاسم
+    // 4. نسخ الاسم
     function copyName(name) {
         navigator.clipboard.writeText(name).then(() => {
             alert("تم نسخ الاسم: " + name);
         });
     }
 
-    // 4. حذف الحساب
+    // 5. حذف الحساب
     function deleteAcc(name) {
         if (!confirm("متأكد تبي تحذف " + name + "؟")) return;
         fetch('/api/delete', {
@@ -290,18 +327,16 @@
         }).then(() => window.location.reload());
     }
 
-    // 5. تحديث البيانات
+    // 6. تحديث البيانات
     function fetchData() {
         fetch(window.location.href)
             .then(res => res.text())
             .then(html => {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
                 document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
-                
-                // إعادة تطبيق الفرز لو كان مفعل عشان الترتيب ما يخرب بعد التحديث
                 if(sortOrder !== 'none') {
                     const currentOrder = sortOrder;
-                    sortOrder = currentOrder === 'asc' ? 'desc' : 'asc'; // نعكسه عشان دالة toggle تشتغل صح
+                    sortOrder = currentOrder === 'asc' ? 'desc' : 'asc'; 
                     toggleSort();
                 }
             })
@@ -317,7 +352,7 @@
         setTimeout(() => btn.classList.remove('spinning'), 800);
     }
 
-    // 6. عداد الـ Uptime
+    // 7. عداد الـ Uptime
     function formatUptime(totalSeconds) {
         if (totalSeconds <= 0) return "0s";
         const d = Math.floor(totalSeconds / 86400);
