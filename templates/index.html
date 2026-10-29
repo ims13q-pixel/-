@@ -220,13 +220,11 @@ h1{font-size:clamp(22px,2.2vw,30px);letter-spacing:-.045em}
 <script>
 const DEMO = [
   {name:"iodu34zhhh83",user_id:"e7a44251",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"19/28",total_level:60,skills:{stamina:61,swiper:74,janitor:1,cook:1},cash:3450000,bank:3450000,rate:300000,session:"11h 57m",seen:"just now"},
-  {name:"ddoetvzo6780",user_id:"c29e44251",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"19/28",total_level:70,skills:{stamina:64,swiper:73,janitor:1,cook:1},cash:3340000,bank:3340000,rate:110000,session:"11h 58m",seen:"just now"},
-  {name:"tria56hkvo37",user_id:"fefabf83",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"20/28",total_level:60,skills:{stamina:64,swiper:73,janitor:1,cook:1},cash:3320000,bank:3320000,rate:40000,session:"12h 00m",seen:"just now",trend:"Stagnant"}
+  {name:"ddoetvzo6780",user_id:"c29e44251",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"19/28",total_level:70,skills:{stamina:64,swiper:73,janitor:1,cook:1},cash:3340000,bank:3340000,rate:110000,session:"11h 58m",seen:"just now"}
 ];
 
 function loadBoot(){
   const raw = (document.getElementById("server-boot").innerHTML || "").trim();
-  // تم إصلاح هذا السطر (شلنا شرط {%)
   if(raw.startsWith("{")){
     try { return JSON.parse(raw); } catch (e) {}
   }
