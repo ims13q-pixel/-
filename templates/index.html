@@ -3,253 +3,409 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#080a0f">
+<meta name="theme-color" content="#080b12">
 <title>OVERSEER — Control Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   color-scheme:dark;
-  --bg:#080a0f;--surface:#10141c;--border:#202837;--text:#f4f7fb;--muted:#8995a8;
-  --green:#36d399;--red:#fb6572;--blue:#69a7ff;--purple:#b18cff;--gold:#f5c451;
-  --radius:15px;--shadow:0 18px 50px rgba(0,0,0,.22)
+  --bg:#080b12;
+  --panel:#0e141d;
+  --border:#1c2636;
+  --text:#eef3fb;
+  --muted:#8090a6;
+  --green:#3ee0a3;
+  --red:#fb6d78;
+  --blue:#6aa8ff;
+  --gold:#f3c45a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;background:radial-gradient(ellipse at 70% -20%,rgba(48,86,130,.13),transparent 42%),var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;overflow-x:hidden;display:flex;justify-content:center}
-button,input,select{font:inherit}
-button,a,select{ -webkit-tap-highlight-color:transparent}
-button{cursor:pointer}
-.main{width:100%;max-width:1500px;padding:27px clamp(16px,2.2vw,34px) 34px;scrollbar-color:#293343 transparent;scrollbar-width:thin}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:27px}
-.breadcrumb{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
-.crumb-sep{color:#4c586a}.crumb-current{color:#f3f6fc;font-weight:700}
-.top-right{display:flex;align-items:center;gap:12px}
-.live-pill{display:flex;align-items:center;gap:8px;color:#9fb0c5;font-size:11px;padding:7px 10px;border:1px solid var(--border);background:#0e131a;border-radius:999px}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 11px rgba(54,211,153,.65)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #2a3444;background:#151b25;color:#eaf0f9;padding:9px 13px;border-radius:9px;font-size:11px;font-weight:700;transition:.18s;text-decoration:none}
-.btn:hover{border-color:#46566e;background:#1a2230;transform:translateY(-1px)}
-.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
-.btn-danger{color:var(--red);border-color:rgba(251,101,114,.2);background:rgba(251,101,114,.05)}
-.user-info-top{display:flex;align-items:center;gap:10px;background:#0e131a;border:1px solid var(--border);padding:6px 12px;border-radius:10px;}
-.user-avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(145deg,#28364a,#151b26);border:1px solid #344257;display:grid;place-items:center;font-size:11px;font-weight:800;color:#dbe8fb}
-.user-name{font-size:12px;font-weight:700}
-.user-role{font-size:10px;color:var(--muted)}
-.heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:17px}
-.eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.17em;color:var(--blue);margin-bottom:7px}
-h1{font-size:clamp(22px,2vw,29px);letter-spacing:-.045em;line-height:1.15}
-.heading-note{color:var(--muted);font-size:12px;margin-top:8px}
-.updated{font-size:10px;color:#718096}
-.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:16px}
-.stat-card{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;min-height:105px;padding:18px;background:linear-gradient(145deg,rgba(21,27,38,.98),rgba(14,18,26,.98));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-.stat-card:after{content:"";position:absolute;right:-28px;top:-38px;width:105px;height:105px;border-radius:50%;background:var(--accent);opacity:.06;filter:blur(2px)}
-.stat-icon{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;background:var(--icon-bg);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);flex:none}
-.stat-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
-.stat-label{font-size:11px;color:var(--muted);font-weight:600}
-.stat-value{font-size:26px;font-weight:800;letter-spacing:-.045em;margin-top:4px;line-height:1.1}
-.stat-foot{font-size:10px;color:#748196;margin-top:6px}
-.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:15px;margin-bottom:16px}
-.panel{background:linear-gradient(145deg,#11151d,#0f131a);border:1px solid var(--border);border-radius:var(--radius);min-width:0;box-shadow:var(--shadow)}
-.panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 18px;border-bottom:1px solid rgba(32,40,55,.8)}
-.panel-title-wrap{display:flex;align-items:center;gap:11px;min-width:0}
-.panel-icon{width:35px;height:35px;display:grid;place-items:center;border:1px solid var(--border);background:#171e29;border-radius:11px;color:#a8b7ca;flex:none}
-.panel-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8}
-.panel-title{font-size:12px;font-weight:800}.panel-subtitle{font-size:10px;color:var(--muted);margin-top:3px}
-.select{appearance:none;background:#0d1118;border:1px solid #293242;border-radius:8px;color:#aeb9c9;padding:8px 28px 8px 10px;font-size:10px;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238995a8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
-.money-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px}
-.money-card{display:flex;align-items:center;gap:11px;min-width:0;padding:13px 12px;background:#0b1017;border:1px solid #202a39;border-radius:12px;transition:border-color .2s,transform .2s}
-.money-card:hover{border-color:#34465d;transform:translateY(-2px)}
-.money-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:#151e29;font-size:19px;flex:none}
-.money-info{min-width:0}.money-title{font-size:10px;color:var(--muted);font-weight:600}.money-val{display:block;font-size:15px;font-weight:800;color:var(--green);margin-top:4px;overflow:hidden;text-overflow:ellipsis}
-.panel-inner{padding:16px}
-.pc-card{position:relative;max-width:260px;padding:15px;background:linear-gradient(145deg,#0b1017,#111722);border:1px solid #273142;border-radius:13px}
-.pc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.pc-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(251,101,114,.1);color:var(--red);border:1px solid rgba(251,101,114,.2);font-size:9px;font-weight:800;padding:5px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em}
-.pc-name{font-size:14px;font-weight:800;margin-top:16px}
-.pc-accounts{font-size:11px;color:var(--muted);margin-top:4px}
-.pc-divider{height:1px;background:#222b39;margin:13px 0 11px}
-.pc-stats{display:flex;gap:15px;font-size:10px;font-weight:700}.online{color:var(--green)}.offline{color:var(--red)}
-.pc-foot{font-size:10px;color:#647187;margin-top:14px}
-.table-panel{overflow:hidden}
-.table-toolbar{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.toolbar-left{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:10px;white-space:nowrap}
-.page-btn{width:27px;height:27px;border:1px solid #283243;background:#0d1219;color:#aeb9c9;border-radius:7px;display:grid;place-items:center}
-.page-label{padding:0 5px}
-.search-wrap{position:relative;flex:1;min-width:170px;max-width:300px;margin:0 auto}
-.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:#78869a;fill:none;stroke-width:2}
-.search-input{width:100%;background:#0b1017;border:1px solid #283243;border-radius:8px;padding:9px 12px 9px 33px;color:#f3f6fb;font-size:11px;outline:none;transition:border-color .2s}
-.toolbar-right{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.tool-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;background:#101620;border:1px solid #293344;color:#aeb9c9;border-radius:8px;font-size:10px;font-weight:700;white-space:nowrap}
-.tool-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
-.tool-btn.danger{color:#ff7c86}.tool-btn.success{color:#5be0ae;border-color:rgba(54,211,153,.2);background:rgba(54,211,153,.06)}
-.table-responsive{width:100%;overflow:auto;scrollbar-color:#2a3547 transparent;scrollbar-width:thin}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1180px;text-align:left}
-thead th{position:sticky;top:0;z-index:1;padding:13px 14px;background:#111720;color:#8390a4;border-bottom:1px solid #283141;font-size:10px;font-weight:800;white-space:nowrap}
-tbody td{padding:12px 14px;border-bottom:1px solid rgba(37,46,61,.75);font-size:11px;white-space:nowrap;color:#d5dce7}
-tbody tr:hover td{background:rgba(105,167,255,.035)}
-input[type=checkbox]{appearance:none;width:14px;height:14px;border:1px solid #3a4658;border-radius:4px;background:#0b1017;cursor:pointer;position:relative}
-input[type=checkbox]:checked{background:var(--blue);border-color:var(--blue)}
-input[type=checkbox]:checked:after{content:"✓";position:absolute;color:#07101d;font-size:10px;font-weight:900;left:2px;top:-1px}
-.status-cell{display:flex;align-items:center;gap:7px}.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}.status-dot.online{background:var(--green);box-shadow:0 0 8px rgba(54,211,153,.4)}.status-dot.offline{background:var(--red)}
-.status-days{font-size:10px;color:#8a96a9}.pc-tag{color:#a4b1c4;font-weight:600}.username{color:#f4f7fc;font-weight:700}.level-col{color:var(--gold);font-weight:700}.money-col{color:var(--green);font-weight:700}.money-col-zero{color:#d5bd6c;font-weight:700}
-.toast{position:fixed;bottom:22px;right:22px;z-index:10;padding:12px 16px;border:1px solid #2d3c4f;background:#111923;color:#e9f3ff;border-radius:10px;box-shadow:var(--shadow);font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}
-.toast.show{opacity:1;transform:translateY(0)}
-
-@media(max-width:1250px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid{grid-template-columns:1fr}.pc-card{max-width:none}}
-@media(max-width:900px){.main{height:auto;overflow:visible;padding:22px 15px 30px}.topbar{margin-bottom:23px;flex-direction:column;align-items:flex-start;gap:15px;}.top-right{width:100%;justify-content:space-between;}.heading-row{align-items:flex-start}.updated{display:none}.table-toolbar{align-items:stretch}.toolbar-left{order:1}.search-wrap{order:2;max-width:none;width:100%;flex-basis:100%;margin:0}.toolbar-right{order:3}.toolbar-right .tool-btn{flex:1;justify-content:center}}
-@media(max-width:560px){.stats-grid{gap:9px}.stat-card{min-height:92px;padding:12px;gap:10px}.stat-icon{width:35px;height:35px;border-radius:10px}.stat-value{font-size:22px}.stat-label{font-size:10px}.stat-foot{font-size:9px}.panel-header{padding:13px}.money-grid{grid-template-columns:1fr;padding:12px}.money-card{padding:11px}.money-val{font-size:14px}.panel-inner{padding:12px}.heading-note{font-size:11px}.tool-btn{padding:8px}.toolbar-right{gap:6px}}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(900px 420px at 85% -8%,rgba(80,120,175,.14),transparent 50%),
+    var(--bg);
+  color:var(--text);
+  font:13px/1.4 Inter,system-ui,sans-serif;
+}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1480px;margin:0 auto;padding:20px 20px 36px}
+.topbar,.hero,.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar{margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:11px;color:var(--muted);font-size:12px}
+.logo{width:36px;height:36px;border-radius:11px;border:1px solid #2a3648;background:#121924;display:grid;place-items:center;font-weight:800;color:#fff}
+.brand b{color:#fff}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill,.btn,.tool,.page-btn,.select{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  height:34px;padding:0 12px;border:1px solid var(--border);background:#121924;
+  border-radius:10px;color:#c5d0e0;font-size:11px;font-weight:700
+}
+.pill{border-radius:999px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(62,224,163,.65)}
+.btn:hover,.tool:hover,.icon-btn:hover,.page-btn:hover{background:#182231;border-color:#31445c}
+.btn.danger{color:var(--red);background:rgba(251,109,120,.07);border-color:rgba(251,109,120,.22)}
+.user{display:flex;align-items:center;gap:8px;padding:4px 6px 4px 4px;border:1px solid var(--border);border-radius:12px;background:#10161f}
+.avatar{width:30px;height:30px;border-radius:9px;background:#1b2432;display:grid;place-items:center;font-size:10px;font-weight:800}
+.user small{display:block;color:var(--muted);font-size:10px}
+.hero{align-items:flex-end;margin:6px 0 16px}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#7aa6ff;margin-bottom:6px}
+h1{font-size:clamp(22px,2.2vw,30px);letter-spacing:-.045em}
+.hero p{color:var(--muted);margin-top:6px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.kpi{display:flex;align-items:center;gap:12px;min-height:86px;padding:14px;background:#10161f;border:1px solid var(--border);border-radius:16px}
+.kpi b{display:block;font-size:24px;letter-spacing:-.04em}
+.kpi span{color:var(--muted);font-size:11px;font-weight:600}
+.ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
+.grid{display:grid;grid-template-columns:1.45fr .9fr;gap:10px;margin-bottom:12px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.panel-h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+.panel-h h2{font-size:13px}
+.panel-h p{color:var(--muted);font-size:11px;margin-top:2px}
+.money{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px}
+.money div{background:#0b1118;border:1px solid #1d2838;border-radius:12px;padding:12px}
+.money small{color:var(--muted);font-size:11px}
+.money strong{display:block;margin-top:5px;font-size:18px;color:var(--green)}
+.pc{margin:14px;padding:14px;border:1px solid #223044;border-radius:14px;background:#0b1118}
+.pc-top{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
+.badge{padding:4px 8px;border-radius:6px;font-weight:800;letter-spacing:.04em}
+.badge.on{background:rgba(62,224,163,.1);color:var(--green)}
+.badge.off{background:rgba(251,109,120,.1);color:var(--red)}
+.pc h3{margin:10px 0 3px;font-size:16px}
+.pc-stats{display:flex;gap:14px;margin-top:12px;font-size:12px;font-weight:700}
+.toolbar{padding:12px 14px;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.search{position:relative;flex:1;min-width:180px}
+.search svg{position:absolute;left:10px;top:50%;width:14px;height:14px;transform:translateY(-50%);stroke:#7d8a9c;fill:none;stroke-width:2}
+.search input{width:100%;height:34px;padding:0 10px 0 32px;border:1px solid #243042;border-radius:10px;background:#0b1118;outline:none}
+.page-btn{width:32px;padding:0}
+.select{appearance:none;padding-right:26px;background:#121924 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238995a8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center}
+.tool.ok{color:var(--green);border-color:rgba(62,224,163,.22);background:rgba(62,224,163,.07)}
+.tool.danger{color:#ff868e}
+.fleet{padding:8px}
+.row{
+  display:grid;
+  grid-template-columns:22px minmax(170px,1.25fr) 120px 150px 130px 110px 88px 92px auto;
+  align-items:center;gap:10px;
+  min-height:58px;padding:7px 10px;border-radius:14px
+}
+.row + .row{margin-top:2px}
+.row:hover{background:#121a24}
+.check{appearance:none;width:14px;height:14px;border:1px solid #3a4658;border-radius:4px;background:#0b1017;cursor:pointer;position:relative}
+.check:checked{background:var(--blue);border-color:var(--blue)}
+.check:checked:after{content:"✓";position:absolute;left:2px;top:-2px;font-size:10px;font-weight:900;color:#07101d}
+.who{min-width:0}
+.name{display:flex;align-items:center;gap:7px;font-weight:700;font-size:13px;white-space:nowrap}
+.name em{font-style:normal;font-size:11px;font-weight:700;color:var(--green)}
+.name em.off{color:#8b97a8;font-weight:600}
+.pcn{margin-top:2px;font-size:10px;color:#748297;letter-spacing:.03em;text-transform:uppercase}
+.server-chip{display:inline-block;background:#151d2a;border:1px solid #27364b;border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;color:#9eb0c8}
+.uid{display:block;margin-top:4px;font:10px/1.2 "JetBrains Mono",ui-monospace,monospace;color:#6f7d90}
+.skills{display:flex;align-items:center;gap:8px}
+.lvl{font-size:22px;font-weight:800;letter-spacing:-.05em;width:34px}
+.mini{display:grid;grid-template-columns:auto auto;gap:1px 9px;font-size:11px;color:#a7b4c6}
+.mini i{font-style:normal;color:#66768b;margin-right:3px}
+.wealth b{display:block;font-size:16px;letter-spacing:-.03em}
+.hb{margin-top:2px;font-size:10px;color:#748297}
+.hb span+span{margin-left:7px}
+.rate b{display:block;color:var(--green);font-size:12px;font-weight:800}
+.rate.flat b{color:#8ea0b6}
+.rate span{font-size:10px;color:#7d8a9c}
+.time{width:fit-content;padding:6px 8px;border:1px solid #243042;border-radius:9px;background:#121a24;font-size:12px;font-weight:700}
+.seen{display:flex;align-items:center;gap:6px;color:#8ea0b6;font-size:12px}
+.actions{display:flex;gap:6px}
+.icon-btn{width:30px;height:30px;border-radius:9px;border:1px solid #243042;background:#121a24;display:grid;place-items:center;color:#9eb0c8}
+.icon-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.toast{position:fixed;right:18px;bottom:18px;z-index:20;padding:11px 14px;border:1px solid #2a3b50;background:#121a24;border-radius:12px;opacity:0;transform:translateY(8px);transition:.2s}
+.toast.show{opacity:1;transform:none}
+@media(max-width:1200px){
+  .kpis,.grid{grid-template-columns:1fr 1fr}
+  .row{grid-template-columns:22px 1.2fr 110px 1fr 1fr auto}
+  .time,.seen{display:none}
+}
+@media(max-width:760px){
+  .kpis,.grid,.money,.topbar,.hero{grid-template-columns:1fr;flex-direction:column;align-items:flex-start}
+  .row{grid-template-columns:22px 1fr auto}
+  .server-chip,.uid,.skills,.rate,.time,.seen{display:none}
+}
 </style>
 </head>
 <body>
-
-<main class="main">
+<div class="wrap">
   <header class="topbar">
-    <div class="breadcrumb"><span>Dashboard</span><span class="crumb-sep">/</span><span class="crumb-current">Block Spin</span></div>
-    <div class="top-right">
-      <div class="user-info-top">
-        <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'OV' }}</div>
-        <div>
-          <div class="user-name">{{ my_key }}</div>
-          <div class="user-role">Starter Plan</div>
-        </div>
-        <a href="/logout" class="btn btn-danger" style="margin-left: 10px; padding: 6px 10px;">Logout</a>
+    <div class="brand"><div class="logo">OV</div><span>Dashboard / <b>Block Spin</b></span></div>
+    <div class="top-actions">
+      <div class="user">
+        <div class="avatar" id="user-avatar">OV</div>
+        <div><b id="user-name">Overseer</b><small>Starter Plan</small></div>
+        <a class="btn danger" href="/logout">Logout</a>
       </div>
-      <div class="live-pill"><span class="live-dot"></span>Monitoring system</div>
-      <button class="btn" onclick="window.location.reload()"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9a7 7 0 0 1 12-2L20 12M4 12l2.5 5a7 7 0 0 0 12-2"/></svg>Refresh</button>
+      <div class="pill"><span class="dot"></span>Monitoring live</div>
+      <button class="btn" type="button" onclick="location.reload()">Refresh</button>
     </div>
   </header>
 
-  <section class="heading-row">
-    <div><div class="eyebrow">Control center / Block Spin</div><h1>Dashboard Overview</h1><p class="heading-note">Monitor your account activity and in-game economy at a glance.</p></div>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Control center / Block Spin</div>
+      <h1>Account fleet</h1>
+      <p>Live workstation view with skills, cashflow, and session time.</p>
+    </div>
   </section>
 
-  <section class="stats-grid">
-    <div class="stat-card" style="--accent:var(--green);--icon-bg:rgba(54,211,153,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 12.5a11 11 0 0 1 14 0M2 9a16 16 0 0 1 20 0M8.5 16a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg></div><div><div class="stat-label">Online accounts</div><div class="stat-value">{{ stats.online }}</div><div class="stat-foot">Currently connected</div></div></div>
-    <div class="stat-card" style="--accent:var(--red);--icon-bg:rgba(251,101,114,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 12.5a11 11 0 0 1 14 0M2 9a16 16 0 0 1 20 0M8.5 16a5.5 5.5 0 0 1 7 0M3 3l18 18"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg></div><div><div class="stat-label">Offline accounts</div><div class="stat-value">{{ stats.offline }}</div><div class="stat-foot">Currently disconnected</div></div></div>
-    <div class="stat-card" style="--accent:var(--purple);--icon-bg:rgba(177,140,255,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2m2-14a4 4 0 0 1 0 8m2 2a5 5 0 0 1 2 4v0"/></svg></div><div><div class="stat-label">Total accounts</div><div class="stat-value">{{ stats.total }}</div><div class="stat-foot">Accounts in your list</div></div></div>
-    <div class="stat-card" style="--accent:#e78ab7;--icon-bg:rgba(231,138,183,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg></div><div><div class="stat-label">User package</div><div class="stat-value" style="font-size:21px">Starter</div><div class="stat-foot">Current subscription</div></div></div>
+  <section class="kpis">
+    <div class="kpi"><div class="ico" style="background:rgba(62,224,163,.1);color:var(--green)">●</div><div><span>Online</span><b id="stat-online">0</b></div></div>
+    <div class="kpi"><div class="ico" style="background:rgba(251,109,120,.1);color:var(--red)">●</div><div><span>Offline</span><b id="stat-offline">0</b></div></div>
+    <div class="kpi"><div class="ico" style="background:rgba(106,168,255,.1);color:var(--blue)">◎</div><div><span>Total accounts</span><b id="stat-total">0</b></div></div>
+    <div class="kpi"><div class="ico" style="background:rgba(243,196,90,.1);color:var(--gold)">★</div><div><span>Package</span><b style="font-size:18px">Starter</b></div></div>
   </section>
 
-  <section class="dashboard-grid">
+  <section class="grid">
     <div class="panel">
-      <div class="panel-header"><div class="panel-title-wrap"><div class="panel-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5a7 7 0 0 0 0-3l2-1.5-2-3.5-2.5 1a8 8 0 0 0-2.5-1.5L13.5 2h-4L9 5a8 8 0 0 0-2.5 1.5L4 5.5 2 9l2 1.5a7 7 0 0 0 0 3L2 15l2 3.5 2.5-1A8 8 0 0 0 9 19l.5 3h4l.5-3a8 8 0 0 0 2.5-1.5l2.5 1 2-3.5z"/></svg></div><div><div class="panel-title">Item Monitor</div><div class="panel-subtitle">3 tracked money metrics</div></div></div><select class="select"><option>All items</option></select></div>
-      <div class="money-grid">
-        <div class="money-card"><div class="money-icon">💵</div><div class="money-info"><div class="money-title">Cash</div><div class="money-val" id="total-cash-monitor">0</div></div></div>
-        <div class="money-card"><div class="money-icon">🏦</div><div class="money-info"><div class="money-title">Bank balance</div><div class="money-val" id="total-bank-monitor" style="color:var(--blue)">0</div></div></div>
-        <div class="money-card"><div class="money-icon">💰</div><div class="money-info"><div class="money-title">Total wealth</div><div class="money-val" id="total-combined-monitor">0</div></div></div>
+      <div class="panel-h"><div><h2>Item monitor</h2><p>Combined cash and bank</p></div></div>
+      <div class="money">
+        <div><small>Cash</small><strong id="total-cash">0</strong></div>
+        <div><small>Bank</small><strong id="total-bank" style="color:var(--blue)">0</strong></div>
+        <div><small>Total wealth</small><strong id="total-wealth">0</strong></div>
       </div>
     </div>
     <div class="panel">
-      <div class="panel-header"><div class="panel-title-wrap"><div class="panel-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></div><div><div class="panel-title">PC Monitor</div><div class="panel-subtitle">1 registered workstation</div></div></div><select class="select"><option>All PCs</option></select></div>
-      <div class="panel-inner"><div class="pc-card"><div class="pc-top"><span class="pc-badge">Offline</span><span style="font-size:10px;color:var(--muted)">WORKSTATION</span></div><div class="pc-name">MR 1</div><div class="pc-accounts">{{ stats.total }} monitored accounts</div><div class="pc-divider"></div><div class="pc-stats"><span class="online">● {{ stats.online }} online</span><span class="offline">● {{ stats.offline }} offline</span></div><div class="pc-foot">Status reflects the latest reported data.</div></div></div>
+      <div class="panel-h"><div><h2>PC monitor</h2><p>Registered workstations</p></div></div>
+      <div class="pc">
+        <div class="pc-top"><span class="badge on" id="pc-badge">ONLINE</span><span>WORKSTATION</span></div>
+        <h3>MR 1</h3>
+        <div style="color:var(--muted);font-size:12px" id="pc-meta">0 monitored accounts</div>
+        <div class="pc-stats">
+          <span style="color:var(--green)" id="pc-on">● 0 online</span>
+          <span style="color:var(--red)" id="pc-off">● 0 offline</span>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="panel table-panel">
-    <div class="panel-header"><div class="panel-title-wrap"><div class="panel-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11m6-11v11"/></svg></div><div><div class="panel-title">Account Inventory</div><div class="panel-subtitle">Search, review and manage the account list</div></div></div><span class="live-pill"><span class="live-dot"></span>{{ stats.total }} records</span></div>
-    <div class="table-toolbar">
-      <div class="toolbar-left"><button class="page-btn">«</button><button class="page-btn">‹</button><span class="page-label">Page 1 of 4</span><button class="page-btn">›</button><button class="page-btn">»</button><select class="select"><option>20 rows</option><option>50 rows</option></select></div>
-      <div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input type="text" id="searchInput" class="search-input" placeholder="Search usernames..." autocomplete="off"></div>
-      <div class="toolbar-right">
-        <button class="tool-btn" id="select-all-btn"><svg viewBox="0 0 24 24"><path d="M4 5h16M7 12h10m-7 7h4"/></svg>Select all</button>
-        <button class="tool-btn" onclick="copyScript()"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy script</button>
-        <button class="tool-btn danger" id="delete-btn"><svg viewBox="0 0 24 24"><path d="M4 7h16m-10 4v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg>Delete selected</button>
-        <button class="tool-btn success" id="export-btn"><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>Export CSV</button>
-      </div>
+  <section class="panel">
+    <div class="panel-h">
+      <div><h2>Account inventory</h2><p>Dense live rows — status, skills, cashflow, session</p></div>
+      <div class="pill"><span class="dot"></span><span id="record-count">0 records</span></div>
     </div>
-    <div class="table-responsive"><table>
-      <thead><tr><th><input type="checkbox" id="header-check"></th><th>Status</th><th>PC</th><th>Username</th><th>Total Level</th><th>Stamina</th><th>Shelf Stocker</th><th>Swiper</th><th>Janitor</th><th>Cook</th><th>Cash</th><th>Bank</th></tr></thead>
-      <tbody id="table-body">
-      {% for a in accounts %}
-      <tr class="account-row" data-name="{{ a.name|lower }}">
-        <td><input type="checkbox" class="row-check"></td>
-        <td><div class="status-cell">{% if a.online %}<span class="status-dot online"></span><span style="color:var(--green);font-weight:700">Online</span>{% else %}<span class="status-dot offline"></span><span class="status-days">Offline</span>{% endif %}</div></td>
-        <td class="pc-tag">{{ a.pc }}</td><td class="username">{{ a.name }}</td><td class="level-col">{{ a.total_level or 0 }}</td>
-        
-        <!-- قراءة المهارات بالطريقة الجديدة الآمنة -->
-        <td class="level-col">{{ a.skills.get('stamina', 0) }}</td>
-        <td class="level-col">{{ a.skills.get('shelf stocker', 0) }}</td>
-        <td class="level-col">{{ a.skills.get('swiper', 0) }}</td>
-        <td class="level-col">{{ a.skills.get('janitor', 0) }}</td>
-        <td class="level-col">{{ a.skills.get('cook', 0) }}</td>
-        
-        <td class="money-col-zero" data-label="Cash" data-money="{{ a.cash }}">{{ a.cash }}</td><td class="money-col" data-label="Bank" data-money="{{ a.bank }}">{{ a.bank }}</td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table></div>
+    <div class="toolbar">
+      <button class="page-btn" type="button" id="first-page">«</button>
+      <button class="page-btn" type="button" id="prev-page">‹</button>
+      <span id="page-label" style="font-size:11px;color:var(--muted)">Page 1</span>
+      <button class="page-btn" type="button" id="next-page">›</button>
+      <button class="page-btn" type="button" id="last-page">»</button>
+      <select class="select" id="page-size"><option value="20">20 rows</option><option value="50">50 rows</option></select>
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
+        <input id="searchInput" placeholder="Search usernames..." autocomplete="off">
+      </div>
+      <button class="tool" id="select-all-btn" type="button">Select all</button>
+      <button class="tool" id="copy-script-btn" type="button">Copy script</button>
+      <button class="tool danger" id="delete-btn" type="button">Delete</button>
+      <button class="tool ok" id="export-btn" type="button">Export CSV</button>
+    </div>
+    <div class="fleet" id="table-body"></div>
   </section>
-</main>
+</div>
 <div class="toast" id="toast"></div>
 
+<template id="server-boot">
+{% if accounts is defined %}{"my_key":{{ my_key|tojson }},"stats":{{ stats|tojson }},"accounts":{{ accounts|tojson }}}{% endif %}
+</template>
+
 <script>
-function formatNum(value){
-  const num=Number(value)||0;
-  if(Math.abs(num)>=1e9)return (num/1e9).toFixed(1)+'B';
-  if(Math.abs(num)>=1e6)return (num/1e6).toFixed(1)+'M';
-  if(Math.abs(num)>=1e3)return (num/1e3).toFixed(1)+'K';
-  return num.toLocaleString('en-US');
-}
-let totalCash=0,totalBank=0;
-document.querySelectorAll('[data-money]').forEach(el=>{
-  const val=Number(el.getAttribute('data-money'))||0;
-  el.textContent=formatNum(val);
-  if(el.dataset.label==='Cash')totalCash+=val;
-  if(el.dataset.label==='Bank')totalBank+=val;
-});
-document.getElementById('total-cash-monitor').textContent=formatNum(totalCash);
-document.getElementById('total-bank-monitor').textContent=formatNum(totalBank);
-document.getElementById('total-combined-monitor').textContent=formatNum(totalCash+totalBank);
+const DEMO = [
+  {name:"iodu34zhhh83",user_id:"e7a44251",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"19/28",total_level:60,skills:{stamina:61,swiper:74,janitor:1,cook:1},cash:3450000,bank:3450000,rate:300000,session:"11h 57m",seen:"just now"},
+  {name:"ddoetvzo6780",user_id:"c29e44251",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"19/28",total_level:70,skills:{stamina:64,swiper:73,janitor:1,cook:1},cash:3340000,bank:3340000,rate:110000,session:"11h 58m",seen:"just now"},
+  {name:"tria56hkvo37",user_id:"fefabf83",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"20/28",total_level:60,skills:{stamina:64,swiper:73,janitor:1,cook:1},cash:3320000,bank:3320000,rate:40000,session:"12h 00m",seen:"just now",trend:"Stagnant"},
+  {name:"zyxt173eegh31",user_id:"d59e551c",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"22/28",total_level:60,skills:{stamina:61,swiper:74,janitor:1,cook:1},cash:3300000,bank:3300000,rate:180000,session:"12h 01m",seen:"just now"},
+  {name:"fymrfjim4834",user_id:"d59e551c",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"22/28",total_level:66,skills:{stamina:63,swiper:73,janitor:1,cook:1},cash:3100000,bank:3100000,rate:110000,session:"11h 50m",seen:"just now"},
+  {name:"woybcmsm6640",user_id:"fefabf83",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"20/28",total_level:60,skills:{stamina:61,swiper:74,janitor:1,cook:1},cash:3010000,bank:3010000,rate:260000,session:"12h 01m",seen:"just now"},
+  {name:"owhpkjom9172",user_id:"17d39534",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"26/28",total_level:65,skills:{stamina:57,swiper:73,janitor:1,cook:1},cash:2890000,bank:2890000,rate:110000,session:"11h 37m",seen:"just now"},
+  {name:"rfjqmabl0367",user_id:"fefabf83",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"20/28",total_level:71,skills:{stamina:71,swiper:73,janitor:1,cook:1},cash:2890000,bank:2890000,rate:120000,session:"12h 01m",seen:"just now"},
+  {name:"jhei14rttu06",user_id:"c532f9c4",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"21/28",total_level:72,skills:{stamina:69,swiper:73,janitor:2,cook:1},cash:2850000,bank:2850000,rate:213000,session:"11h 56m",seen:"just now"},
+  {name:"ngns08kysb67",user_id:"d59e551c",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"22/28",total_level:71,skills:{stamina:69,swiper:73,janitor:1,cook:1},cash:2820000,bank:2820000,rate:200000,session:"12h 01m",seen:"just now"},
+  {name:"ipvf23jphi90",user_id:"d59e551c",online:true,pc:"DESKTOP-AD566RC",server:"Server 1",server_count:"22/28",total_level:60,skills:{stamina:47,swiper:74,janitor:1,cook:1},cash:2800000,bank:2800000,rate:60000,session:"12h 00m",seen:"just now"}
+];
 
-const toastEl=document.getElementById('toast');
-let toastTimer;
-function showToast(message){
-  toastEl.textContent=message;toastEl.classList.add('show');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2600);
-}
-document.getElementById('searchInput').addEventListener('input',function(e){
-  const val=e.target.value.trim().toLowerCase();
-  document.querySelectorAll('.account-row').forEach(row=>{
-    row.style.display=row.dataset.name.includes(val)?'':'none';
-  });
-});
-const headerCheck=document.getElementById('header-check');
-function rowChecks(){return [...document.querySelectorAll('.row-check')]}
-headerCheck.addEventListener('change',()=>rowChecks().forEach(c=>c.checked=headerCheck.checked));
-document.getElementById('select-all-btn').addEventListener('click',()=>{
-  const checks=rowChecks();const allSelected=checks.length&&checks.every(c=>c.checked);
-  checks.forEach(c=>c.checked=!allSelected);headerCheck.checked=!allSelected;
-  showToast(allSelected?'Selection cleared':'All accounts selected');
-});
-
-document.getElementById('delete-btn').addEventListener('click', async () => {
-  const selected = rowChecks().filter(c => c.checked).map(c => c.closest('tr').dataset.name);
-  if(!selected.length){ showToast('Select at least one account first'); return; }
-  if(!confirm("Are you sure you want to delete " + selected.length + " account(s)?")) return;
-  for (let name of selected) {
-    await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: name }) });
+function loadBoot(){
+  const raw = (document.getElementById("server-boot").innerHTML || "").trim();
+  if(raw.startsWith("{") && !raw.startsWith("{%")){
+    try { return JSON.parse(raw); } catch (e) {}
   }
-  showToast('Deleted ' + selected.length + ' account(s)');
-  setTimeout(() => window.location.reload(), 1000);
-});
-
-document.getElementById('export-btn').addEventListener('click',()=>{
-  const rows=[...document.querySelectorAll('.account-row')].filter(r=>r.style.display!=='none');
-  const headers=[...document.querySelectorAll('thead th')].slice(1).map(th=>th.textContent.trim());
-  const csv=[headers,...rows.map(row=>[...row.cells].slice(1).map(cell=>cell.innerText.trim()))]
-    .map(row=>row.map(value=>'"'+String(value).replace(/"/g,'""')+'"').join(',')).join('\r\n');
-  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');
-  a.href=url;a.download='overseer-accounts.csv';a.click();URL.revokeObjectURL(url);
-  showToast('CSV export downloaded');
-});
-
-async function copyScript(){
-  const currentKey = "{{ my_key }}";
-  const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${currentKey}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if n:find("fishing")or n:find("stamina")or n:find("shelfstocker")or n:find("janitor")or n:find("swiper")or n:find("farming")or n:find("cook")then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
-  try{await navigator.clipboard.writeText(script);showToast('✅ Script copied to clipboard!');}
-  catch(e){showToast('Clipboard access denied by browser');}
+  return null;
 }
+
+const boot = loadBoot();
+const accounts = (boot && Array.isArray(boot.accounts)) ? boot.accounts : DEMO;
+const STATS = (boot && boot.stats) ? boot.stats : {};
+const MY_KEY = (boot && boot.my_key) ? boot.my_key : "Overseer";
+
+let page = 1;
+const toastEl = document.getElementById("toast");
+let toastTimer;
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2400);
+}
+function formatNum(value){
+  const num = Number(value) || 0;
+  const abs = Math.abs(num);
+  if(abs >= 1e9) return (num/1e9).toFixed(2).replace(/\.00$/,"") + "B";
+  if(abs >= 1e6) return (num/1e6).toFixed(2).replace(/0$/,"").replace(/\.0$/,"") + "M";
+  if(abs >= 1e3) return (num/1e3).toFixed(0) + "K";
+  return num.toLocaleString("en-US");
+}
+function skill(a, key){
+  const s = a.skills || {};
+  const compact = key.replace(/\s+/g, "");
+  return s[key] ?? s[compact] ?? s[key.toLowerCase()] ?? 0;
+}
+function filtered(){
+  const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+  return accounts.filter(a =>
+    String(a.name || "").toLowerCase().includes(q) ||
+    String(a.display_name || "").toLowerCase().includes(q)
+  );
+}
+function pageSize(){ return Number(document.getElementById("page-size").value) || 20; }
+
+function rowHtml(a){
+  const cash = Number(a.cash) || 0;
+  const bank = Number(a.bank) || 0;
+  const total = cash + bank;
+  const rate = Number(a.rate) || 0;
+  const trend = a.trend || (rate > 50000 ? "Rising" : rate ? "Stagnant" : a.online ? "Active" : "Idle");
+  const pc = a.pc || a.pc_name || "MR 1";
+  const server = a.server || "Server 1";
+  const uid = a.user_id || a.id || "";
+  const safeName = String(a.name || "").replace(/['"<>]/g, "");
+  return `<article class="row account-row" data-name="${safeName.toLowerCase()}">
+    <input class="check row-check" type="checkbox">
+    <div class="who">
+      <div class="name">${a.display_name || a.name || "unknown"} <em class="${a.online ? "" : "off"}">${a.online ? "Online" : "Offline"}</em></div>
+      <div class="pcn">${pc}</div>
+    </div>
+    <div>
+      <span class="server-chip">${server}</span>
+      <span class="uid">${uid}${a.server_count ? " · " + a.server_count : ""}</span>
+    </div>
+    <div class="skills">
+      <div class="lvl">${a.total_level || 0}</div>
+      <div class="mini">
+        <span><i>♥</i>${skill(a,"stamina")}</span>
+        <span><i>◇</i>${skill(a,"swiper")}</span>
+        <span><i>⌂</i>${skill(a,"janitor")}</span>
+        <span><i>□</i>${skill(a,"cook")}</span>
+      </div>
+    </div>
+    <div class="wealth">
+      <b>${formatNum(cash || total)}</b>
+      <div class="hb"><span>H ${formatNum(cash)}</span><span>B ${formatNum(bank)}</span></div>
+    </div>
+    <div class="rate ${rate > 50000 ? "" : "flat"}">
+      <b>${rate ? ("+" + formatNum(rate) + "/h") : (a.online ? "Live" : "—")}</b>
+      <span>${trend}</span>
+    </div>
+    <div class="time">${a.session || a.playtime || "—"}</div>
+    <div class="seen"><span class="dot" style="${a.online ? "" : "background:#fb6d78;box-shadow:none"}"></span>${a.seen || (a.online ? "just now" : "offline")}</div>
+    <div class="actions">
+      <button class="icon-btn" type="button" title="Copy username" data-copy="${safeName}">
+        <svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <button class="icon-btn" type="button" title="Home">
+        <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></svg>
+      </button>
+    </div>
+  </article>`;
+}
+
+function render(){
+  const rows = filtered();
+  const size = pageSize();
+  const pages = Math.max(1, Math.ceil(rows.length / size));
+  if(page > pages) page = pages;
+  const slice = rows.slice((page-1)*size, page*size);
+  document.getElementById("table-body").innerHTML = slice.map(rowHtml).join("") || `<div class="empty">No accounts match this search.</div>`;
+  document.getElementById("record-count").textContent = rows.length + " records";
+  document.getElementById("page-label").textContent = "Page " + page + " of " + pages;
+}
+
+function refreshStats(){
+  const online = accounts.filter(a => a.online).length;
+  const total = accounts.length;
+  const offline = total - online;
+  const cash = accounts.reduce((n,a) => n + (Number(a.cash)||0), 0);
+  const bank = accounts.reduce((n,a) => n + (Number(a.bank)||0), 0);
+  document.getElementById("stat-online").textContent = STATS.online ?? online;
+  document.getElementById("stat-offline").textContent = STATS.offline ?? offline;
+  document.getElementById("stat-total").textContent = STATS.total ?? total;
+  document.getElementById("total-cash").textContent = formatNum(cash);
+  document.getElementById("total-bank").textContent = formatNum(bank);
+  document.getElementById("total-wealth").textContent = formatNum(cash + bank);
+  document.getElementById("pc-meta").textContent = (STATS.total ?? total) + " monitored accounts";
+  document.getElementById("pc-on").textContent = "● " + (STATS.online ?? online) + " online";
+  document.getElementById("pc-off").textContent = "● " + (STATS.offline ?? offline) + " offline";
+  const isOn = (STATS.online ?? online) > 0;
+  document.getElementById("pc-badge").textContent = isOn ? "ONLINE" : "OFFLINE";
+  document.getElementById("pc-badge").className = "badge " + (isOn ? "on" : "off");
+  document.getElementById("user-name").textContent = MY_KEY || "Overseer";
+  document.getElementById("user-avatar").textContent = String(MY_KEY || "OV").slice(0,2).toUpperCase();
+}
+
+document.getElementById("searchInput").addEventListener("input", () => { page = 1; render(); });
+document.getElementById("page-size").addEventListener("change", () => { page = 1; render(); });
+document.getElementById("first-page").onclick = () => { page = 1; render(); };
+document.getElementById("prev-page").onclick = () => { page = Math.max(1, page-1); render(); };
+document.getElementById("next-page").onclick = () => { page += 1; render(); };
+document.getElementById("last-page").onclick = () => { page = 9999; render(); };
+document.getElementById("table-body").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-copy]");
+  if(!btn) return;
+  navigator.clipboard.writeText(btn.dataset.copy).then(() => showToast("Username copied"));
+});
+document.getElementById("select-all-btn").onclick = () => {
+  const checks = [...document.querySelectorAll(".row-check")];
+  const all = checks.length && checks.every(c => c.checked);
+  checks.forEach(c => c.checked = !all);
+  showToast(all ? "Selection cleared" : "All visible accounts selected");
+};
+document.getElementById("delete-btn").onclick = async () => {
+  const selected = [...document.querySelectorAll(".row-check:checked")].map(c => c.closest(".account-row").dataset.name);
+  if(!selected.length){ showToast("Select at least one account first"); return; }
+  if(!confirm("Delete " + selected.length + " account(s)?")) return;
+  for(const name of selected){
+    await fetch("/api/delete", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name }) });
+  }
+  showToast("Deleted " + selected.length + " account(s)");
+  setTimeout(() => location.reload(), 900);
+};
+document.getElementById("export-btn").onclick = () => {
+  const rows = filtered();
+  const csv = [["Name","User ID","Online","PC","Level","Stamina","Swiper","Janitor","Cook","Cash","Bank"],
+    ...rows.map(a => [a.name, a.user_id||"", a.online?"online":"offline", a.pc||"MR 1", a.total_level||0, skill(a,"stamina"), skill(a,"swiper"), skill(a,"janitor"), skill(a,"cook"), a.cash||0, a.bank||0])]
+    .map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+  const blob = new Blob(["\ufeff"+csv], { type:"text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "overseer-accounts.csv"; a.click();
+  URL.revokeObjectURL(url);
+  showToast("CSV export downloaded");
+};
+document.getElementById("copy-script-btn").onclick = async () => {
+  const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${MY_KEY}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME})})end end)]])()`;
+  try { await navigator.clipboard.writeText(script); showToast("Script copied"); }
+  catch (e) { showToast("Clipboard access denied"); }
+};
+
+refreshStats();
+render();
 </script>
 </body>
 </html>
