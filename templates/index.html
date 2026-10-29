@@ -11,9 +11,8 @@
 <style>
 :root{
   color-scheme:dark;
-  --bg:#080a0f;--surface:#10141c;--surface-2:#141a24;
-  --border:#202837;--text:#f4f7fb;--muted:#8995a8;--green:#36d399;
-  --red:#fb6572;--blue:#69a7ff;--purple:#b18cff;--gold:#f5c451;
+  --bg:#080a0f;--surface:#10141c;--border:#202837;--text:#f4f7fb;--muted:#8995a8;
+  --green:#36d399;--red:#fb6572;--blue:#69a7ff;--purple:#b18cff;--gold:#f5c451;
   --radius:15px;--shadow:0 18px 50px rgba(0,0,0,.22)
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -21,8 +20,6 @@ body{min-height:100vh;background:radial-gradient(ellipse at 70% -20%,rgba(48,86,
 button,input,select{font:inherit}
 button,a,select{ -webkit-tap-highlight-color:transparent}
 button{cursor:pointer}
-
-/* توسيط المحتوى بعد شيل الشريط الجانبي */
 .main{width:100%;max-width:1500px;padding:27px clamp(16px,2.2vw,34px) 34px;scrollbar-color:#293343 transparent;scrollbar-width:thin}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:27px}
 .breadcrumb{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
@@ -34,14 +31,10 @@ button{cursor:pointer}
 .btn:hover{border-color:#46566e;background:#1a2230;transform:translateY(-1px)}
 .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
 .btn-danger{color:var(--red);border-color:rgba(251,101,114,.2);background:rgba(251,101,114,.05)}
-.btn-danger:hover{background:rgba(251,101,114,.1);border-color:var(--red)}
-
-/* معلومات المستخدم فوق */
 .user-info-top{display:flex;align-items:center;gap:10px;background:#0e131a;border:1px solid var(--border);padding:6px 12px;border-radius:10px;}
 .user-avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(145deg,#28364a,#151b26);border:1px solid #344257;display:grid;place-items:center;font-size:11px;font-weight:800;color:#dbe8fb}
 .user-name{font-size:12px;font-weight:700}
 .user-role{font-size:10px;color:var(--muted)}
-
 .heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:17px}
 .eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.17em;color:var(--blue);margin-bottom:7px}
 h1{font-size:clamp(22px,2vw,29px);letter-spacing:-.045em;line-height:1.15}
@@ -72,7 +65,6 @@ h1{font-size:clamp(22px,2vw,29px);letter-spacing:-.045em;line-height:1.15}
 .pc-card{position:relative;max-width:260px;padding:15px;background:linear-gradient(145deg,#0b1017,#111722);border:1px solid #273142;border-radius:13px}
 .pc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .pc-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(251,101,114,.1);color:var(--red);border:1px solid rgba(251,101,114,.2);font-size:9px;font-weight:800;padding:5px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em}
-.pc-badge:before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
 .pc-name{font-size:14px;font-weight:800;margin-top:16px}
 .pc-accounts{font-size:11px;color:var(--muted);margin-top:4px}
 .pc-divider{height:1px;background:#222b39;margin:13px 0 11px}
@@ -82,35 +74,30 @@ h1{font-size:clamp(22px,2vw,29px);letter-spacing:-.045em;line-height:1.15}
 .table-toolbar{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .toolbar-left{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:10px;white-space:nowrap}
 .page-btn{width:27px;height:27px;border:1px solid #283243;background:#0d1219;color:#aeb9c9;border-radius:7px;display:grid;place-items:center}
-.page-btn:hover{color:#fff;border-color:#46556b}
 .page-label{padding:0 5px}
 .search-wrap{position:relative;flex:1;min-width:170px;max-width:300px;margin:0 auto}
 .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:#78869a;fill:none;stroke-width:2}
 .search-input{width:100%;background:#0b1017;border:1px solid #283243;border-radius:8px;padding:9px 12px 9px 33px;color:#f3f6fb;font-size:11px;outline:none;transition:border-color .2s}
-.search-input:focus{border-color:#4d79b5;box-shadow:0 0 0 3px rgba(105,167,255,.08)}
 .toolbar-right{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .tool-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;background:#101620;border:1px solid #293344;color:#aeb9c9;border-radius:8px;font-size:10px;font-weight:700;white-space:nowrap}
 .tool-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
-.tool-btn:hover{color:#fff;border-color:#46566d}
 .tool-btn.danger{color:#ff7c86}.tool-btn.success{color:#5be0ae;border-color:rgba(54,211,153,.2);background:rgba(54,211,153,.06)}
 .table-responsive{width:100%;overflow:auto;scrollbar-color:#2a3547 transparent;scrollbar-width:thin}
 table{width:100%;border-collapse:separate;border-spacing:0;min-width:1180px;text-align:left}
 thead th{position:sticky;top:0;z-index:1;padding:13px 14px;background:#111720;color:#8390a4;border-bottom:1px solid #283141;font-size:10px;font-weight:800;white-space:nowrap}
-th span{color:#4f5e73;margin-left:4px}
 tbody td{padding:12px 14px;border-bottom:1px solid rgba(37,46,61,.75);font-size:11px;white-space:nowrap;color:#d5dce7}
-tbody tr{transition:background .15s}tbody tr:hover td{background:rgba(105,167,255,.035)}tbody tr:last-child td{border-bottom:0}
-input[type=checkbox]{appearance:none;width:14px;height:14px;border:1px solid #3a4658;border-radius:4px;background:#0b1017;cursor:pointer;vertical-align:middle;position:relative}
+tbody tr:hover td{background:rgba(105,167,255,.035)}
+input[type=checkbox]{appearance:none;width:14px;height:14px;border:1px solid #3a4658;border-radius:4px;background:#0b1017;cursor:pointer;position:relative}
 input[type=checkbox]:checked{background:var(--blue);border-color:var(--blue)}
 input[type=checkbox]:checked:after{content:"✓";position:absolute;color:#07101d;font-size:10px;font-weight:900;left:2px;top:-1px}
 .status-cell{display:flex;align-items:center;gap:7px}.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}.status-dot.online{background:var(--green);box-shadow:0 0 8px rgba(54,211,153,.4)}.status-dot.offline{background:var(--red)}
 .status-days{font-size:10px;color:#8a96a9}.pc-tag{color:#a4b1c4;font-weight:600}.username{color:#f4f7fc;font-weight:700}.level-col{color:var(--gold);font-weight:700}.money-col{color:var(--green);font-weight:700}.money-col-zero{color:#d5bd6c;font-weight:700}
-.empty-state{padding:35px!important;text-align:center;color:var(--muted)!important}
 .toast{position:fixed;bottom:22px;right:22px;z-index:10;padding:12px 16px;border:1px solid #2d3c4f;background:#111923;color:#e9f3ff;border-radius:10px;box-shadow:var(--shadow);font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}
 .toast.show{opacity:1;transform:translateY(0)}
 
-@media(max-width:1250px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid{grid-template-columns:1fr}.pc-card{max-width:none}.pc-card-inner{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.pc-name{margin-top:0}}
+@media(max-width:1250px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid{grid-template-columns:1fr}.pc-card{max-width:none}}
 @media(max-width:900px){.main{height:auto;overflow:visible;padding:22px 15px 30px}.topbar{margin-bottom:23px;flex-direction:column;align-items:flex-start;gap:15px;}.top-right{width:100%;justify-content:space-between;}.heading-row{align-items:flex-start}.updated{display:none}.table-toolbar{align-items:stretch}.toolbar-left{order:1}.search-wrap{order:2;max-width:none;width:100%;flex-basis:100%;margin:0}.toolbar-right{order:3}.toolbar-right .tool-btn{flex:1;justify-content:center}}
-@media(max-width:560px){.brand-caption{display:none}.brand-name{font-size:12px}.topbar{align-items:flex-start}.breadcrumb{font-size:10px}.live-pill{display:none}.stats-grid{gap:9px}.stat-card{min-height:92px;padding:12px;gap:10px}.stat-icon{width:35px;height:35px;border-radius:10px}.stat-value{font-size:22px}.stat-label{font-size:10px}.stat-foot{font-size:9px}.panel-header{padding:13px}.money-grid{grid-template-columns:1fr;padding:12px}.money-card{padding:11px}.money-val{font-size:14px}.panel-inner{padding:12px}.heading-note{font-size:11px}.tool-btn{padding:8px}.toolbar-right{gap:6px}}
+@media(max-width:560px){.stats-grid{gap:9px}.stat-card{min-height:92px;padding:12px;gap:10px}.stat-icon{width:35px;height:35px;border-radius:10px}.stat-value{font-size:22px}.stat-label{font-size:10px}.stat-foot{font-size:9px}.panel-header{padding:13px}.money-grid{grid-template-columns:1fr;padding:12px}.money-card{padding:11px}.money-val{font-size:14px}.panel-inner{padding:12px}.heading-note{font-size:11px}.tool-btn{padding:8px}.toolbar-right{gap:6px}}
 </style>
 </head>
 <body>
@@ -118,26 +105,22 @@ input[type=checkbox]:checked:after{content:"✓";position:absolute;color:#07101d
 <main class="main">
   <header class="topbar">
     <div class="breadcrumb"><span>Dashboard</span><span class="crumb-sep">/</span><span class="crumb-current">Block Spin</span></div>
-    
     <div class="top-right">
-      <!-- حطينا معلومات حسابك هنا بعد شيل الشريط اليسار -->
       <div class="user-info-top">
-        <div class="user-avatar">{{ my_key[:2]|upper }}</div>
+        <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'OV' }}</div>
         <div>
           <div class="user-name">{{ my_key }}</div>
           <div class="user-role">Starter Plan</div>
         </div>
         <a href="/logout" class="btn btn-danger" style="margin-left: 10px; padding: 6px 10px;">Logout</a>
       </div>
-
       <div class="live-pill"><span class="live-dot"></span>Monitoring system</div>
-      <button class="btn" onclick="window.location.reload()"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9a7 7 0 0 1 12-2L20 12M4 12l2.5 5a7 7 0 0 0 12-2"/></svg>Refresh data</button>
+      <button class="btn" onclick="window.location.reload()"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9a7 7 0 0 1 12-2L20 12M4 12l2.5 5a7 7 0 0 0 12-2"/></svg>Refresh</button>
     </div>
   </header>
 
   <section class="heading-row">
     <div><div class="eyebrow">Control center / Block Spin</div><h1>Dashboard Overview</h1><p class="heading-note">Monitor your account activity and in-game economy at a glance.</p></div>
-    <div class="updated">LIVE OVERVIEW&nbsp; · &nbsp;BLOCK SPIN</div>
   </section>
 
   <section class="stats-grid">
@@ -165,7 +148,7 @@ input[type=checkbox]:checked:after{content:"✓";position:absolute;color:#07101d
   <section class="panel table-panel">
     <div class="panel-header"><div class="panel-title-wrap"><div class="panel-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11m6-11v11"/></svg></div><div><div class="panel-title">Account Inventory</div><div class="panel-subtitle">Search, review and manage the account list</div></div></div><span class="live-pill"><span class="live-dot"></span>{{ stats.total }} records</span></div>
     <div class="table-toolbar">
-      <div class="toolbar-left"><button class="page-btn" aria-label="First page">«</button><button class="page-btn" aria-label="Previous page">‹</button><span class="page-label">Page 1 of 4</span><button class="page-btn" aria-label="Next page">›</button><button class="page-btn" aria-label="Last page">»</button><select class="select" aria-label="Rows per page"><option>20 rows</option><option>50 rows</option><option>100 rows</option></select></div>
+      <div class="toolbar-left"><button class="page-btn">«</button><button class="page-btn">‹</button><span class="page-label">Page 1 of 4</span><button class="page-btn">›</button><button class="page-btn">»</button><select class="select"><option>20 rows</option><option>50 rows</option></select></div>
       <div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input type="text" id="searchInput" class="search-input" placeholder="Search usernames..." autocomplete="off"></div>
       <div class="toolbar-right">
         <button class="tool-btn" id="select-all-btn"><svg viewBox="0 0 24 24"><path d="M4 5h16M7 12h10m-7 7h4"/></svg>Select all</button>
@@ -175,18 +158,21 @@ input[type=checkbox]:checked:after{content:"✓";position:absolute;color:#07101d
       </div>
     </div>
     <div class="table-responsive"><table>
-      <thead><tr><th><input type="checkbox" id="header-check" aria-label="Select all accounts"></th><th>Status <span>↕</span></th><th>PC <span>↕</span></th><th>Username <span>↕</span></th><th>Total Level <span>↕</span></th><th>Stamina <span>↕</span></th><th>Shelf Stocker <span>↕</span></th><th>Swiper <span>↕</span></th><th>Janitor <span>↕</span></th><th>Cook <span>↕</span></th><th>Cash <span>↕</span></th><th>Bank <span>↕</span></th></tr></thead>
+      <thead><tr><th><input type="checkbox" id="header-check"></th><th>Status</th><th>PC</th><th>Username</th><th>Total Level</th><th>Stamina</th><th>Shelf Stocker</th><th>Swiper</th><th>Janitor</th><th>Cook</th><th>Cash</th><th>Bank</th></tr></thead>
       <tbody id="table-body">
       {% for a in accounts %}
       <tr class="account-row" data-name="{{ a.name|lower }}">
-        <td><input type="checkbox" class="row-check" aria-label="Select {{ a.name }}"></td>
+        <td><input type="checkbox" class="row-check"></td>
         <td><div class="status-cell">{% if a.online %}<span class="status-dot online"></span><span style="color:var(--green);font-weight:700">Online</span>{% else %}<span class="status-dot offline"></span><span class="status-days">Offline</span>{% endif %}</div></td>
         <td class="pc-tag">{{ a.pc }}</td><td class="username">{{ a.name }}</td><td class="level-col">{{ a.total_level or 0 }}</td>
-        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "stamina") | first %}{{ s.level if s else 0 }}</td>
-        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "shelf stocker") | first %}{{ s.level if s else 0 }}</td>
-        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "swiper") | first %}{{ s.level if s else 0 }}</td>
-        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "janitor") | first %}{{ s.level if s else 0 }}</td>
-        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "cook") | first %}{{ s.level if s else 0 }}</td>
+        
+        <!-- قراءة المهارات بالطريقة الجديدة الآمنة -->
+        <td class="level-col">{{ a.skills.get('stamina', 0) }}</td>
+        <td class="level-col">{{ a.skills.get('shelf stocker', 0) }}</td>
+        <td class="level-col">{{ a.skills.get('swiper', 0) }}</td>
+        <td class="level-col">{{ a.skills.get('janitor', 0) }}</td>
+        <td class="level-col">{{ a.skills.get('cook', 0) }}</td>
+        
         <td class="money-col-zero" data-label="Cash" data-money="{{ a.cash }}">{{ a.cash }}</td><td class="money-col" data-label="Bank" data-money="{{ a.bank }}">{{ a.bank }}</td>
       </tr>
       {% endfor %}
@@ -194,7 +180,7 @@ input[type=checkbox]:checked:after{content:"✓";position:absolute;color:#07101d
     </table></div>
   </section>
 </main>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="toast" id="toast"></div>
 
 <script>
 function formatNum(value){
@@ -239,15 +225,9 @@ document.getElementById('select-all-btn').addEventListener('click',()=>{
 document.getElementById('delete-btn').addEventListener('click', async () => {
   const selected = rowChecks().filter(c => c.checked).map(c => c.closest('tr').dataset.name);
   if(!selected.length){ showToast('Select at least one account first'); return; }
-  
   if(!confirm("Are you sure you want to delete " + selected.length + " account(s)?")) return;
-
   for (let name of selected) {
-    await fetch('/api/delete', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ name: name })
-    });
+    await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: name }) });
   }
   showToast('Deleted ' + selected.length + ' account(s)');
   setTimeout(() => window.location.reload(), 1000);
@@ -255,7 +235,7 @@ document.getElementById('delete-btn').addEventListener('click', async () => {
 
 document.getElementById('export-btn').addEventListener('click',()=>{
   const rows=[...document.querySelectorAll('.account-row')].filter(r=>r.style.display!=='none');
-  const headers=[...document.querySelectorAll('thead th')].slice(1).map(th=>th.textContent.replace('↕','').trim());
+  const headers=[...document.querySelectorAll('thead th')].slice(1).map(th=>th.textContent.trim());
   const csv=[headers,...rows.map(row=>[...row.cells].slice(1).map(cell=>cell.innerText.trim()))]
     .map(row=>row.map(value=>'"'+String(value).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
@@ -266,8 +246,7 @@ document.getElementById('export-btn').addEventListener('click',()=>{
 
 async function copyScript(){
   const currentKey = "{{ my_key }}";
-  const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${currentKey}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if n:find("fishing|stamina|shelfstocker|janitor|swiper|farming|cook")then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
-  
+  const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${currentKey}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if n:find("fishing")or n:find("stamina")or n:find("shelfstocker")or n:find("janitor")or n:find("swiper")or n:find("farming")or n:find("cook")then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
   try{await navigator.clipboard.writeText(script);showToast('✅ Script copied to clipboard!');}
   catch(e){showToast('Clipboard access denied by browser');}
 }
