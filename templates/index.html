@@ -3,404 +3,274 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>OVERSEER | Network</title>
+<meta name="theme-color" content="#080a0f">
+<title>OVERSEER — Control Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    
-    :root { 
-        --bg: #05070a; 
-        --panel: #0d1117;
-        --panel-hover: #161b22;
-        --border: #21262d;
-        --text: #ffffff; 
-        --dim: #8b949e; 
-        --green: #2ea043; 
-        --red: #f85149; 
-        --blue: #58a6ff;
-        --purple: #bc8cff;
-    }
-    
-    * { box-sizing: border-box; }
-    
-    body { 
-        margin: 0; 
-        background-color: var(--bg); 
-        /* توهج خلفي فخم */
-        background-image: radial-gradient(circle at 50% -20%, rgba(88, 166, 255, 0.15), transparent 40%);
-        color: var(--text); 
-        font-family: 'Plus Jakarta Sans', sans-serif; 
-        display: flex; 
-        justify-content: center; 
-        min-height: 100vh;
-        padding: 40px 20px;
-    }
-    
-    .dashboard { width: 100%; max-width: 1500px; }
-    
-    /* الشريط العلوي */
-    .header { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-bottom: 30px;
-        background: rgba(13, 17, 23, 0.6);
-        backdrop-filter: blur(12px);
-        padding: 15px 25px;
-        border-radius: 16px;
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    }
-    
-    .logo { display: flex; align-items: center; gap: 12px; }
-    .logo-icon { 
-        width: 36px; height: 36px; 
-        background: linear-gradient(135deg, var(--blue), var(--purple)); 
-        border-radius: 10px; display: flex; justify-content: center; align-items: center; 
-        font-weight: 900; font-size: 20px; color: #fff;
-        box-shadow: 0 0 15px rgba(88, 166, 255, 0.4);
-    }
-    .logo-text { font-size: 20px; font-weight: 800; letter-spacing: 1px; }
-    
-    .actions { display: flex; gap: 12px; align-items: center; }
-    
-    .btn { 
-        background: var(--panel); border: 1px solid var(--border); color: #fff;
-        padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;
-        text-decoration: none; cursor: pointer; transition: all 0.2s;
-        display: flex; align-items: center; gap: 8px;
-    }
-    .btn:hover { border-color: var(--dim); background: var(--panel-hover); }
-    
-    .btn-primary { background: var(--blue); border-color: var(--blue); color: #000; }
-    .btn-primary:hover { background: #79c0ff; border-color: #79c0ff; }
-    
-    .btn-danger { color: var(--red); border-color: rgba(248, 81, 73, 0.3); }
-    .btn-danger:hover { background: rgba(248, 81, 73, 0.1); border-color: var(--red); }
-    
-    .btn-admin { color: var(--purple); border-color: rgba(188, 140, 255, 0.3); }
-    .btn-admin:hover { background: rgba(188, 140, 255, 0.1); border-color: var(--purple); }
+:root{
+  color-scheme:dark;
+  --bg:#080a0f;--surface:#10141c;--surface-2:#141a24;
+  --border:#202837;--text:#f4f7fb;--muted:#8995a8;--green:#36d399;
+  --red:#fb6572;--blue:#69a7ff;--purple:#b18cff;--gold:#f5c451;
+  --radius:15px;--shadow:0 18px 50px rgba(0,0,0,.22)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:radial-gradient(ellipse at 70% -20%,rgba(48,86,130,.13),transparent 42%),var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;overflow-x:hidden;display:flex;justify-content:center}
+button,input,select{font:inherit}
+button,a,select{ -webkit-tap-highlight-color:transparent}
+button{cursor:pointer}
 
-    /* الجدول */
-    .table-container {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    
-    .table-responsive { width: 100%; overflow-x: auto; }
-    
-    table { width: 100%; border-collapse: collapse; min-width: 1100px; text-align: left; }
-    
-    th { 
-        padding: 18px 24px; 
-        font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-        color: var(--dim);
-        border-bottom: 1px solid var(--border);
-        background: rgba(0,0,0,0.2);
-    }
-    
-    td { 
-        padding: 18px 24px; 
-        border-bottom: 1px solid var(--border); 
-        vertical-align: middle; 
-        font-size: 14px;
-    }
-    
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--panel-hover); }
-    
-    /* بيانات الحساب */
-    .acc-info { display: flex; flex-direction: column; gap: 4px; }
-    .acc-name { font-weight: 800; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-    .acc-pc { font-size: 11px; color: var(--dim); font-weight: 600; text-transform: uppercase; }
-    
-    /* نقطة الحالة */
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); }
-    .status-dot.offline { background: var(--red); box-shadow: 0 0 10px var(--red); }
-    
-    /* المهارات (كبسولات) */
-    .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 10px; width: 180px; }
-    .skill-pill { 
-        display: flex; align-items: center; gap: 5px; 
-        background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-        padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; color: #c9d1d9;
-    }
-    .skill-pill svg { width: 14px; height: 14px; stroke-width: 2.5; fill: none; }
-    
-    /* اللفل */
-    .level-badge { 
-        background: rgba(88, 166, 255, 0.1); color: var(--blue); border: 1px solid rgba(88, 166, 255, 0.2);
-        padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 15px; display: inline-block; 
-    }
-    
-    /* الفلوس */
-    .money-main { font-size: 16px; font-weight: 800; color: #fff; }
-    .money-sub { font-size: 11px; color: var(--dim); font-weight: 600; margin-top: 2px; }
-    
-    /* الأرباح */
-    .profit { color: var(--green); font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
-    .profit.neg { color: var(--red); }
-    
-    /* الوقت */
-    .uptime { 
-        display: inline-flex; align-items: center; gap: 6px; 
-        background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-        padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; 
-    }
-    .uptime svg { width: 12px; height: 12px; stroke: var(--dim); fill: none; stroke-width: 2.5; }
-    
-    /* الأزرار */
-    .action-btns { display: flex; gap: 8px; }
-    .btn-icon { 
-        background: transparent; border: 1px solid var(--border); color: var(--dim); 
-        width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; 
-        cursor: pointer; transition: 0.2s; 
-    }
-    .btn-icon:hover { background: var(--panel-hover); color: #fff; border-color: var(--dim); }
-    .btn-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+/* توسيط المحتوى بعد شيل الشريط الجانبي */
+.main{width:100%;max-width:1500px;padding:27px clamp(16px,2.2vw,34px) 34px;scrollbar-color:#293343 transparent;scrollbar-width:thin}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:27px}
+.breadcrumb{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}
+.crumb-sep{color:#4c586a}.crumb-current{color:#f3f6fc;font-weight:700}
+.top-right{display:flex;align-items:center;gap:12px}
+.live-pill{display:flex;align-items:center;gap:8px;color:#9fb0c5;font-size:11px;padding:7px 10px;border:1px solid var(--border);background:#0e131a;border-radius:999px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 11px rgba(54,211,153,.65)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #2a3444;background:#151b25;color:#eaf0f9;padding:9px 13px;border-radius:9px;font-size:11px;font-weight:700;transition:.18s;text-decoration:none}
+.btn:hover{border-color:#46566e;background:#1a2230;transform:translateY(-1px)}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.btn-danger{color:var(--red);border-color:rgba(251,101,114,.2);background:rgba(251,101,114,.05)}
+.btn-danger:hover{background:rgba(251,101,114,.1);border-color:var(--red)}
 
-    /* ألوان المهارات */
-    .fishing svg { stroke: #38bdf8; }
-    .shelf svg { stroke: #fbbf24; }
-    .stamina svg { stroke: #fb7185; }
-    .farming svg { stroke: #4ade80; }
-    .janitor svg { stroke: #a78bfa; }
-    .cook svg { stroke: #f87171; }
-    .swiper svg { stroke: #2dd4bf; }
-    .default svg { stroke: #94a3b8; }
+/* معلومات المستخدم فوق */
+.user-info-top{display:flex;align-items:center;gap:10px;background:#0e131a;border:1px solid var(--border);padding:6px 12px;border-radius:10px;}
+.user-avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(145deg,#28364a,#151b26);border:1px solid #344257;display:grid;place-items:center;font-size:11px;font-weight:800;color:#dbe8fb}
+.user-name{font-size:12px;font-weight:700}
+.user-role{font-size:10px;color:var(--muted)}
 
-    /* 📱 الجوال */
-    @media (max-width: 950px) {
-        body { padding: 15px; }
-        .header { flex-direction: column; gap: 15px; align-items: flex-start; }
-        .actions { width: 100%; flex-wrap: wrap; }
-        .actions > * { flex: 1; justify-content: center; }
-        
-        table, thead, tbody, th, td, tr { display: block; }
-        thead tr { position: absolute; top: -9999px; left: -9999px; }
-        tr { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 15px; padding: 10px; }
-        td { border: none; border-bottom: 1px solid var(--border); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; text-align: right; }
-        td:last-child { border-bottom: none; }
-        td::before { content: attr(data-label); font-weight: 800; color: var(--dim); font-size: 11px; text-transform: uppercase; text-align: left; margin-right: 15px; }
-        .skills-grid { width: 100%; max-width: 240px; justify-content: flex-end; margin-left: auto; }
-    }
+.heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:17px}
+.eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.17em;color:var(--blue);margin-bottom:7px}
+h1{font-size:clamp(22px,2vw,29px);letter-spacing:-.045em;line-height:1.15}
+.heading-note{color:var(--muted);font-size:12px;margin-top:8px}
+.updated{font-size:10px;color:#718096}
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:16px}
+.stat-card{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;min-height:105px;padding:18px;background:linear-gradient(145deg,rgba(21,27,38,.98),rgba(14,18,26,.98));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+.stat-card:after{content:"";position:absolute;right:-28px;top:-38px;width:105px;height:105px;border-radius:50%;background:var(--accent);opacity:.06;filter:blur(2px)}
+.stat-icon{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;background:var(--icon-bg);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 18%,transparent);flex:none}
+.stat-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600}
+.stat-value{font-size:26px;font-weight:800;letter-spacing:-.045em;margin-top:4px;line-height:1.1}
+.stat-foot{font-size:10px;color:#748196;margin-top:6px}
+.dashboard-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,1fr);gap:15px;margin-bottom:16px}
+.panel{background:linear-gradient(145deg,#11151d,#0f131a);border:1px solid var(--border);border-radius:var(--radius);min-width:0;box-shadow:var(--shadow)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 18px;border-bottom:1px solid rgba(32,40,55,.8)}
+.panel-title-wrap{display:flex;align-items:center;gap:11px;min-width:0}
+.panel-icon{width:35px;height:35px;display:grid;place-items:center;border:1px solid var(--border);background:#171e29;border-radius:11px;color:#a8b7ca;flex:none}
+.panel-icon svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8}
+.panel-title{font-size:12px;font-weight:800}.panel-subtitle{font-size:10px;color:var(--muted);margin-top:3px}
+.select{appearance:none;background:#0d1118;border:1px solid #293242;border-radius:8px;color:#aeb9c9;padding:8px 28px 8px 10px;font-size:10px;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%238995a8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
+.money-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px}
+.money-card{display:flex;align-items:center;gap:11px;min-width:0;padding:13px 12px;background:#0b1017;border:1px solid #202a39;border-radius:12px;transition:border-color .2s,transform .2s}
+.money-card:hover{border-color:#34465d;transform:translateY(-2px)}
+.money-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:10px;background:#151e29;font-size:19px;flex:none}
+.money-info{min-width:0}.money-title{font-size:10px;color:var(--muted);font-weight:600}.money-val{display:block;font-size:15px;font-weight:800;color:var(--green);margin-top:4px;overflow:hidden;text-overflow:ellipsis}
+.panel-inner{padding:16px}
+.pc-card{position:relative;max-width:260px;padding:15px;background:linear-gradient(145deg,#0b1017,#111722);border:1px solid #273142;border-radius:13px}
+.pc-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pc-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(251,101,114,.1);color:var(--red);border:1px solid rgba(251,101,114,.2);font-size:9px;font-weight:800;padding:5px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em}
+.pc-badge:before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.pc-name{font-size:14px;font-weight:800;margin-top:16px}
+.pc-accounts{font-size:11px;color:var(--muted);margin-top:4px}
+.pc-divider{height:1px;background:#222b39;margin:13px 0 11px}
+.pc-stats{display:flex;gap:15px;font-size:10px;font-weight:700}.online{color:var(--green)}.offline{color:var(--red)}
+.pc-foot{font-size:10px;color:#647187;margin-top:14px}
+.table-panel{overflow:hidden}
+.table-toolbar{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.toolbar-left{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:10px;white-space:nowrap}
+.page-btn{width:27px;height:27px;border:1px solid #283243;background:#0d1219;color:#aeb9c9;border-radius:7px;display:grid;place-items:center}
+.page-btn:hover{color:#fff;border-color:#46556b}
+.page-label{padding:0 5px}
+.search-wrap{position:relative;flex:1;min-width:170px;max-width:300px;margin:0 auto}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:#78869a;fill:none;stroke-width:2}
+.search-input{width:100%;background:#0b1017;border:1px solid #283243;border-radius:8px;padding:9px 12px 9px 33px;color:#f3f6fb;font-size:11px;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:#4d79b5;box-shadow:0 0 0 3px rgba(105,167,255,.08)}
+.toolbar-right{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tool-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;background:#101620;border:1px solid #293344;color:#aeb9c9;border-radius:8px;font-size:10px;font-weight:700;white-space:nowrap}
+.tool-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
+.tool-btn:hover{color:#fff;border-color:#46566d}
+.tool-btn.danger{color:#ff7c86}.tool-btn.success{color:#5be0ae;border-color:rgba(54,211,153,.2);background:rgba(54,211,153,.06)}
+.table-responsive{width:100%;overflow:auto;scrollbar-color:#2a3547 transparent;scrollbar-width:thin}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:1180px;text-align:left}
+thead th{position:sticky;top:0;z-index:1;padding:13px 14px;background:#111720;color:#8390a4;border-bottom:1px solid #283141;font-size:10px;font-weight:800;white-space:nowrap}
+th span{color:#4f5e73;margin-left:4px}
+tbody td{padding:12px 14px;border-bottom:1px solid rgba(37,46,61,.75);font-size:11px;white-space:nowrap;color:#d5dce7}
+tbody tr{transition:background .15s}tbody tr:hover td{background:rgba(105,167,255,.035)}tbody tr:last-child td{border-bottom:0}
+input[type=checkbox]{appearance:none;width:14px;height:14px;border:1px solid #3a4658;border-radius:4px;background:#0b1017;cursor:pointer;vertical-align:middle;position:relative}
+input[type=checkbox]:checked{background:var(--blue);border-color:var(--blue)}
+input[type=checkbox]:checked:after{content:"✓";position:absolute;color:#07101d;font-size:10px;font-weight:900;left:2px;top:-1px}
+.status-cell{display:flex;align-items:center;gap:7px}.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}.status-dot.online{background:var(--green);box-shadow:0 0 8px rgba(54,211,153,.4)}.status-dot.offline{background:var(--red)}
+.status-days{font-size:10px;color:#8a96a9}.pc-tag{color:#a4b1c4;font-weight:600}.username{color:#f4f7fc;font-weight:700}.level-col{color:var(--gold);font-weight:700}.money-col{color:var(--green);font-weight:700}.money-col-zero{color:#d5bd6c;font-weight:700}
+.empty-state{padding:35px!important;text-align:center;color:var(--muted)!important}
+.toast{position:fixed;bottom:22px;right:22px;z-index:10;padding:12px 16px;border:1px solid #2d3c4f;background:#111923;color:#e9f3ff;border-radius:10px;box-shadow:var(--shadow);font-size:12px;opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}
+.toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:1250px){.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dashboard-grid{grid-template-columns:1fr}.pc-card{max-width:none}.pc-card-inner{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.pc-name{margin-top:0}}
+@media(max-width:900px){.main{height:auto;overflow:visible;padding:22px 15px 30px}.topbar{margin-bottom:23px;flex-direction:column;align-items:flex-start;gap:15px;}.top-right{width:100%;justify-content:space-between;}.heading-row{align-items:flex-start}.updated{display:none}.table-toolbar{align-items:stretch}.toolbar-left{order:1}.search-wrap{order:2;max-width:none;width:100%;flex-basis:100%;margin:0}.toolbar-right{order:3}.toolbar-right .tool-btn{flex:1;justify-content:center}}
+@media(max-width:560px){.brand-caption{display:none}.brand-name{font-size:12px}.topbar{align-items:flex-start}.breadcrumb{font-size:10px}.live-pill{display:none}.stats-grid{gap:9px}.stat-card{min-height:92px;padding:12px;gap:10px}.stat-icon{width:35px;height:35px;border-radius:10px}.stat-value{font-size:22px}.stat-label{font-size:10px}.stat-foot{font-size:9px}.panel-header{padding:13px}.money-grid{grid-template-columns:1fr;padding:12px}.money-card{padding:11px}.money-val{font-size:14px}.panel-inner{padding:12px}.heading-note{font-size:11px}.tool-btn{padding:8px}.toolbar-right{gap:6px}}
 </style>
 </head>
 <body>
 
-<div class="dashboard">
+<main class="main">
+  <header class="topbar">
+    <div class="breadcrumb"><span>Dashboard</span><span class="crumb-sep">/</span><span class="crumb-current">Block Spin</span></div>
     
-    <!-- الشريط العلوي -->
-    <div class="header">
-        <div class="logo">
-            <div class="logo-icon">O</div>
-            <div class="logo-text">OVERSEER</div>
+    <div class="top-right">
+      <!-- حطينا معلومات حسابك هنا بعد شيل الشريط اليسار -->
+      <div class="user-info-top">
+        <div class="user-avatar">{{ my_key[:2]|upper }}</div>
+        <div>
+          <div class="user-name">{{ my_key }}</div>
+          <div class="user-role">Starter Plan</div>
         </div>
-        <div class="actions">
-            {% if is_admin %}
-            <a href="/admin" class="btn btn-admin">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Admin
-            </a>
-            {% endif %}
-            
-            <button class="btn btn-primary" onclick="copyScript()">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                Copy Script
-            </button>
-            
-            <a href="/logout" class="btn btn-danger">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Logout
-            </a>
-        </div>
-    </div>
+        <a href="/logout" class="btn btn-danger" style="margin-left: 10px; padding: 6px 10px;">Logout</a>
+      </div>
 
-    <!-- الجدول -->
-    <div class="table-container">
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Account</th>
-                        <th>Server</th>
-                        <th>Level</th>
-                        <th>Skills</th>
-                        <th>Money</th>
-                        <th>Profit (1h)</th>
-                        <th>Uptime</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for a in accounts %}
-                    <tr>
-                        <!-- 1. الحساب -->
-                        <td data-label="Account">
-                            <div class="acc-info">
-                                <span class="acc-name">
-                                    <span class="status-dot {{ '' if a.online else 'offline' }}"></span>
-                                    {{ a.name }}
-                                </span>
-                                <span class="acc-pc">{{ a.pc }}</span>
-                            </div>
-                        </td>
-                        
-                        <!-- 2. السيرفر -->
-                        <td data-label="Server">
-                            <span style="background:var(--bg); padding:4px 10px; border-radius:6px; border:1px solid var(--border); font-size:12px; font-weight:700;">Server 1</span>
-                        </td>
-                        
-                        <!-- 3. اللفل -->
-                        <td data-label="Level">
-                            <span class="level-badge">{{ a.total_level }}</span>
-                        </td>
-                        
-                        <!-- 4. المهارات -->
-                        <td data-label="Skills">
-                            <div class="skills-grid">
-                                {% for s in a.skills %}
-                                    <div class="skill-pill 
-                                        {% if s.name == 'fishing' %}fishing
-                                        {% elif s.name == 'shelf stocker' %}shelf
-                                        {% elif s.name == 'stamina' %}stamina
-                                        {% elif s.name == 'farming' %}farming
-                                        {% elif s.name == 'janitor' %}janitor
-                                        {% elif s.name == 'cook' %}cook
-                                        {% elif s.name == 'swiper' %}swiper
-                                        {% else %}default{% endif %}">
-                                        
-                                        {% if s.name == 'fishing' %}
-                                            <svg viewBox="0 0 24 24"><path d="M2 12s3-4 7-4 7 4 7 4-3 4-7 4-7-4-7-4z"/><path d="M16 12h5l-2-3m2 3l-2 3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/></svg>
-                                        {% elif s.name == 'shelf stocker' %}
-                                            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                                        {% elif s.name == 'stamina' %}
-                                            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                        {% elif s.name == 'farming' %}
-                                            <svg viewBox="0 0 24 24"><path d="M12 22v-7"/><path d="M9 9h6"/><path d="M12 2C8 2 5 5 5 9c0 4 3 7 7 7s7-3 7-7c0-4-3-7-7-7z"/></svg>
-                                        {% elif s.name == 'janitor' %}
-                                            <svg viewBox="0 0 24 24"><path d="M2 22l4-4"/><path d="M22 2l-4 4"/><path d="M18 6l-6 6"/><path d="M15 3l6 6-6 6-6-6z"/><path d="M3 15l6 6-6 6-6-6z"/></svg>
-                                        {% elif s.name == 'cook' %}
-                                            <svg viewBox="0 0 24 24"><path d="M17 22H7v-4h10v4z"/><path d="M7 18H5a2 2 0 0 1 0-4h14a2 2 0 0 1 0 4h-2"/><path d="M12 2a5 5 0 0 0-5 5v7h10V7a5 5 0 0 0-5-5z"/></svg>
-                                        {% elif s.name == 'swiper' %}
-                                            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-                                        {% else %}
-                                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-                                        {% endif %}
-                                        {{ s.level }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </td>
-                        
-                        <!-- 5. الفلوس -->
-                        <td data-label="Money">
-                            <div class="money-main" data-money="{{ a.total_money }}">{{ a.total_money }}</div>
-                            <div class="money-sub">C: $<span data-cash="{{ a.cash }}">{{ a.cash }}</span> | B: $<span data-bank="{{ a.bank }}">{{ a.bank }}</span></div>
-                        </td>
-                        
-                        <!-- 6. الأرباح -->
-                        <td data-label="Profit (1h)">
-                            <span class="profit {{ 'neg' if a.hourly < 0 else '' }}">
-                                {{ '↑' if a.hourly >= 0 else '↓' }} +$<span data-hourly="{{ a.hourly }}">{{ a.hourly }}</span>/h
-                            </span>
-                        </td>
-                        
-                        <!-- 7. الوقت -->
-                        <td data-label="Uptime">
-                            <span class="uptime">
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                {% if a.online %}
-                                    <span class="uptime-text" data-time="{{ a.uptime }}">...</span>
-                                {% else %}
-                                    <span>Off</span>
-                                {% endif %}
-                            </span>
-                        </td>
-                        
-                        <!-- 8. الأزرار -->
-                        <td data-label="Actions">
-                            <div class="action-btns" style="justify-content: flex-end;">
-                                <button class="btn-icon" onclick="copyName('{{ a.name }}')" title="Copy Name">
-                                    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                </button>
-                                <button class="btn-icon" onclick="deleteAcc('{{ a.name }}')" title="Delete">
-                                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+      <div class="live-pill"><span class="live-dot"></span>Monitoring system</div>
+      <button class="btn" onclick="window.location.reload()"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9a7 7 0 0 1 12-2L20 12M4 12l2.5 5a7 7 0 0 0 12-2"/></svg>Refresh data</button>
     </div>
-</div>
+  </header>
+
+  <section class="heading-row">
+    <div><div class="eyebrow">Control center / Block Spin</div><h1>Dashboard Overview</h1><p class="heading-note">Monitor your account activity and in-game economy at a glance.</p></div>
+    <div class="updated">LIVE OVERVIEW&nbsp; · &nbsp;BLOCK SPIN</div>
+  </section>
+
+  <section class="stats-grid">
+    <div class="stat-card" style="--accent:var(--green);--icon-bg:rgba(54,211,153,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 12.5a11 11 0 0 1 14 0M2 9a16 16 0 0 1 20 0M8.5 16a5.5 5.5 0 0 1 7 0"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg></div><div><div class="stat-label">Online accounts</div><div class="stat-value">{{ stats.online }}</div><div class="stat-foot">Currently connected</div></div></div>
+    <div class="stat-card" style="--accent:var(--red);--icon-bg:rgba(251,101,114,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M5 12.5a11 11 0 0 1 14 0M2 9a16 16 0 0 1 20 0M8.5 16a5.5 5.5 0 0 1 7 0M3 3l18 18"/><circle cx="12" cy="20" r="1" fill="currentColor" stroke="none"/></svg></div><div><div class="stat-label">Offline accounts</div><div class="stat-value">{{ stats.offline }}</div><div class="stat-foot">Currently disconnected</div></div></div>
+    <div class="stat-card" style="--accent:var(--purple);--icon-bg:rgba(177,140,255,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2m2-14a4 4 0 0 1 0 8m2 2a5 5 0 0 1 2 4v0"/></svg></div><div><div class="stat-label">Total accounts</div><div class="stat-value">{{ stats.total }}</div><div class="stat-foot">Accounts in your list</div></div></div>
+    <div class="stat-card" style="--accent:#e78ab7;--icon-bg:rgba(231,138,183,.09)"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="m12 2 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg></div><div><div class="stat-label">User package</div><div class="stat-value" style="font-size:21px">Starter</div><div class="stat-foot">Current subscription</div></div></div>
+  </section>
+
+  <section class="dashboard-grid">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title-wrap"><div class="panel-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5a7 7 0 0 0 0-3l2-1.5-2-3.5-2.5 1a8 8 0 0 0-2.5-1.5L13.5 2h-4L9 5a8 8 0 0 0-2.5 1.5L4 5.5 2 9l2 1.5a7 7 0 0 0 0 3L2 15l2 3.5 2.5-1A8 8 0 0 0 9 19l.5 3h4l.5-3a8 8 0 0 0 2.5-1.5l2.5 1 2-3.5z"/></svg></div><div><div class="panel-title">Item Monitor</div><div class="panel-subtitle">3 tracked money metrics</div></div></div><select class="select"><option>All items</option></select></div>
+      <div class="money-grid">
+        <div class="money-card"><div class="money-icon">💵</div><div class="money-info"><div class="money-title">Cash</div><div class="money-val" id="total-cash-monitor">0</div></div></div>
+        <div class="money-card"><div class="money-icon">🏦</div><div class="money-info"><div class="money-title">Bank balance</div><div class="money-val" id="total-bank-monitor" style="color:var(--blue)">0</div></div></div>
+        <div class="money-card"><div class="money-icon">💰</div><div class="money-info"><div class="money-title">Total wealth</div><div class="money-val" id="total-combined-monitor">0</div></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title-wrap"><div class="panel-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></div><div><div class="panel-title">PC Monitor</div><div class="panel-subtitle">1 registered workstation</div></div></div><select class="select"><option>All PCs</option></select></div>
+      <div class="panel-inner"><div class="pc-card"><div class="pc-top"><span class="pc-badge">Offline</span><span style="font-size:10px;color:var(--muted)">WORKSTATION</span></div><div class="pc-name">MR 1</div><div class="pc-accounts">{{ stats.total }} monitored accounts</div><div class="pc-divider"></div><div class="pc-stats"><span class="online">● {{ stats.online }} online</span><span class="offline">● {{ stats.offline }} offline</span></div><div class="pc-foot">Status reflects the latest reported data.</div></div></div>
+    </div>
+  </section>
+
+  <section class="panel table-panel">
+    <div class="panel-header"><div class="panel-title-wrap"><div class="panel-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11m6-11v11"/></svg></div><div><div class="panel-title">Account Inventory</div><div class="panel-subtitle">Search, review and manage the account list</div></div></div><span class="live-pill"><span class="live-dot"></span>{{ stats.total }} records</span></div>
+    <div class="table-toolbar">
+      <div class="toolbar-left"><button class="page-btn" aria-label="First page">«</button><button class="page-btn" aria-label="Previous page">‹</button><span class="page-label">Page 1 of 4</span><button class="page-btn" aria-label="Next page">›</button><button class="page-btn" aria-label="Last page">»</button><select class="select" aria-label="Rows per page"><option>20 rows</option><option>50 rows</option><option>100 rows</option></select></div>
+      <div class="search-wrap"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input type="text" id="searchInput" class="search-input" placeholder="Search usernames..." autocomplete="off"></div>
+      <div class="toolbar-right">
+        <button class="tool-btn" id="select-all-btn"><svg viewBox="0 0 24 24"><path d="M4 5h16M7 12h10m-7 7h4"/></svg>Select all</button>
+        <button class="tool-btn" onclick="copyScript()"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Copy script</button>
+        <button class="tool-btn danger" id="delete-btn"><svg viewBox="0 0 24 24"><path d="M4 7h16m-10 4v6m4-6v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg>Delete selected</button>
+        <button class="tool-btn success" id="export-btn"><svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>Export CSV</button>
+      </div>
+    </div>
+    <div class="table-responsive"><table>
+      <thead><tr><th><input type="checkbox" id="header-check" aria-label="Select all accounts"></th><th>Status <span>↕</span></th><th>PC <span>↕</span></th><th>Username <span>↕</span></th><th>Total Level <span>↕</span></th><th>Stamina <span>↕</span></th><th>Shelf Stocker <span>↕</span></th><th>Swiper <span>↕</span></th><th>Janitor <span>↕</span></th><th>Cook <span>↕</span></th><th>Cash <span>↕</span></th><th>Bank <span>↕</span></th></tr></thead>
+      <tbody id="table-body">
+      {% for a in accounts %}
+      <tr class="account-row" data-name="{{ a.name|lower }}">
+        <td><input type="checkbox" class="row-check" aria-label="Select {{ a.name }}"></td>
+        <td><div class="status-cell">{% if a.online %}<span class="status-dot online"></span><span style="color:var(--green);font-weight:700">Online</span>{% else %}<span class="status-dot offline"></span><span class="status-days">Offline</span>{% endif %}</div></td>
+        <td class="pc-tag">{{ a.pc }}</td><td class="username">{{ a.name }}</td><td class="level-col">{{ a.total_level or 0 }}</td>
+        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "stamina") | first %}{{ s.level if s else 0 }}</td>
+        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "shelf stocker") | first %}{{ s.level if s else 0 }}</td>
+        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "swiper") | first %}{{ s.level if s else 0 }}</td>
+        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "janitor") | first %}{{ s.level if s else 0 }}</td>
+        <td class="level-col">{% set s = a.skills | selectattr("name", "equalto", "cook") | first %}{{ s.level if s else 0 }}</td>
+        <td class="money-col-zero" data-label="Cash" data-money="{{ a.cash }}">{{ a.cash }}</td><td class="money-col" data-label="Bank" data-money="{{ a.bank }}">{{ a.bank }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-    // 1. تنسيق الأرقام (K و M)
-    function formatNum(num) {
-        num = Number(num);
-        if (num >= 1000000) {
-            let val = num / 1000000;
-            return (val % 1 === 0 ? val : val.toFixed(2)) + 'M';
-        }
-        if (num >= 1000) {
-            let val = num / 1000;
-            return (val % 1 === 0 ? val : val.toFixed(1)) + 'K';
-        }
-        return num;
-    }
+function formatNum(value){
+  const num=Number(value)||0;
+  if(Math.abs(num)>=1e9)return (num/1e9).toFixed(1)+'B';
+  if(Math.abs(num)>=1e6)return (num/1e6).toFixed(1)+'M';
+  if(Math.abs(num)>=1e3)return (num/1e3).toFixed(1)+'K';
+  return num.toLocaleString('en-US');
+}
+let totalCash=0,totalBank=0;
+document.querySelectorAll('[data-money]').forEach(el=>{
+  const val=Number(el.getAttribute('data-money'))||0;
+  el.textContent=formatNum(val);
+  if(el.dataset.label==='Cash')totalCash+=val;
+  if(el.dataset.label==='Bank')totalBank+=val;
+});
+document.getElementById('total-cash-monitor').textContent=formatNum(totalCash);
+document.getElementById('total-bank-monitor').textContent=formatNum(totalBank);
+document.getElementById('total-combined-monitor').textContent=formatNum(totalCash+totalBank);
 
-    // تطبيق التنسيق
-    document.querySelectorAll('[data-money]').forEach(el => el.innerText = "$" + formatNum(el.getAttribute('data-money')));
-    document.querySelectorAll('[data-cash]').forEach(el => el.innerText = formatNum(el.getAttribute('data-cash')));
-    document.querySelectorAll('[data-bank]').forEach(el => el.innerText = formatNum(el.getAttribute('data-bank')));
-    document.querySelectorAll('[data-hourly]').forEach(el => el.innerText = formatNum(el.getAttribute('data-hourly')));
+const toastEl=document.getElementById('toast');
+let toastTimer;
+function showToast(message){
+  toastEl.textContent=message;toastEl.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2600);
+}
+document.getElementById('searchInput').addEventListener('input',function(e){
+  const val=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.account-row').forEach(row=>{
+    row.style.display=row.dataset.name.includes(val)?'':'none';
+  });
+});
+const headerCheck=document.getElementById('header-check');
+function rowChecks(){return [...document.querySelectorAll('.row-check')]}
+headerCheck.addEventListener('change',()=>rowChecks().forEach(c=>c.checked=headerCheck.checked));
+document.getElementById('select-all-btn').addEventListener('click',()=>{
+  const checks=rowChecks();const allSelected=checks.length&&checks.every(c=>c.checked);
+  checks.forEach(c=>c.checked=!allSelected);headerCheck.checked=!allSelected;
+  showToast(allSelected?'Selection cleared':'All accounts selected');
+});
 
-    // 2. تنسيق الوقت
-    function formatUptime(totalSeconds) {
-        if (totalSeconds <= 0) return "0m";
-        const d = Math.floor(totalSeconds / 86400);
-        const h = Math.floor((totalSeconds % 86400) / 3600);
-        const m = Math.floor((totalSeconds % 3600) / 60);
-        let parts = [];
-        if (d > 0) parts.push(`${d}d`);
-        if (h > 0) parts.push(`${h}h`);
-        if (m > 0) parts.push(`${m}m`);
-        return parts.length > 0 ? parts.join(' ') : '0m';
-    }
-    
-    document.querySelectorAll('.uptime-text').forEach(el => {
-        let t = parseInt(el.getAttribute('data-time')) || 0;
-        el.innerText = formatUptime(t);
+document.getElementById('delete-btn').addEventListener('click', async () => {
+  const selected = rowChecks().filter(c => c.checked).map(c => c.closest('tr').dataset.name);
+  if(!selected.length){ showToast('Select at least one account first'); return; }
+  
+  if(!confirm("Are you sure you want to delete " + selected.length + " account(s)?")) return;
+
+  for (let name of selected) {
+    await fetch('/api/delete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name: name })
     });
+  }
+  showToast('Deleted ' + selected.length + ' account(s)');
+  setTimeout(() => window.location.reload(), 1000);
+});
 
-    // 3. نسخ السكربت
-    function copyScript() {
-        const currentKey = "{{ my_key }}"; 
-        const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${currentKey}",\n    ["PC_NAME"] = "dwadwa"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if n:find("fishing|stamina|shelfstocker|janitor|swiper|farming|cook")then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
-        navigator.clipboard.writeText(script).then(() => {
-            alert("✅ Script Copied Successfully!");
-        });
-    }
+document.getElementById('export-btn').addEventListener('click',()=>{
+  const rows=[...document.querySelectorAll('.account-row')].filter(r=>r.style.display!=='none');
+  const headers=[...document.querySelectorAll('thead th')].slice(1).map(th=>th.textContent.replace('↕','').trim());
+  const csv=[headers,...rows.map(row=>[...row.cells].slice(1).map(cell=>cell.innerText.trim()))]
+    .map(row=>row.map(value=>'"'+String(value).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='overseer-accounts.csv';a.click();URL.revokeObjectURL(url);
+  showToast('CSV export downloaded');
+});
 
-    // 4. نسخ الاسم
-    function copyName(name) {
-        navigator.clipboard.writeText(name).then(() => alert("✅ Copied: " + name));
-    }
-
-    // 5. حذف الحساب
-    function deleteAcc(name) {
-        if (!confirm("Delete " + name + "?")) return;
-        fetch('/api/delete', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name: name })
-        }).then(() => window.location.reload());
-    }
+async function copyScript(){
+  const currentKey = "{{ my_key }}";
+  const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${currentKey}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if n:find("fishing|stamina|shelfstocker|janitor|swiper|farming|cook")then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,pc=c.PC_NAME})})end end)]])()`;
+  
+  try{await navigator.clipboard.writeText(script);showToast('✅ Script copied to clipboard!');}
+  catch(e){showToast('Clipboard access denied by browser');}
+}
 </script>
 </body>
 </html>
