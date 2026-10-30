@@ -1,11 +1,10 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-import time
-import hashlib
+import time, hashlib
 
 app = Flask(__name__)
 app.secret_key = "axiom_overseer_secret_key_2024"
 
-# حساب الأدمن الافتراضي
+# الحساب الافتراضي (admin / admin)
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 accounts = {}
 
@@ -43,7 +42,20 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-# 🔴 الرابط اللي يفتح الجدول ويمرر البيانات له
+# 🔴 مسار تغيير الباسورد
+@app.route("/api/reset_password", methods=["POST"])
+def reset_password():
+    data = request.get_json(force=True, silent=True) or {}
+    username = data.get("username")
+    new_password = data.get("new_password")
+
+    if not username or not new_password: return jsonify({"error": "بيانات ناقصة"}), 400
+    if username not in users: return jsonify({"error": "المستخدم غير موجود"}), 404
+
+    users[username] = hashlib.sha256(new_password.encode()).hexdigest()
+    return jsonify({"ok": True})
+
+# 🔴 مسار عرض الداشبورد
 @app.route("/")
 def index():
     if "user" not in session:
@@ -56,12 +68,10 @@ def index():
     display_accounts = []
 
     for name, a in accounts.items():
-        if not is_admin and a.get("key") != my_key:
-            continue
+        if not is_admin and a.get("key") != my_key: continue
             
         is_online = (now - a.get("last_seen", 0)) < 15 
         
-        # تجهيز البيانات بالشكل اللي الجدول حقه يطلبه
         acc_copy = a.copy()
         acc_copy["name"] = name
         acc_copy["online"] = is_online
@@ -70,7 +80,7 @@ def index():
         acc_copy["cash"] = int(a.get("cash", 0) or 0)
         acc_copy["bank"] = int(a.get("bank", 0) or 0)
         
-        # تأكد إن المهارات جاية كـ قاموس (Dictionary) عشان زر skills.items() يشتغل
+        # تأمين المهارات عشان الجدول يقرأها
         if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict):
             acc_copy["skills"] = {}
             
@@ -78,7 +88,7 @@ def index():
         
     return render_template("index.html", my_key=my_key, accounts=display_accounts)
 
-# 🔴 المسار اللي السكربت يرسل له البيانات
+# 🔴 مسار استقبال البيانات من السكربت
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
@@ -94,7 +104,6 @@ def report():
     bank = int(data.get("b", 0) or 0)
     level = int(data.get("l", 0) or 0)
     
-    # تحويل المهارات من List إلى Dict
     raw_skills = data.get("s", [])
     skills_dict = {}
     if isinstance(raw_skills, list):
@@ -106,16 +115,10 @@ def report():
         accounts[name] = {"login_time": now, "total_money": cash + bank}
 
     accounts[name].update({
-        "key": username_key, 
-        "pc": data.get("pc", "MR 1"),
-        "cash": cash, 
-        "bank": bank, 
-        "total_money": cash + bank, 
-        "total_level": level,
-        "skills": skills_dict, 
-        "display_name": data.get("dn", name),
-        "user_id": str(data.get("u", "")), 
-        "last_seen": now
+        "key": username_key, "pc": data.get("pc", "MR 1"),
+        "cash": cash, "bank": bank, "total_money": cash + bank, "total_level": level,
+        "skills": skills_dict, "display_name": data.get("dn", name),
+        "user_id": str(data.get("u", "")), "last_seen": now
     })
     
     return jsonify({"ok": True})
