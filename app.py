@@ -1,15 +1,36 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import time
 import hashlib
+import json
+import os
 
 app = Flask(__name__)
 app.secret_key = "axiom_overseer_secret_key_2024"
 
-# قاعدة البيانات في الذاكرة
-# حساب الأدمن الافتراضي: admin / admin
-users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
-passwords = {"admin": "admin"} 
-accounts = {}
+DB_FILE = "db.json"
+
+# دالة تحميل البيانات من الملف
+def load_data():
+    if os.path.exists(DB_FILE):
+        with open(DB_FILE, "r") as f:
+            return json.load(f)
+    # إذا الملف مو موجود، ننشئ حساب أدمن افتراضي
+    return {
+        "users": {"admin": hashlib.sha256("admin".encode()).hexdigest()},
+        "passwords": {"admin": "admin"},
+        "accounts": {}
+    }
+
+# دالة حفظ البيانات في الملف
+def save_data():
+    with open(DB_FILE, "w") as f:
+        json.dump({"users": users, "passwords": passwords, "accounts": accounts}, f)
+
+# تحميل البيانات أول ما يشتغل السيرفر
+data = load_data()
+users = data["users"]
+passwords = data["passwords"]
+accounts = data["accounts"]
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -27,6 +48,7 @@ def register():
             
         users[username] = hashlib.sha256(password.encode()).hexdigest()
         passwords[username] = password
+        save_data() # حفظ التعديلات
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -49,7 +71,6 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-# 🔴 مسار جلب البيانات الحقيقية للواجهة
 @app.route("/api/accounts")
 def get_api_accounts():
     if "user" not in session:
@@ -64,7 +85,7 @@ def get_api_accounts():
     offline_count = 0
 
     for name, a in accounts.items():
-        # إذا مو أدمن، يشوف بس حسابه
+        # الفلترة: الأدمن يشوف الكل، والمستخدم يشوف بس حسابه
         if not is_admin and a.get("key") != my_key:
             continue
             
@@ -106,6 +127,7 @@ def delete_account():
     if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
         if name in accounts:
             del accounts[name]
+            save_data() # حفظ بعد الحذف
             return jsonify({"ok": True})
     return jsonify({"error": "Not found"}), 404
 
@@ -123,9 +145,9 @@ def reset_password():
     users[username] = hashlib.sha256(new_password.encode()).hexdigest()
     if username in passwords:
         passwords[username] = new_password
+    save_data() # حفظ بعد تغيير الباسورد
     return jsonify({"ok": True})
 
-# 🔴 مسار استقبال البيانات من السكربت
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
@@ -166,14 +188,14 @@ def report():
         "last_seen": now
     })
     
+    save_data() # 🔴 أهم سطر: نحفظ البيانات فوراً عشان ما تطير
     return jsonify({"ok": True})
 
-# 🔴 مسار الفحص (لو حبيت تعرف هل البيانات وصلت للسيرفر)
+# مسار للفحص (عشان تشوف البيانات بعينك)
 @app.route("/api/debug")
 def debug():
     return jsonify(accounts)
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port) # ✅ هذا هو الصحيح
+    app.run(host="0.0.0.0", port=port)
