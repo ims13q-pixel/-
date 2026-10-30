@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 import time
 import hashlib
-import traceback
 
 app = Flask(__name__)
 app.secret_key = "axiom_overseer_secret_key_2024"
@@ -53,51 +52,42 @@ def index():
     if "user" not in session:
         return redirect(url_for("login"))
     
-    try:
-        my_key = session["user"]
-        is_admin = (my_key == "admin")
-        now = time.time()
-        
-        filtered_accounts = []
-        online_count = 0
-        offline_count = 0
-
-        for name, a in accounts.items():
-            if not is_admin and a.get("key") != my_key:
-                continue
-                
-            is_online = (now - a.get("last_seen", 0)) < 15 
-            
-            if is_online: 
-                online_count += 1
-                if "login_time" not in a: a["login_time"] = now
-                uptime = int(now - a["login_time"])
-                h = uptime // 3600
-                m = (uptime % 3600) // 60
-                a["session"] = f"{h}h {m}m" if h > 0 else f"{m}m"
-            else: 
-                offline_count += 1
-                a["session"] = "—"
-                a["login_time"] = now
-                
-            a["online"] = is_online
-            a["seen"] = "just now" if is_online else "offline"
-            
-            acc_copy = a.copy()
-            acc_copy["name"] = name
-            filtered_accounts.append(acc_copy)
-            
-        stats = {
-            "total": len(filtered_accounts),
-            "online": online_count,
-            "offline": offline_count
-        }
-            
-        return render_template("index.html", accounts=filtered_accounts, my_key=my_key, stats=stats)
+    my_key = session["user"]
+    is_admin = (my_key == "admin")
+    now = time.time()
     
-    except Exception as e:
-        # هذا السطر بيكشف لك أي خطأ مخفي في السيرفر
-        return f"<h1>Server Error</h1><p>{str(e)}</p><pre>{traceback.format_exc()}</pre>", 500
+    filtered_accounts = []
+    online_count = 0
+    offline_count = 0
+
+    for name, a in accounts.items():
+        if not is_admin and a.get("key") != my_key:
+            continue
+            
+        is_online = (now - a.get("last_seen", 0)) < 15 
+        
+        if is_online: 
+            online_count += 1
+            if "login_time" not in a: a["login_time"] = now
+            uptime = int(now - a["login_time"])
+        else: 
+            offline_count += 1
+            uptime = 0
+            a["login_time"] = now
+            
+        acc_copy = a.copy()
+        acc_copy["name"] = name
+        acc_copy["online"] = is_online
+        acc_copy["uptime"] = uptime # بالثواني
+        filtered_accounts.append(acc_copy)
+        
+    stats = {
+        "total": len(filtered_accounts),
+        "online": online_count,
+        "offline": offline_count
+    }
+        
+    return render_template("index.html", accounts=filtered_accounts, my_key=my_key, stats=stats)
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
@@ -134,29 +124,17 @@ def report():
             if isinstance(sk, dict) and "name" in sk:
                 skills_dict[sk["name"]] = int(sk.get("level", 0))
 
-    rate = 0
-    if name in accounts and (now - accounts[name].get("last_seen", now)) > 10:
-        old_money = accounts[name].get("total_money", current_money)
-        time_diff = now - accounts[name]["last_seen"]
-        if time_diff > 0:
-            rate = int(((current_money - old_money) / time_diff) * 3600)
-
     if name not in accounts:
         accounts[name] = {"login_time": now, "total_money": current_money}
 
     accounts[name].update({
         "key": username_key,
         "pc": data.get("pc", "MR 1"),
-        "server": "Server 1",
-        "server_count": "19/28",
         "cash": cash,
         "bank": bank,
         "total_money": current_money,
-        "rate": rate,
         "total_level": level,
         "skills": skills_dict,
-        "display_name": data.get("dn", name),
-        "user_id": str(data.get("u", "")),
         "last_seen": now
     })
     
