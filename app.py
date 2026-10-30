@@ -5,6 +5,8 @@ import hashlib
 app = Flask(__name__)
 app.secret_key = "axiom_overseer_secret_key_2024"
 
+# قاعدة البيانات في الذاكرة
+# حساب الأدمن الافتراضي: admin / admin
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 passwords = {"admin": "admin"} 
 accounts = {}
@@ -47,6 +49,7 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
+# 🔴 مسار جلب البيانات الحقيقية للواجهة
 @app.route("/api/accounts")
 def get_api_accounts():
     if "user" not in session:
@@ -61,6 +64,7 @@ def get_api_accounts():
     offline_count = 0
 
     for name, a in accounts.items():
+        # إذا مو أدمن، يشوف بس حسابه
         if not is_admin and a.get("key") != my_key:
             continue
             
@@ -121,6 +125,7 @@ def reset_password():
         passwords[username] = new_password
     return jsonify({"ok": True})
 
+# 🔴 مسار استقبال البيانات من السكربت
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
@@ -162,6 +167,11 @@ def report():
     })
     
     return jsonify({"ok": True})
+
+# 🔴 مسار الفحص (لو حبيت تعرف هل البيانات وصلت للسيرفر)
+@app.route("/api/debug")
+def debug():
+    return jsonify(accounts)
 
 if __name__ == "__main__":
     app.run(port=5000)
