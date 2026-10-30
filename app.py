@@ -5,7 +5,6 @@ import hashlib
 app = Flask(__name__)
 app.secret_key = "axiom_overseer_secret_key_2024"
 
-# قاعدة البيانات في الذاكرة
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 passwords = {"admin": "admin"} 
 accounts = {}
@@ -104,7 +103,7 @@ def delete_account():
         if name in accounts:
             del accounts[name]
             return jsonify({"ok": True})
-    return jsonify({"error": "Not found or unauthorized"}), 404
+    return jsonify({"error": "Not found"}), 404
 
 @app.route("/api/reset_password", methods=["POST"])
 def reset_password():
@@ -138,7 +137,6 @@ def report():
     current_money = cash + bank
     level = int(data.get("l", 0) or 0)
     
-    # تحويل المهارات بشكل آمن جداً
     raw_skills = data.get("s", [])
     skills_dict = {}
     if isinstance(raw_skills, list):
