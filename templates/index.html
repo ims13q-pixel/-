@@ -36,18 +36,24 @@ button,input{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--a
 .user-dropdown a:hover{background:rgba(255,107,125,0.1);color:var(--bad);}
 .dropdown-divider{height:1px;background:var(--line);margin:4px 0;}
 
-/* الهيرو */
+/* الهيرو (الإحصائيات) */
 .hero{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
 .card{background:var(--p);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative;overflow:hidden}
 .net{background:radial-gradient(120% 140% at 0% 0%,var(--glow),transparent 60%),var(--p)}
 .lbl{color:var(--mute);font-size:12px;font-weight:700}
 .big{font:800 clamp(38px,6vw,64px)/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:6px 0 2px}
+.sub{color:var(--mute);font-size:13px;margin-top:5px;}
 .kp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .kp .card{padding:16px}.kv{font:800 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
 .up{color:var(--ok)}.gd{color:var(--gold)}
 
+/* شريط البحث */
+.tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.tb input[type=search]{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:10px 15px;min-width:300px;color:white;outline:none;}
+.tb input[type=search]:focus{border-color:var(--ac);}
+
 /* الجدول */
-.tw{background:var(--p);border:1px solid var(--line);border-radius:16px;overflow:auto;max-height:640px;margin-top:14px;}
+.tw{background:var(--p);border:1px solid var(--line);border-radius:16px;overflow:auto;max-height:640px;}
 table { width: 100%; border-collapse: collapse; margin-top: 0; }
 th { text-align: left; padding: 14px 16px; color: var(--mute); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--line); }
 td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
@@ -63,6 +69,17 @@ tr:hover { background: rgba(255,255,255,0.02); }
 .money-main { font-size: 15px; font-weight: 800; color: var(--ink); }
 .money-sub { font-size: 11px; color: var(--mute); margin-top: 2px; }
 
+/* 🔴 خيارات الحساب (النقاط الثلاث) */
+.action-menu { position: relative; display: inline-block; }
+.action-btn { background: none; border: none; color: var(--mute); font-size: 20px; cursor: pointer; padding: 0 10px; font-weight: bold; }
+.action-btn:hover { color: var(--ink); }
+.action-dropdown { display: none; position: absolute; right: 100%; top: 0; background: var(--p2); border: 1px solid var(--line); border-radius: 8px; padding: 5px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.5); min-width: 150px; margin-right: 5px;}
+.action-dropdown.show { display: flex; flex-direction: column; }
+.action-dropdown button { background: none; border: none; color: var(--ink); padding: 8px 12px; text-align: left; cursor: pointer; font-size: 13px; border-radius: 6px; font-weight: 600;}
+.action-dropdown button:hover { background: rgba(255,255,255,0.05); }
+.action-dropdown button.del { color: var(--bad); }
+.action-dropdown button.del:hover { background: rgba(255,107,125,0.1); }
+
 /* المودال */
 dialog{background:var(--p);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(400px,92vw);}dialog::backdrop{background:rgba(0,0,0,.6)}
 dialog h2{margin:0 0 12px;font:800 20px 'Bricolage Grotesque'}dialog label{display:block;margin-bottom:10px;color:var(--mute);font-size:12px;font-weight:700}
@@ -70,10 +87,18 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </style>
 </head>
 <body>
+
+<!-- 🔴 حساب الإجماليات عشان تطلع حقيقية -->
+{% set total_worth = accounts | sum(attribute='total_money') %}
+{% set total_cash = accounts | sum(attribute='cash') %}
+{% set total_bank = accounts | sum(attribute='bank') %}
+{% set online_count = accounts | selectattr('online') | list | length %}
+{% set health_percent = (online_count / accounts|length * 100)|round|int if accounts|length > 0 else 0 %}
+
 <div class="w">
 <div class="bar">
   <div class="logo"><i></i>Farmledger</div>
-  <div class="meta"><span><b>{{ accounts|length if accounts else 0 }}</b> accounts</span></div>
+  <div class="meta"><span><b>{{ accounts|length }}</b> accounts</span><span><b>{{ online_count }}</b> live</span></div>
   <div class="sp"></div>
   
   <button class="b live on" type="button"><span class="dot"></span>Live</button>
@@ -96,15 +121,26 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 <div class="hero">
   <div class="card net">
     <div class="lbl">Total net worth</div>
-    <div class="big">$0</div>
-    <div class="sub" style="color:var(--mute);font-size:13px">Total calculated automatically</div>
+    <div class="big">${{ "{:,.0f}".format(total_worth) }}</div>
+    <div class="sub">Average ${{ "{:,.0f}".format(total_worth / accounts|length) if accounts|length > 0 else 0 }} per account</div>
   </div>
   <div class="kp">
-    <div class="card"><div class="lbl">Session profit</div><div class="kv up">$0</div></div>
-    <div class="card"><div class="lbl">Hourly rate</div><div class="kv up">$0</div></div>
-    <div class="card"><div class="lbl">Daily estimate</div><div class="kv gd">$0</div></div>
-    <div class="card" style="display:flex;align-items:center;gap:14px;"><svg width="62" height="62" viewBox="0 0 62 62"><circle cx="31" cy="31" r="25" fill="none" stroke="var(--p2)" stroke-width="7"/><circle cx="31" cy="31" r="25" fill="none" stroke="var(--ok)" stroke-width="7" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="0" transform="rotate(-90 31 31)"/></svg><div><div class="lbl">Health</div><div class="kv">100%</div></div></div>
+    <div class="card"><div class="lbl">Total Cash</div><div class="kv up">${{ "{:,.0f}".format(total_cash) }}</div></div>
+    <div class="card"><div class="lbl">Total Bank</div><div class="kv up" style="color:var(--ac)">${{ "{:,.0f}".format(total_bank) }}</div></div>
+    <div class="card"><div class="lbl">Total Accounts</div><div class="kv gd">{{ accounts|length }}</div></div>
+    <div class="card" style="display:flex;align-items:center;gap:14px;">
+      <svg width="62" height="62" viewBox="0 0 62 62">
+        <circle cx="31" cy="31" r="25" fill="none" stroke="var(--p2)" stroke-width="7"/>
+        <circle cx="31" cy="31" r="25" fill="none" stroke="var(--ok)" stroke-width="7" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="{{ 157 - (157 * (health_percent / 100)) }}" transform="rotate(-90 31 31)"/>
+      </svg>
+      <div><div class="lbl">Health</div><div class="kv">{{ health_percent }}%</div></div>
+    </div>
   </div>
+</div>
+
+<!-- 🔴 شريط البحث -->
+<div class="tb">
+    <input type="search" id="searchInput" placeholder="ابحث عن اسم الحساب..." aria-label="Search">
 </div>
 
 <div class="tw">
@@ -115,11 +151,12 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
                 <th>LEVEL</th>
                 <th>SKILLS</th>
                 <th>MONEY</th>
+                <th style="text-align:right;">ACTIONS</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="table-body">
             {% for a in accounts %}
-            <tr>
+            <tr class="account-row">
                 <td>
                     <div class="acc-name">{{ a.name }}</div>
                     <div style="margin-top:4px;">
@@ -145,6 +182,16 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
                     <div class="money-main">${{ "{:,.0f}".format(a.total_money or 0) }}</div>
                     <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash or 0) }} | Bank: ${{ "{:,.0f}".format(a.bank or 0) }}</div>
                 </td>
+                <!-- 🔴 القائمة المنسدلة للحذف والنسخ -->
+                <td style="text-align:right;">
+                    <div class="action-menu">
+                        <button class="action-btn" onclick="toggleActionMenu(event)">⋮</button>
+                        <div class="action-dropdown">
+                            <button onclick="copyUsername('{{ a.name }}')">📋 نسخ الاسم</button>
+                            <button class="del" onclick="deleteAccount('{{ a.name }}')">🗑 حذف الحساب</button>
+                        </div>
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -156,7 +203,6 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </div>
 </div>
 
-<!-- مودال تغيير الباسورد -->
 <dialog id="resetModal">
   <form method="dialog" id="resetForm">
     <h2>Reset Password</h2>
@@ -169,10 +215,9 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </dialog>
 
 <script>
-// 🔴 1. المتغيرات الأساسية
 const MY_KEY = "{{ my_key | default('Overseer') }}";
 
-// 🔴 2. القائمة المنسدلة
+// 1. قائمة المستخدم
 function toggleUserMenu(e) {
     if(e) e.stopPropagation();
     document.getElementById("uDropdown").classList.toggle("show");
@@ -182,14 +227,64 @@ function openResetModal(e) {
     document.getElementById("uDropdown").classList.remove("show");
     document.getElementById("resetModal").showModal();
 }
+
+// 2. خيارات الحساب (حذف ونسخ)
+function toggleActionMenu(e) {
+    e.stopPropagation();
+    // إغلاق أي قائمة مفتوحة
+    document.querySelectorAll('.action-dropdown').forEach(el => el.classList.remove('show'));
+    // فتح القائمة اللي تم الضغط عليها
+    e.target.nextElementSibling.classList.add('show');
+}
+
+// إغلاق القوائم لما تضغط في أي مكان
 window.addEventListener('click', function(e) {
     var menu = document.getElementById('uDropdown');
     if (menu && menu.classList.contains('show') && !e.target.closest('.user-menu')) {
         menu.classList.remove('show');
     }
+    document.querySelectorAll('.action-dropdown').forEach(el => el.classList.remove('show'));
 });
 
-// 🔴 3. نسخ السكربت
+// 3. نسخ اسم المستخدم
+function copyUsername(name) {
+    navigator.clipboard.writeText(name).then(() => {
+        alert("✅ تم نسخ الاسم: " + name);
+    }).catch(err => {
+        alert("فشل النسخ.");
+    });
+}
+
+// 4. حذف الحساب
+async function deleteAccount(name) {
+    if(!confirm("هل أنت متأكد أنك تريد حذف الحساب: " + name + " من اللوق؟")) return;
+    
+    try {
+        const res = await fetch('/api/delete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ name: name })
+        });
+        if(res.ok) {
+            window.location.reload(); // تحديث الصفحة عشان يختفي الحساب
+        } else {
+            alert("حدث خطأ أثناء الحذف.");
+        }
+    } catch(err) {
+        alert("فشل الاتصال بالسيرفر.");
+    }
+}
+
+// 5. شريط البحث
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const val = e.target.value.toLowerCase();
+    document.querySelectorAll('.account-row').forEach(row => {
+        const name = row.querySelector('.acc-name').innerText.toLowerCase();
+        row.style.display = name.includes(val) ? '' : 'none';
+    });
+});
+
+// 6. نسخ السكربت
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const btn = this;
@@ -221,7 +316,7 @@ document.getElementById("copy-script").addEventListener("click", function(e) {
     document.body.removeChild(textArea);
 });
 
-// 🔴 4. تغيير الباسورد
+// 7. تغيير الباسورد
 document.getElementById('resetForm').onsubmit = async function(e) {
     if (!e.submitter || e.submitter.value !== "ok") return;
     e.preventDefault();
