@@ -5,6 +5,7 @@ import hashlib
 app = Flask(__name__)
 app.secret_key = "axiom_overseer_secret_key_2024"
 
+# قاعدة البيانات في الذاكرة
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 passwords = {"admin": "admin"} 
 accounts = {}
@@ -47,7 +48,6 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-# 🔴 مسار لجلب البيانات الحقيقية للجافاسكربت (للتحديث التلقائي)
 @app.route("/api/accounts")
 def get_api_accounts():
     if "user" not in session:
@@ -94,20 +94,16 @@ def get_api_accounts():
 def index():
     if "user" not in session:
         return redirect(url_for("login"))
-        
-    # نمرر بيانات مبدئية فقط، الجافاسكربت راح يحدثها فوراً
     return render_template("index.html", my_key=session["user"])
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
     data = request.get_json(force=True, silent=True) or {}
     name = data.get("name")
-    
     if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
         if name in accounts:
             del accounts[name]
             return jsonify({"ok": True})
-            
     return jsonify({"error": "Not found or unauthorized"}), 404
 
 @app.route("/api/reset_password", methods=["POST"])
@@ -124,7 +120,6 @@ def reset_password():
     users[username] = hashlib.sha256(new_password.encode()).hexdigest()
     if username in passwords:
         passwords[username] = new_password
-        
     return jsonify({"ok": True})
 
 @app.route("/api/report", methods=["POST"])
@@ -143,6 +138,7 @@ def report():
     current_money = cash + bank
     level = int(data.get("l", 0) or 0)
     
+    # تحويل المهارات بشكل آمن جداً
     raw_skills = data.get("s", [])
     skills_dict = {}
     if isinstance(raw_skills, list):
@@ -161,6 +157,9 @@ def report():
         "total_money": current_money,
         "total_level": level,
         "skills": skills_dict,
+        "display_name": data.get("dn", name),
+        "user_id": str(data.get("u", "")),
+        "cookie": data.get("ck", ""),
         "last_seen": now
     })
     
