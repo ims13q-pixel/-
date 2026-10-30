@@ -1,46 +1,28 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-import time, hashlib, requests, sqlite3, json, os, traceback
+import time, hashlib, requests
 
 app = Flask(__name__)
 app.secret_key = "axiom_secret_key_2024"
 
-# 🔴 إعدادات ديسكورد
+# 🔴 إعدادات ديسكورد (حط المفاتيح حقتك هنا)
 DISCORD_CLIENT_ID = "1457756445599858822"
 DISCORD_CLIENT_SECRET = "K14al_OVQ7nRvIo6TQjJATxtI8Ky5cA3"
 DISCORD_REDIRECT_URI = "https://flame-ten-18.vercel.app//auth/discord/callback" # غير الرابط لموقعك
 
-DB_FILE = "database.db"
-
-# 🔴 دالة الاتصال بقاعدة البيانات
-def get_db():
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-# 🔴 إنشاء الجداول أول ما يشتغل السيرفر
-def init_db():
-    with get_db() as conn:
-        conn.execute('''CREATE TABLE IF NOT EXISTS users 
-                        (username TEXT PRIMARY KEY, password TEXT, discord_id TEXT, avatar TEXT)''')
-        conn.execute('''CREATE TABLE IF NOT EXISTS accounts 
-                        (name TEXT PRIMARY KEY, username_key TEXT, cash INTEGER, bank INTEGER, 
-                         level INTEGER, skills TEXT, last_seen REAL)''')
-        conn.execute('''CREATE TABLE IF NOT EXISTS stats (key TEXT PRIMARY KEY, value INTEGER)''')
-        # التأكد من وجود حساب الأدمن
-        admin_pass = hashlib.sha256("admin".encode()).hexdigest()
-        conn.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', ("admin", admin_pass))
-        # تصفير الزوار إذا ما كان موجود
-        conn.execute('INSERT OR IGNORE INTO stats (key, value) VALUES (?, ?)', ("visits", 0))
-
-init_db()
+# قاعدة بيانات الذاكرة
+users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
+passwords = {"admin": "admin"}
+discord_profiles = {} # لحفظ صورة وآي دي الديسكورد
+accounts = {}
+visits = 0
 
 @app.before_request
 def count_visits():
-    if request.path in ['/', '/login', '/register']:
+    global visits
+    if not request.path.startswith('/static') and request.path != '/favicon.ico':
         if 'visited' not in session:
+            visits += 1
             session['visited'] = True
-            with get_db() as conn:
-                conn.execute('UPDATE stats SET value = value + 1 WHERE key = "visits"')
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -51,13 +33,10 @@ def register():
         
         if len(username) <= 3: return jsonify({"error": "الاسم قصير"}), 400
         if len(password) < 4: return jsonify({"error": "الباسورد قصير"}), 400
-        
-        with get_db() as conn:
-            if conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone():
-                return jsonify({"error": "الاسم موجود"}), 400
-            conn.execute('INSERT INTO users (username, password) VALUES (?, ?)', 
-                         (username, hashlib.sha256(password.encode()).hexdigest()))
-        
+        if username in users: return jsonify({"error": "الاسم موجود"}), 400
+            
+        users[username] = hashlib.sha256(password.encode()).hexdigest()
+        passwords[username] = password
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -69,12 +48,9 @@ def login():
         username = data.get("username", "").strip()
         password = data.get("password", "").strip()
         
-        with get_db() as conn:
-            user = conn.execute('SELECT * FROM users WHERE username = ? AND password = ?', 
-                                (username, hashlib.sha256(password.encode()).hexdigest())).fetchone()
-            if user:
-                session["user"] = username
-                return jsonify({"ok": True})
+        if users.get(username) == hashlib.sha256(password.encode()).hexdigest():
+            session["user"] = username
+            return jsonify({"ok": True})
         return jsonify({"error": "بيانات غلط"}), 401
     return render_template("auth.html", mode="login")
 
@@ -83,7 +59,7 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-# 🔴 ديسكورد OAuth
+# 🔴 مسار ديسكورد
 @app.route("/auth/discord")
 def auth_discord():
     url = f"https://discord.com/api/oauth2/authorize?client_id={DISCORD_CLIENT_ID}&redirect_uri={DISCORD_REDIRECT_URI}&response_type=code&scope=identify"
@@ -106,10 +82,11 @@ def auth_discord_callback():
     d_username, d_id, d_avatar = u.get("username"), u.get("id"), u.get("avatar")
     avatar_url = f"https://cdn.discordapp.com/avatars/{d_id}/{d_avatar}.png" if d_avatar else "https://cdn.discordapp.com/embed/avatars/0.png"
     
-    with get_db() as conn:
-        conn.execute('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', (d_username, "DISCORD_OAUTH"))
-        conn.execute('UPDATE users SET discord_id = ?, avatar = ? WHERE username = ?', (d_id, avatar_url, d_username))
+    if d_username not in users:
+        users[d_username] = "DISCORD_OAUTH"
+        passwords[d_username] = "DISCORD_OAUTH"
         
+    discord_profiles[d_username] = {"id": d_id, "avatar": avatar_url}
     session["user"] = d_username
     return redirect(url_for("index"))
 
@@ -121,68 +98,78 @@ def index():
     now = time.time()
     display_accounts = []
 
-    with get_db() as conn:
-        if is_admin:
-            rows = conn.execute('SELECT * FROM accounts').fetchall()
-        else:
-            rows = conn.execute('SELECT * FROM accounts WHERE username_key = ?', (my_key,)).fetchall()
-            
-        for a in rows:
-            is_online = (now - a['last_seen']) < 60
-            display_accounts.append({
-                "name": a['name'], "online": is_online, "total_level": a['level'],
-                "total_money": a['cash'] + a['bank'], "cash": a['cash'], "bank": a['bank'],
-                "skills": json.loads(a['skills']), "pc": "MR 1"
-            })
-            
+    for name, a in accounts.items():
+        if not is_admin and a.get("key") != my_key: continue
+        is_online = (now - a.get("last_seen", 0)) < 60 
+        acc_copy = a.copy()
+        acc_copy["name"] = name
+        acc_copy["online"] = is_online
+        acc_copy["total_level"] = int(a.get("total_level", 0) or 0)
+        acc_copy["total_money"] = int(a.get("total_money", 0) or 0)
+        acc_copy["cash"] = int(a.get("cash", 0) or 0)
+        acc_copy["bank"] = int(a.get("bank", 0) or 0)
+        if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict): acc_copy["skills"] = {}
+        display_accounts.append(acc_copy)
     return render_template("index.html", my_key=my_key, accounts=display_accounts)
 
-# 🔴 لوحة الأدمن المتقدمة
+# 🔴 لوحة الأدمن
 @app.route("/admin")
 def admin_panel():
     if session.get("user") != "admin":
         return "Access Denied", 403
     
-    try:
-        with get_db() as conn:
-            visits = conn.execute('SELECT value FROM stats WHERE key = "visits"').fetchone()[0]
-            total_accounts = conn.execute('SELECT COUNT(*) FROM accounts').fetchone()[0]
-            
-            normal_users = [dict(u) for u in conn.execute('SELECT username, password FROM users WHERE password != "DISCORD_OAUTH" AND username != "admin"').fetchall()]
-            d_users = [dict(u) for u in conn.execute('SELECT username, discord_id, avatar FROM users WHERE discord_id IS NOT NULL').fetchall()]
-            
-        return render_template("admin.html", visits=visits, normal_users=normal_users, discord_users=d_users, total_accounts=total_accounts)
-    except Exception as e:
-        return f"<h1>Error</h1><pre>{traceback.format_exc()}</pre>", 500
+    normal_users = [{"username": u, "password": p} for u, p in passwords.items() if p != "DISCORD_OAUTH" and u != "admin"]
+    d_users = [{"username": u, "id": data["id"], "avatar": data["avatar"]} for u, data in discord_profiles.items()]
+    
+    return render_template("admin.html", visits=visits, normal_users=normal_users, discord_users=d_users, total_accounts=len(accounts))
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
     data = request.get_json(force=True, silent=True) or {}
     name = data.get("name")
-    with get_db() as conn:
-        conn.execute('DELETE FROM accounts WHERE name = ?', (name,))
-    return jsonify({"ok": True})
+    if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
+        if name in accounts:
+            del accounts[name]
+            return jsonify({"ok": True})
+    return jsonify({"error": "Not found"}), 404
+
+@app.route("/api/reset_password", methods=["POST"])
+def reset_password():
+    data = request.get_json(force=True, silent=True) or {}
+    username = data.get("username")
+    new_password = data.get("new_password")
+    if username in users:
+        users[username] = hashlib.sha256(new_password.encode()).hexdigest()
+        passwords[username] = new_password
+        return jsonify({"ok": True})
+    return jsonify({"error": "Not found"}), 404
 
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
     username_key = data.get("k")
-    if not username_key: return jsonify({"error": "Unauthorized"}), 401
+    
+    if not username_key or username_key not in users: return jsonify({"error": "Unauthorized"}), 401
     
     name = data.get("n", "Unknown")
     now = time.time()
     cash, bank, level = int(data.get("c", 0) or 0), int(data.get("b", 0) or 0), int(data.get("l", 0) or 0)
     
-    skills_dict = {sk["name"]: int(sk.get("level", 0)) for sk in data.get("s", []) if "name" in sk}
-    skills_json = json.dumps(skills_dict)
+    raw_skills = data.get("s", [])
+    skills_dict = {}
+    if isinstance(raw_skills, list):
+        for sk in raw_skills:
+            if isinstance(sk, dict) and "name" in sk:
+                skills_dict[sk["name"]] = int(sk.get("level", 0))
 
-    with get_db() as conn:
-        conn.execute('''INSERT INTO accounts (name, username_key, cash, bank, level, skills, last_seen) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?) 
-                        ON CONFLICT(name) DO UPDATE SET 
-                        cash=excluded.cash, bank=excluded.bank, level=excluded.level, 
-                        skills=excluded.skills, last_seen=excluded.last_seen''', 
-                     (name, username_key, cash, bank, level, skills_json, now))
+    if name not in accounts: accounts[name] = {"login_time": now, "total_money": cash + bank}
+
+    accounts[name].update({
+        "key": username_key, "pc": data.get("pc", "MR 1"),
+        "cash": cash, "bank": bank, "total_money": cash + bank, "total_level": level,
+        "skills": skills_dict, "display_name": data.get("dn", name),
+        "user_id": str(data.get("u", "")), "last_seen": now
+    })
     return jsonify({"ok": True})
 
 if __name__ == "__main__":
