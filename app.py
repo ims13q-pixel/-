@@ -9,24 +9,22 @@ app.secret_key = "axiom_overseer_secret_key_2024"
 
 DB_FILE = "db.json"
 
-# دالة تحميل البيانات من الملف
+# دالة تحميل البيانات
 def load_data():
     if os.path.exists(DB_FILE):
         with open(DB_FILE, "r") as f:
             return json.load(f)
-    # إذا الملف مو موجود، ننشئ حساب أدمن افتراضي
     return {
         "users": {"admin": hashlib.sha256("admin".encode()).hexdigest()},
         "passwords": {"admin": "admin"},
         "accounts": {}
     }
 
-# دالة حفظ البيانات في الملف
+# دالة حفظ البيانات
 def save_data():
     with open(DB_FILE, "w") as f:
         json.dump({"users": users, "passwords": passwords, "accounts": accounts}, f)
 
-# تحميل البيانات أول ما يشتغل السيرفر
 data = load_data()
 users = data["users"]
 passwords = data["passwords"]
@@ -48,7 +46,7 @@ def register():
             
         users[username] = hashlib.sha256(password.encode()).hexdigest()
         passwords[username] = password
-        save_data() # حفظ التعديلات
+        save_data()
         session["user"] = username
         return jsonify({"ok": True})
     return render_template("auth.html", mode="register")
@@ -85,7 +83,6 @@ def get_api_accounts():
     offline_count = 0
 
     for name, a in accounts.items():
-        # الفلترة: الأدمن يشوف الكل، والمستخدم يشوف بس حسابه
         if not is_admin and a.get("key") != my_key:
             continue
             
@@ -114,11 +111,48 @@ def get_api_accounts():
     
     return jsonify({"accounts": filtered_accounts, "stats": stats, "my_key": my_key})
 
+# 🔴 هنا التصحيح: نمرر البيانات للصفحة عشان تظهر
 @app.route("/")
 def index():
     if "user" not in session:
         return redirect(url_for("login"))
-    return render_template("index.html", my_key=session["user"])
+    
+    my_key = session["user"]
+    is_admin = (my_key == "admin")
+    now = time.time()
+    
+    filtered_accounts = []
+    online_count = 0
+    offline_count = 0
+
+    for name, a in accounts.items():
+        if not is_admin and a.get("key") != my_key:
+            continue
+            
+        is_online = (now - a.get("last_seen", 0)) < 15 
+        
+        if is_online: 
+            online_count += 1
+            if "login_time" not in a: a["login_time"] = now
+            uptime = int(now - a["login_time"])
+        else: 
+            offline_count += 1
+            uptime = 0
+            a["login_time"] = now
+            
+        acc_copy = a.copy()
+        acc_copy["name"] = name
+        acc_copy["online"] = is_online
+        acc_copy["uptime"] = uptime
+        filtered_accounts.append(acc_copy)
+        
+    stats = {
+        "total": len(filtered_accounts),
+        "online": online_count,
+        "offline": offline_count
+    }
+
+    return render_template("index.html", my_key=my_key, accounts=filtered_accounts, stats=stats)
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
@@ -127,7 +161,7 @@ def delete_account():
     if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
         if name in accounts:
             del accounts[name]
-            save_data() # حفظ بعد الحذف
+            save_data()
             return jsonify({"ok": True})
     return jsonify({"error": "Not found"}), 404
 
@@ -145,7 +179,7 @@ def reset_password():
     users[username] = hashlib.sha256(new_password.encode()).hexdigest()
     if username in passwords:
         passwords[username] = new_password
-    save_data() # حفظ بعد تغيير الباسورد
+    save_data()
     return jsonify({"ok": True})
 
 @app.route("/api/report", methods=["POST"])
@@ -188,13 +222,8 @@ def report():
         "last_seen": now
     })
     
-    save_data() # 🔴 أهم سطر: نحفظ البيانات فوراً عشان ما تطير
+    save_data()
     return jsonify({"ok": True})
-
-# مسار للفحص (عشان تشوف البيانات بعينك)
-@app.route("/api/debug")
-def debug():
-    return jsonify(accounts)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
