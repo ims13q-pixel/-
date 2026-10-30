@@ -5,9 +5,9 @@ app = Flask(__name__)
 app.secret_key = "axiom_secret_key_2024"
 
 # 🔴 إعدادات ديسكورد (حط المفاتيح حقتك هنا)
-DISCORD_CLIENT_ID = "YOUR_CLIENT_ID_HERE"
-DISCORD_CLIENT_SECRET = "YOUR_CLIENT_SECRET_HERE"
-DISCORD_REDIRECT_URI = "https://YOUR-RENDER-URL.onrender.com/auth/discord/callback" # غير الرابط لموقعك
+DISCORD_CLIENT_ID = "1457756445599858822"
+DISCORD_CLIENT_SECRET = "K14al_OVQ7nRvIo6TQjJATxtI8Ky5cA3"
+DISCORD_REDIRECT_URI = "https://flame-ten-18.vercel.app//auth/discord/callback" # غير الرابط لموقعك
 
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 passwords = {"admin": "admin"}
