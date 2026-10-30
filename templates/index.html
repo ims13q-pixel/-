@@ -183,13 +183,6 @@ function openResetModal(e) {
     document.getElementById("resetModal").showModal();
 }
 
-// 🔴 البيانات اللي جاية من البايثون
-const SERVER_DATA = {
-    accounts: {{ accounts | default([]) | tojson | safe }},
-    stats: {{ stats | default({}) | tojson | safe }},
-    my_key: {{ my_key | default('Overseer') | tojson | safe }}
-};
-
 var $=function(i){return document.getElementById(i)},R=function(a,b){return a+Math.random()*(b-a)};
 var seed=7;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
 var PCS=["XEON V4","RYZEN 02","DDC-1"];
@@ -216,12 +209,40 @@ function mapAccounts(raw) {
         };
     });
 }
-accs = mapAccounts(SERVER_DATA.accounts);
 
 var ses0=Date.now()-13.8*36e5,G=[],flt="all",pcf="",q="",sk="bank",sd=-1,live=true;
 var tot=function(a){return a.pocket+a.bank};
 var $$=function(){return accs.reduce(function(s,a){return s+tot(a)},0)};
-var base=$$()*.2;for(var g=0;g<40;g++)G.push(base+($$()-base)*(g/39)*(0.9+rnd()*.1));
+var base=0;
+
+// 🔴 الدالة الجديدة اللي تسحب البيانات من السيرفر مباشرة
+async function fetchData() {
+    try {
+        let res = await fetch('/api/accounts');
+        if (!res.ok) return;
+        let data = await res.json();
+        
+        if (data.accounts) {
+            // نحتفظ بالحسابات المحددة
+            let selectedUsers = accs.filter(a => a.sel).map(a => a.user);
+            
+            // نحدث البيانات
+            accs = mapAccounts(data.accounts);
+            accs.forEach(a => {
+                if(selectedUsers.includes(a.user)) a.sel = 1;
+            });
+            
+            if(base === 0 && accs.length > 0) {
+                base = $$() * 0.2;
+                for(var g=0;g<40;g++) G.push(base+($$()-base)*(g/39)*(0.9+rnd()*.1));
+            }
+            
+            draw();
+        }
+    } catch(e) {
+        console.log("Fetch error", e);
+    }
+}
 
 function M(n){var s=n<0?"-":"";n=Math.abs(n);return s+"$"+(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"K":Math.round(n))}
 function eco(a){var t=tot(a);return t>=20000?["Good","g"]:t>=6000?["Low balance","l"]:["Drained","d"]}
@@ -269,7 +290,7 @@ $("bdel").onclick=async function(){
     for(var i=0; i<selected.length; i++) {
         await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: selected[i]}) });
     }
-    location.reload();
+    fetchData();
 };
 
 $("bcopy").onclick=function(){try{navigator.clipboard.writeText(accs.filter(function(a){return a.sel}).map(function(a){return a.user}).join("\n"))}catch(e){}};
@@ -302,7 +323,9 @@ document.getElementById('resetForm').onsubmit = async function(e) {
     } catch(err) { alert("Failed to connect to server."); }
 };
 
-draw();
+// 🔴 التشغيل التلقائي
+fetchData();
+setInterval(fetchData, 3000);
 </script>
 </body>
 </html>
