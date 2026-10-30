@@ -145,7 +145,6 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </dialog>
 
 <script>
-// 🔴 1. دالة النسخ المضمونة 100%
 function forceCopyScript(btn) {
     const domain = window.location.origin;
     const key = "{{ my_key | default('Overseer') }}";
@@ -184,7 +183,7 @@ function openResetModal(e) {
     document.getElementById("resetModal").showModal();
 }
 
-// 🔴 2. استقبال البيانات من البايثون
+// 🔴 البيانات اللي جاية من البايثون
 const SERVER_DATA = {
     accounts: {{ accounts | default([]) | tojson | safe }},
     stats: {{ stats | default({}) | tojson | safe }},
