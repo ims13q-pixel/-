@@ -4,15 +4,15 @@ import time, hashlib, requests
 app = Flask(__name__)
 app.secret_key = "axiom_secret_key_2024"
 
-# 🔴 إعدادات ديسكورد (حط المفاتيح حقتك هنا)
+# إعدادات ديسكورد
 DISCORD_CLIENT_ID = "1457756445599858822"
 DISCORD_CLIENT_SECRET = "K14al_OVQ7nRvIo6TQjJATxtI8Ky5cA3"
 DISCORD_REDIRECT_URI = "https://flame-ten-18.vercel.app//auth/discord/callback" # غير الرابط لموقعك
 
-# قاعدة بيانات الذاكرة
+# قاعدة البيانات (الذاكرة)
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 passwords = {"admin": "admin"}
-discord_profiles = {} # لحفظ صورة وآي دي الديسكورد
+discord_profiles = {}
 accounts = {}
 visits = 0
 
@@ -30,11 +30,9 @@ def register():
         data = request.get_json(force=True, silent=True) or {}
         username = data.get("username", "").strip()
         password = data.get("password", "").strip()
-        
         if len(username) <= 3: return jsonify({"error": "الاسم قصير"}), 400
         if len(password) < 4: return jsonify({"error": "الباسورد قصير"}), 400
         if username in users: return jsonify({"error": "الاسم موجود"}), 400
-            
         users[username] = hashlib.sha256(password.encode()).hexdigest()
         passwords[username] = password
         session["user"] = username
@@ -47,7 +45,6 @@ def login():
         data = request.get_json(force=True, silent=True) or {}
         username = data.get("username", "").strip()
         password = data.get("password", "").strip()
-        
         if users.get(username) == hashlib.sha256(password.encode()).hexdigest():
             session["user"] = username
             return jsonify({"ok": True})
@@ -59,7 +56,6 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-# 🔴 مسار ديسكورد
 @app.route("/auth/discord")
 def auth_discord():
     url = f"https://discord.com/api/oauth2/authorize?client_id={DISCORD_CLIENT_ID}&redirect_uri={DISCORD_REDIRECT_URI}&response_type=code&scope=identify"
@@ -69,23 +65,18 @@ def auth_discord():
 def auth_discord_callback():
     code = request.args.get("code")
     if not code: return "Auth Failed", 400
-    
     data = {"client_id": DISCORD_CLIENT_ID, "client_secret": DISCORD_CLIENT_SECRET,
             "grant_type": "authorization_code", "code": code, "redirect_uri": DISCORD_REDIRECT_URI}
     r = requests.post("https://discord.com/api/oauth2/token", data=data)
     if r.status_code != 200: return "Token Error", 400
-        
     access_token = r.json().get("access_token")
     user_r = requests.get("https://discord.com/api/users/@me", headers={"Authorization": f"Bearer {access_token}"})
     u = user_r.json()
-    
     d_username, d_id, d_avatar = u.get("username"), u.get("id"), u.get("avatar")
     avatar_url = f"https://cdn.discordapp.com/avatars/{d_id}/{d_avatar}.png" if d_avatar else "https://cdn.discordapp.com/embed/avatars/0.png"
-    
     if d_username not in users:
         users[d_username] = "DISCORD_OAUTH"
         passwords[d_username] = "DISCORD_OAUTH"
-        
     discord_profiles[d_username] = {"id": d_id, "avatar": avatar_url}
     session["user"] = d_username
     return redirect(url_for("index"))
@@ -101,26 +92,29 @@ def index():
     for name, a in accounts.items():
         if not is_admin and a.get("key") != my_key: continue
         is_online = (now - a.get("last_seen", 0)) < 60 
+        
+        # 🔴 حساب المجموع بدقة
+        cash = int(a.get("cash", 0) or 0)
+        bank = int(a.get("bank", 0) or 0)
+        total = cash + bank
+        
         acc_copy = a.copy()
         acc_copy["name"] = name
         acc_copy["online"] = is_online
         acc_copy["total_level"] = int(a.get("total_level", 0) or 0)
-        acc_copy["total_money"] = int(a.get("total_money", 0) or 0)
-        acc_copy["cash"] = int(a.get("cash", 0) or 0)
-        acc_copy["bank"] = int(a.get("bank", 0) or 0)
+        acc_copy["total_money"] = total
+        acc_copy["cash"] = cash
+        acc_copy["bank"] = bank
+        
         if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict): acc_copy["skills"] = {}
         display_accounts.append(acc_copy)
     return render_template("index.html", my_key=my_key, accounts=display_accounts)
 
-# 🔴 لوحة الأدمن
 @app.route("/admin")
 def admin_panel():
-    if session.get("user") != "admin":
-        return "Access Denied", 403
-    
+    if session.get("user") != "admin": return "Access Denied", 403
     normal_users = [{"username": u, "password": p} for u, p in passwords.items() if p != "DISCORD_OAUTH" and u != "admin"]
     d_users = [{"username": u, "id": data["id"], "avatar": data["avatar"]} for u, data in discord_profiles.items()]
-    
     return render_template("admin.html", visits=visits, normal_users=normal_users, discord_users=d_users, total_accounts=len(accounts))
 
 @app.route("/api/delete", methods=["POST"])
@@ -148,12 +142,13 @@ def reset_password():
 def report():
     data = request.get_json(force=True, silent=True) or {}
     username_key = data.get("k")
-    
     if not username_key or username_key not in users: return jsonify({"error": "Unauthorized"}), 401
     
     name = data.get("n", "Unknown")
     now = time.time()
-    cash, bank, level = int(data.get("c", 0) or 0), int(data.get("b", 0) or 0), int(data.get("l", 0) or 0)
+    cash = int(data.get("c", 0) or 0)
+    bank = int(data.get("b", 0) or 0)
+    level = int(data.get("l", 0) or 0)
     
     raw_skills = data.get("s", [])
     skills_dict = {}
