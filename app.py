@@ -2,9 +2,8 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for, s
 import time, hashlib
 
 app = Flask(__name__)
-app.secret_key = "axiom_overseer_secret_key_2024"
+app.secret_key = "axiom_secret_key_2024"
 
-# الحساب الافتراضي (admin / admin)
 users = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
 accounts = {}
 
@@ -42,7 +41,6 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-# 🔴 مسار تغيير الباسورد
 @app.route("/api/reset_password", methods=["POST"])
 def reset_password():
     data = request.get_json(force=True, silent=True) or {}
@@ -55,7 +53,6 @@ def reset_password():
     users[username] = hashlib.sha256(new_password.encode()).hexdigest()
     return jsonify({"ok": True})
 
-# 🔴 مسار عرض الداشبورد
 @app.route("/")
 def index():
     if "user" not in session:
@@ -70,7 +67,8 @@ def index():
     for name, a in accounts.items():
         if not is_admin and a.get("key") != my_key: continue
             
-        is_online = (now - a.get("last_seen", 0)) < 15 
+        # 🔴 هنا التعديل: خليت المهلة 60 ثانية بدل 15 عشان الأونلاين يثبت
+        is_online = (now - a.get("last_seen", 0)) < 60 
         
         acc_copy = a.copy()
         acc_copy["name"] = name
@@ -80,7 +78,6 @@ def index():
         acc_copy["cash"] = int(a.get("cash", 0) or 0)
         acc_copy["bank"] = int(a.get("bank", 0) or 0)
         
-        # تأمين المهارات عشان الجدول يقرأها
         if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict):
             acc_copy["skills"] = {}
             
@@ -88,7 +85,46 @@ def index():
         
     return render_template("index.html", my_key=my_key, accounts=display_accounts)
 
-# 🔴 مسار استقبال البيانات من السكربت
+@app.route("/api/accounts")
+def get_api_accounts():
+    if "user" not in session: return jsonify({"error": "Unauthorized"}), 401
+    
+    my_key = session["user"]
+    is_admin = (my_key == "admin")
+    now = time.time()
+    
+    filtered_accounts = []
+    online_count = 0
+    offline_count = 0
+
+    for name, a in accounts.items():
+        if not is_admin and a.get("key") != my_key: continue
+            
+        # 🔴 هنا كمان خليتها 60 ثانية عشان ما يطير
+        is_online = (now - a.get("last_seen", 0)) < 60 
+        
+        if is_online: online_count += 1
+        else: offline_count += 1
+            
+        acc_copy = a.copy()
+        acc_copy["name"] = name
+        acc_copy["online"] = is_online
+        acc_copy["uptime"] = 0
+        filtered_accounts.append(acc_copy)
+        
+    stats = {"total": len(filtered_accounts), "online": online_count, "offline": offline_count}
+    return jsonify({"accounts": filtered_accounts, "stats": stats, "my_key": my_key})
+
+@app.route("/api/delete", methods=["POST"])
+def delete_account():
+    data = request.get_json(force=True, silent=True) or {}
+    name = data.get("name")
+    if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
+        if name in accounts:
+            del accounts[name]
+            return jsonify({"ok": True})
+    return jsonify({"error": "Not found"}), 404
+
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
