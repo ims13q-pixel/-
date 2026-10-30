@@ -47,10 +47,11 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-@app.route("/")
-def index():
+# 🔴 مسار لجلب البيانات الحقيقية للجافاسكربت (للتحديث التلقائي)
+@app.route("/api/accounts")
+def get_api_accounts():
     if "user" not in session:
-        return redirect(url_for("login"))
+        return jsonify({"error": "Unauthorized"}), 401
     
     my_key = session["user"]
     is_admin = (my_key == "admin")
@@ -86,8 +87,16 @@ def index():
         "online": online_count,
         "offline": offline_count
     }
+    
+    return jsonify({"accounts": filtered_accounts, "stats": stats, "my_key": my_key})
+
+@app.route("/")
+def index():
+    if "user" not in session:
+        return redirect(url_for("login"))
         
-    return render_template("index.html", accounts=filtered_accounts, my_key=my_key, stats=stats)
+    # نمرر بيانات مبدئية فقط، الجافاسكربت راح يحدثها فوراً
+    return render_template("index.html", my_key=session["user"])
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
