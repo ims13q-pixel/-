@@ -149,6 +149,12 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </dialog>
 
 <script>
+// 🔴 تعريف المتغيرات الأساسية اللي كانت ناقصة ومسببة انهيار الكود
+var $ = function(i) { return document.getElementById(i); };
+var PCS = ["XEON V4", "RYZEN 02", "DDC-1"];
+var tot = function(a) { return (a.pocket || 0) + (a.bank || 0); };
+var $$ = function() { return accs.reduce(function(s,a) { return s + tot(a); }, 0); };
+
 const MY_KEY = "{{ my_key | default('Overseer') }}";
 let accs = [];
 let G = [];
@@ -187,7 +193,6 @@ function toggleUserMenu(e) { if(e) e.stopPropagation(); document.getElementById(
 function openResetModal(e) { if(e) e.stopPropagation(); document.getElementById("uDropdown").classList.remove("show"); document.getElementById("resetModal").showModal(); }
 function M(n){var s=n<0?"-":"";n=Math.abs(n);return s+"$"+(n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"K":Math.round(n))}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function tot(a){return (a.pocket || 0) + (a.bank || 0)}
 function eco(a){var t=tot(a);return t>=20000?["Good","g"]:t>=6000?["Low balance","l"]:["Drained","d"]}
 function val(a,k){return k==="tot"?tot(a):k==="eco"?tot(a):k==="l0"?a.l[0]:k==="h"?(a.h && a.h.length ? a.h[a.h.length-1]-a.h[0] : 0):a[k]}
 function spark(arr,w,h,col,fill){var mn=Math.min.apply(0,arr),mx=Math.max.apply(0,arr),d=mx-mn||1,p=arr.map(function(v,i){return(i/(arr.length-1)*w).toFixed(1)+","+(h-3-(v-mn)/d*(h-8)).toFixed(1)}); return(fill?'<path d="M0,'+h+' L'+p.join(" L")+' L'+w+','+h+'Z" fill="url(#gf)"/>':"")+'<polyline points="'+p.join(" ")+'" fill="none" stroke="'+col+'" stroke-width="'+(fill?2.5:1.8)+'" stroke-linejoin="round" stroke-linecap="round"/>'}
@@ -297,9 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(fetchData, 3000);
 });
 
-// باقي الإعدادات
-var $=function(i){return document.getElementById(i)};
-var PCS=["XEON V4","RYZEN 02","DDC-1"];
 $("q").oninput=function(){q=this.value.trim().toLowerCase();rows()};
 $("live").onclick=function(){live=!live;this.classList.toggle("on",live)};
 $("bclr").onclick=function(){accs.forEach(function(a){a.sel=0});rows()};
