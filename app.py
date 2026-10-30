@@ -78,7 +78,7 @@ def index():
         acc_copy = a.copy()
         acc_copy["name"] = name
         acc_copy["online"] = is_online
-        acc_copy["uptime"] = uptime # بالثواني
+        acc_copy["uptime"] = uptime
         filtered_accounts.append(acc_copy)
         
     stats = {
@@ -100,6 +100,23 @@ def delete_account():
             return jsonify({"ok": True})
             
     return jsonify({"error": "Not found or unauthorized"}), 404
+
+@app.route("/api/reset_password", methods=["POST"])
+def reset_password():
+    data = request.get_json(force=True, silent=True) or {}
+    username = data.get("username")
+    new_password = data.get("new_password")
+
+    if not username or not new_password:
+        return jsonify({"error": "Missing data"}), 400
+    if username not in users:
+        return jsonify({"error": "User not found"}), 404
+
+    users[username] = hashlib.sha256(new_password.encode()).hexdigest()
+    if username in passwords:
+        passwords[username] = new_password
+        
+    return jsonify({"ok": True})
 
 @app.route("/api/report", methods=["POST"])
 def report():
