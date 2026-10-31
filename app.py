@@ -5,12 +5,10 @@ from upstash_redis import Redis
 app = Flask(__name__)
 app.secret_key = "axiom_secret_key_2024"
 
-# 🔴 إعدادات ديسكورد (تأكد من تعديل الرابط إذا لزم الأمر)
 DISCORD_CLIENT_ID = "1457756445599858822"
 DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET", "K14al_OVQ7nRvIo6TQjJATxtI8Ky5cA3")
 DISCORD_REDIRECT_URI = "https://flame-ten-18.vercel.app/auth/discord/callback"
 
-# 🔴 الربط بقاعدة بيانات Vercel KV (Upstash)
 REDIS_URL = os.environ.get("KV_REST_API_URL") or os.environ.get("UPSTASH_REDIS_REST_URL")
 REDIS_TOKEN = os.environ.get("KV_REST_API_TOKEN") or os.environ.get("UPSTASH_REDIS_REST_TOKEN")
 redis = Redis(url=REDIS_URL, token=REDIS_TOKEN) if REDIS_URL and REDIS_TOKEN else None
@@ -132,7 +130,6 @@ def admin_panel():
     d_users = [{"username": u, "id": data["id"], "avatar": data["avatar"]} for u, data in discord_profiles.items()]
     return render_template("admin.html", visits=visits, normal_users=normal_users, discord_users=d_users, total_accounts=len(accounts))
 
-# 🔴 هذا هو الـ API السريع الذي يسحب منه الموقع البيانات كل 3 ثواني
 @app.route("/api/data")
 def api_data():
     if "user" not in session: return jsonify({"error": "Unauthorized"}), 401
@@ -168,7 +165,6 @@ def api_data():
         total_bank += bank
         total_farmed += farmed
         
-        # تنسيق الوقت باللغة الإنجليزية
         if uptime_sec < 60:
             uptime_str = "< 1m"
         else:
@@ -186,7 +182,9 @@ def api_data():
             "farmed": farmed,
             "uptime": uptime_str, 
             "pc": a.get("pc", "PC"), 
-            "skills": a.get("skills", {})
+            "skills": a.get("skills", {}),
+            "srv": a.get("srv", "Unknown"),  # 🔴 السيرفر الجديد
+            "ver": a.get("ver", "Unknown")   # 🔴 الإصدار الجديد
         })
         
     return jsonify({
@@ -224,7 +222,6 @@ def reset_password():
         return jsonify({"ok": True})
     return jsonify({"error": "Not found"}), 404
 
-# 🔴 المسار الذي يستقبل البيانات من السكربت داخل اللعبة
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
@@ -242,6 +239,10 @@ def report():
     total_money = cash + bank
     level = int(data.get("l", 0) or 0)
     
+    # استقبال السيرفر والإصدار
+    srv_id = data.get("srv", "Unknown")
+    ver = data.get("ver", "Unknown")
+
     raw_skills = data.get("s", [])
     skills_dict = {}
     if isinstance(raw_skills, list):
@@ -249,7 +250,6 @@ def report():
             if isinstance(sk, dict) and "name" in sk:
                 skills_dict[sk["name"]] = int(sk.get("level", 0))
 
-    # بدء جلسة جديدة إذا كان الحساب جديد أو توقف السكربت لأكثر من دقيقتين
     if name not in accounts or (now - accounts[name].get("last_seen", 0)) > 120:
         if name not in accounts: accounts[name] = {}
         accounts[name]["session_start_time"] = now
@@ -265,7 +265,9 @@ def report():
         "skills": skills_dict, 
         "display_name": data.get("dn", name),
         "user_id": str(data.get("u", "")), 
-        "last_seen": now
+        "last_seen": now,
+        "srv": srv_id,    # حفظ السيرفر
+        "ver": ver        # حفظ الإصدار
     })
     
     save_db(users, passwords, discord_profiles, accounts)
