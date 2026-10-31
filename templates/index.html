@@ -1,54 +1,105 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Farmledger Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<!-- الخطوط الجديدة -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root {
-    --bg: #0b0e14; --panel: #121620; --panel-hover: #181d29; --line: #1f2533; --ink: #ffffff; --mute: #8b949e;
-    --ac: #7c8cff; --ok: #2ea043; --bad: #f85149; --gold: #e3b341;
-    --c-pocket: #2ea043; --c-bank: #c084fc; --c-total: #60a5fa; --c-profit: #10b981; --c-acc: #f97316; --c-online: #14b8a6;
+    /* لون الباك قراوند اللي طلبته */
+    --bg: #212232; 
+    --panel: #2a2c40;
+    --panel-hover: #34364d;
+    --line: #3b3e59;
+    --ink: #ffffff;
+    --mute: #9ca3af;
+    
+    --ac: #5c5cff; 
+    --ac-hover: #4b4bff;
+    --ok: #2ea043; 
+    --bad: #f85149; 
+    --gold: #e3b341;
+    
+    --c-pocket: #2ea043; 
+    --c-bank: #c084fc; 
+    --c-total: #60a5fa; 
+    --c-profit: #10b981; 
+    --c-acc: #f97316; 
+    --c-online: #14b8a6;
 }
-* { box-sizing: border-box; transition: all 0.2s ease; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 500 14px/1.5 'Manrope', sans-serif; }
+
+* { 
+    box-sizing: border-box; 
+    transition: all 0.2s ease; 
+    /* تطبيق الخط الجديد */
+    font-family: 'Space Grotesk', sans-serif; 
+}
+
+body { 
+    margin: 0; 
+    background: var(--bg); 
+    color: var(--ink); 
+    font-size: 14px; 
+    line-height: 1.5;
+}
+
 .w { max-width: 1400px; margin: 0 auto; padding: 30px 20px 60px; }
+
+/* Top Bar */
 .bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
-.logo { font: 800 24px 'Manrope', sans-serif; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+.logo { font-weight: 700; font-size: 24px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
 .logo i { width: 30px; height: 30px; border-radius: 8px; background: conic-gradient(from 200deg, var(--ac), #3a46c8, var(--ok), var(--ac)); display: block; }
 .sp { flex: 1; }
-.b { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none;}
-.b:hover { background: var(--panel-hover); border-color: #30384b; }
-.b.pri { background: var(--ac); border-color: var(--ac); color: #fff; }
-.b.pri:hover { background: #6b7aff; }
 
-.lang-menu, .user-menu { position: relative; }
-.lang-trigger, .user-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); font-weight: 700; font-size: 13px; }
-.lang-trigger:hover, .user-trigger:hover { border-color: #30384b; }
-.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3a46c8, var(--ac)); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
-.dropdown { display: none; position: absolute; top: calc(100% + 8px); left: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; min-width: 180px; z-index: 9999; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+/* الأزرار */
+.b { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 16px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none;}
+.b:hover { background: var(--panel-hover); border-color: #4b4e6b; }
+
+/* زر نسخ السكربت */
+.b.pri { 
+    background: var(--ac); 
+    border: none; 
+    color: #fff; 
+    box-shadow: 0 4px 14px rgba(92, 92, 255, 0.3); 
+}
+.b.pri:hover { 
+    background: var(--ac-hover); 
+    transform: translateY(-1px); 
+    box-shadow: 0 6px 20px rgba(92, 92, 255, 0.4); 
+}
+
+/* Dropdowns */
+.user-menu { position: relative; }
+.user-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; font-size: 14px; }
+.user-trigger:hover { border-color: #4b4e6b; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3a46c8, var(--ac)); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+.dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; min-width: 180px; z-index: 9999; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .dropdown.show { display: flex; }
-.dropdown button, .dropdown a { width: 100%; text-align: right; padding: 10px 12px; border: none; background: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.dropdown button, .dropdown a { width: 100%; text-align: left; padding: 10px 12px; border: none; background: none; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 14px; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
 .dropdown button:hover { background: var(--panel-hover); }
 .dropdown a:hover { background: rgba(248,81,73,0.1); color: var(--bad); }
 .dropdown-divider { height: 1px; background: var(--line); margin: 4px 0; }
 
+/* Header Title */
 .header-title { margin-bottom: 24px; }
-.header-title h1 { font-size: 28px; font-weight: 800; margin: 0 0 5px 0; letter-spacing: -0.5px; }
-.header-title p { color: var(--mute); font-size: 13px; margin: 0; font-weight: 600; }
+.header-title h1 { font-size: 28px; font-weight: 700; margin: 0 0 5px 0; letter-spacing: -0.5px; }
+.header-title p { color: var(--mute); font-size: 14px; margin: 0; font-weight: 500; }
 
+/* Stat Cards */
 .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
-.stat-card:hover { border-color: #30384b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.stat-card:hover { border-color: #4b4e6b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
 .stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.stat-title { color: var(--mute); font-size: 13px; font-weight: 700; }
+.stat-title { color: var(--mute); font-size: 13px; font-weight: 600; }
 .stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
 .stat-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-.stat-value { font: 800 28px 'JetBrains Mono', monospace; letter-spacing: -1px; margin-bottom: 4px; }
-.stat-sub { font-size: 11px; color: var(--mute); font-weight: 600; }
+/* خط الأرقام الجديد */
+.stat-value { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 26px; letter-spacing: -0.5px; margin-bottom: 4px; }
+.stat-sub { font-size: 12px; color: var(--mute); font-weight: 500; }
 
 .c-pocket .stat-icon { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); } .c-pocket .stat-value { color: var(--c-pocket); }
 .c-bank .stat-icon { background: rgba(192, 132, 252, 0.15); color: var(--c-bank); } .c-bank .stat-value { color: var(--c-bank); }
@@ -57,58 +108,70 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 500 14px/1.5 '
 .c-acc .stat-icon { background: rgba(249, 115, 22, 0.15); color: var(--c-acc); } .c-acc .stat-value { color: var(--c-acc); }
 .c-online .stat-icon { background: rgba(20, 184, 166, 0.15); color: var(--c-online); } .c-online .stat-value { color: var(--c-online); }
 
+/* Toolbar */
 .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
-.toolbar input[type=search] { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 16px; min-width: 300px; color: white; outline: none; font-family: 'Manrope', sans-serif; }
-.toolbar input[type=search]:focus { border-color: var(--ac); }
+.toolbar input[type=search] { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; min-width: 300px; color: white; outline: none; font-size: 14px; }
+.toolbar input[type=search]:focus { border-color: var(--ac); box-shadow: 0 0 0 2px rgba(92, 92, 255, 0.2); }
 
+/* Table */
 .table-container { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: auto; max-height: 750px; }
 table { width: 100%; border-collapse: collapse; }
-th { text-align: right; padding: 16px; color: var(--mute); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--line); cursor: pointer; position: sticky; top: 0; background: var(--panel); z-index: 10;}
+th { text-align: left; padding: 16px; color: var(--mute); font-size: 13px; font-weight: 600; border-bottom: 1px solid var(--line); cursor: pointer; position: sticky; top: 0; background: var(--panel); z-index: 10; user-select: none; text-transform: uppercase; letter-spacing: 0.5px;}
 th:hover { color: var(--ink); }
 td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
 tr:hover { background: var(--panel-hover); }
 
-.acc-name { font-weight: 700; color: var(--ink); font-size: 14px; }
-.badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+/* Sort Icons */
+.sort-icon { display: inline-block; width: 12px; height: 12px; margin-left: 6px; opacity: 0.3; vertical-align: middle; }
+.sort-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+th:hover .sort-icon { opacity: 0.7; }
+.sort-icon.active { opacity: 1; color: var(--ac); }
+
+/* Table Content */
+.acc-name { font-weight: 600; color: var(--ink); font-size: 15px; }
+.badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 6px; }
 .badge.online { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); }
 .badge.offline { background: rgba(248, 81, 73, 0.15); color: var(--bad); }
-.badge.pc { background: #1f2533; color: #a1a1aa; }
+.badge.pc { background: #3b3e59; color: #cbd5e1; }
 
-.money-col { font: 800 16px 'JetBrains Mono', monospace; letter-spacing: -0.5px; }
+/* خط الأرقام في الجدول */
+.money-col { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 16px; letter-spacing: 0px; }
 .money-cash { color: var(--c-pocket); }
 .money-bank { color: var(--c-bank); }
 .money-total { color: var(--c-total); }
 
-.farmed-up { color: var(--c-profit); font: 700 14px 'JetBrains Mono', monospace; }
-.farmed-down { color: var(--bad); font: 700 14px 'JetBrains Mono', monospace; }
-.uptime-badge { background: rgba(227, 179, 65, 0.15); color: var(--gold); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block; }
+.farmed-up { color: var(--c-profit); font-family: 'Share Tech Mono', monospace; font-size: 15px; }
+.farmed-down { color: var(--bad); font-family: 'Share Tech Mono', monospace; font-size: 15px; }
+.uptime-badge { background: rgba(227, 179, 65, 0.15); color: var(--gold); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; display: inline-block;}
 
 input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 2px solid var(--mute); border-radius: 4px; background: transparent; cursor: pointer; position: relative; outline: none; }
 input[type="checkbox"]:checked { background: var(--ac); border-color: var(--ac); }
 input[type="checkbox"]:checked::after { content: "✓"; position: absolute; top: -2px; left: 2px; color: white; font-size: 13px; font-weight: bold; }
 
+/* Modals */
 dialog { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 24px; width: min(400px, 92vw); }
-dialog::backdrop { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
-dialog h2 { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
-dialog label { display: block; margin-bottom: 12px; color: var(--mute); font-size: 13px; font-weight: 700; }
+dialog::backdrop { background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
+dialog h2 { margin: 0 0 16px; font-size: 20px; font-weight: 700; }
+dialog label { display: block; margin-bottom: 12px; color: var(--mute); font-size: 13px; font-weight: 500; }
 dialog input { width: 100%; margin-top: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: white; outline: none; }
+dialog input:focus { border-color: var(--ac); }
 
-.custom-alert { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+.custom-alert { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
 .custom-alert.show { display: flex; opacity: 1; }
 .alert-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; width: min(400px, 90vw); padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.2s; }
 .custom-alert.show .alert-box { transform: translateY(0); }
-.alert-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--c-pocket); }
+.alert-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--c-pocket); }
 .alert-message { font-size: 14px; color: var(--ink); margin-bottom: 24px; }
 .alert-actions { display: flex; justify-content: flex-end; gap: 10px; }
-.alert-btn { background: var(--ac); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.alert-btn { background: var(--ac); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .alert-btn.cancel { background: transparent; border: 1px solid var(--line); color: var(--ink); }
 
 @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .bar { flex-direction: column; align-items: stretch; }
-    .lang-menu, .user-menu { width: 100%; }
-    .lang-trigger, .user-trigger { justify-content: space-between; }
+    .user-menu { width: 100%; }
+    .user-trigger { justify-content: space-between; }
     .toolbar { flex-direction: column; align-items: stretch; }
     .toolbar input[type=search] { width: 100%; }
     .bar > .b { width: 100%; justify-content: center; }
@@ -122,90 +185,76 @@ dialog input { width: 100%; margin-top: 6px; background: var(--bg); border: 1px 
     <div class="bar">
         <div class="logo"><i></i>Farmledger</div>
         <div class="sp"></div>
-        
-        <div class="lang-menu">
-            <div class="lang-trigger" onclick="document.getElementById('langDropdown').classList.toggle('show')">
-                <span id="current-lang-flag">🇸🇦</span>
-                <span data-i18n="lang_ar">عربي</span>
-            </div>
-            <div class="dropdown" id="langDropdown">
-                <button onclick="changeLanguage('ar')">🇸🇦 <span data-i18n="lang_ar">عربي</span></button>
-                <button onclick="changeLanguage('en')">🇺🇸 <span data-i18n="lang_en">English</span></button>
-            </div>
-        </div>
 
-        <div id="live-indicator" class="b" style="border-color: var(--c-pocket); color: var(--c-pocket); background: rgba(46, 160, 67, 0.1); cursor: default;">
-            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--c-pocket); animation: pulse 1.5s infinite;"></span>
-            <span data-i18n="live_status">مباشر</span>
+        <div id="live-indicator" class="b" style="border-color: rgba(46, 160, 67, 0.3); color: var(--c-pocket); background: rgba(46, 160, 67, 0.1); cursor: default;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--c-pocket); animation:pulse 1.5s infinite;"></span>
+            Live
         </div>
 
         <button class="b pri" id="copy-script" type="button">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span data-i18n="copy_script">نسخ السكربت</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Script
         </button>
 
         {% if my_key == 'admin' %}
-        <a href="/admin" class="b" style="color: var(--gold); border-color: var(--gold);"><span>الإدارة</span></a>
+        <a href="/admin" class="b" style="color: var(--gold); border-color: rgba(227, 179, 65, 0.3); background: rgba(227, 179, 65, 0.05);">Admin</a>
         {% endif %}
 
         <div class="user-menu">
             <div class="user-trigger" onclick="document.getElementById('uDropdown').classList.toggle('show')">
                 <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
-                <div style="font-weight: 700;">{{ my_key | default('Overseer') }}</div>
+                <div>{{ my_key | default('Overseer') }}</div>
             </div>
             <div class="dropdown" id="uDropdown">
-                <button type="button" onclick="openResetModal()"><span data-i18n="reset_pass">تغيير الباسورد</span></button>
+                <button type="button" onclick="openResetModal()">Reset Password</button>
                 <div class="dropdown-divider"></div>
-                <a href="/logout"><span data-i18n="sign_out">تسجيل خروج</span></a>
+                <a href="/logout">Sign Out</a>
             </div>
         </div>
     </div>
 
     <div class="header-title">
-        <h1 data-i18n="dashboard_title">Farmledger Dashboard</h1>
-        <p>
-            <span id="meta-acc">{{ accounts|length }}</span> <span data-i18n="accounts">حسابات</span> • 
-            <span id="meta-live">{{ online_count }}</span> <span data-i18n="live">متصل</span>
-        </p>
+        <h1>Farmledger Dashboard</h1>
+        <p><span id="meta-acc">0</span> accounts • <span id="meta-live">0</span> online</p>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card c-pocket">
-            <div class="stat-top"><div class="stat-title" data-i18n="pocket_money">الكاش (Pocket)</div><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div></div>
+            <div class="stat-top"><div class="stat-title">Pocket Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div></div>
             <div class="stat-value" id="stat-cash">$0</div>
-            <div class="stat-sub" data-i18n="total_cash_sub">إجمالي الكاش</div>
+            <div class="stat-sub">Total in all accounts</div>
         </div>
         <div class="stat-card c-bank">
-            <div class="stat-top"><div class="stat-title" data-i18n="bank_money">البنك (Bank)</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div></div>
+            <div class="stat-top"><div class="stat-title">Bank Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div></div>
             <div class="stat-value" id="stat-bank">$0</div>
-            <div class="stat-sub" data-i18n="total_bank_sub">إجمالي البنك</div>
+            <div class="stat-sub">Total in bank accounts</div>
         </div>
         <div class="stat-card c-total">
-            <div class="stat-top"><div class="stat-title" data-i18n="total_money">إجمالي الثروة</div><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/></svg></div></div>
+            <div class="stat-top"><div class="stat-title">Total Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/></svg></div></div>
             <div class="stat-value" id="stat-worth">$0</div>
-            <div class="stat-sub" data-i18n="total_money_sub">الكاش + البنك</div>
+            <div class="stat-sub">Cash + Bank</div>
         </div>
         <div class="stat-card c-profit">
-            <div class="stat-top"><div class="stat-title" data-i18n="session_profit">أرباح الجلسة</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 17l9.2-9.2"/><path d="M7 7h10v10"/></svg></div></div>
+            <div class="stat-top"><div class="stat-title">Session Profit</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 17l9.2-9.2"/><path d="M7 7h10v10"/></svg></div></div>
             <div class="stat-value" id="stat-farmed">$0</div>
-            <div class="stat-sub" data-i18n="session_profit_sub">المجمع مؤخراً</div>
+            <div class="stat-sub">Farmed recently</div>
         </div>
         <div class="stat-card c-acc">
-            <div class="stat-top"><div class="stat-title" data-i18n="total_acc">إجمالي الحسابات</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
+            <div class="stat-top"><div class="stat-title">Total Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
             <div class="stat-value" id="stat-acc">0</div>
-            <div class="stat-sub" data-i18n="total_acc_sub">حسابات مسجلة</div>
+            <div class="stat-sub">Registered accounts</div>
         </div>
         <div class="stat-card c-online">
-            <div class="stat-top"><div class="stat-title" data-i18n="online_status">متصل الآن</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
+            <div class="stat-top"><div class="stat-title">Online Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
             <div class="stat-value" id="stat-online">0</div>
-            <div class="stat-sub" id="stat-active-percent">0% <span data-i18n="active">نشط</span></div>
+            <div class="stat-sub" id="stat-active-percent">0% active</div>
         </div>
     </div>
 
     <div class="toolbar">
-        <input type="search" id="searchInput" placeholder="ابحث عن اسم الحساب..." data-i18n-placeholder="search_placeholder">
-        <button class="b" id="copySelectedBtn" onclick="copySelected()" style="color:var(--ac); display:none;"><span data-i18n="copy_selected">نسخ المحدد</span> (<span id="selectedCountCopy">0</span>)</button>
-        <button class="b" id="deleteSelectedBtn" onclick="deleteSelected()" style="color:var(--bad); display:none;"><span data-i18n="delete_selected">حذف المحدد</span> (<span id="selectedCount">0</span>)</button>
+        <input type="search" id="searchInput" placeholder="Search account name...">
+        <button class="b" id="copySelectedBtn" onclick="copySelected()" style="color:var(--ac); display:none;">Copy Selected (<span id="selectedCountCopy">0</span>)</button>
+        <button class="b" id="deleteSelectedBtn" onclick="deleteSelected()" style="color:var(--bad); display:none;">Delete Selected (<span id="selectedCount">0</span>)</button>
     </div>
 
     <div class="table-container">
@@ -213,18 +262,18 @@ dialog input { width: 100%; margin-top: 6px; background: var(--bg); border: 1px 
             <thead>
                 <tr>
                     <th style="width:40px; cursor: default;"><input type="checkbox" id="selectAll"></th>
-                    <th onclick="sortTable('name')"><div style="display:flex; align-items:center; justify-content:flex-end;"><span data-i18n="th_account">الحساب</span></div></th>
-                    <th onclick="sortTable('level')"><div style="display:flex; align-items:center; justify-content:flex-end;"><span data-i18n="th_level">المستوى</span></div></th>
-                    <th data-i18n="th_skills" style="cursor: default;">المهارات</th>
-                    <th style="cursor: default;">الوقت</th>
-                    <th style="cursor: default;">المجمع</th>
-                    <th onclick="sortTable('money')"><div style="display:flex; align-items:center; justify-content:flex-end;"><span>Cash</span></div></th>
-                    <th onclick="sortTable('money')"><div style="display:flex; align-items:center; justify-content:flex-end;"><span>Bank</span></div></th>
-                    <th onclick="sortTable('money')"><div style="display:flex; align-items:center; justify-content:flex-end;"><span>All</span></div></th>
+                    <th onclick="sortTable('name')">Account <span id="icon-name" class="sort-icon"></span></th>
+                    <th onclick="sortTable('level')">Level <span id="icon-level" class="sort-icon"></span></th>
+                    <th style="cursor: default;">Skills</th>
+                    <th onclick="sortTable('uptime')">Uptime <span id="icon-uptime" class="sort-icon"></span></th>
+                    <th onclick="sortTable('farmed')">Farmed <span id="icon-farmed" class="sort-icon"></span></th>
+                    <th onclick="sortTable('cash')">Cash <span id="icon-cash" class="sort-icon"></span></th>
+                    <th onclick="sortTable('bank')">Bank <span id="icon-bank" class="sort-icon"></span></th>
+                    <th onclick="sortTable('total')">All (Total) <span id="icon-total" class="sort-icon"></span></th>
                 </tr>
             </thead>
             <tbody id="table-body">
-                <!-- سيتم تعبئتها بالبيانات من الجافاسكربت -->
+                <!-- Filled via JavaScript -->
             </tbody>
         </table>
     </div>
@@ -232,11 +281,11 @@ dialog input { width: 100%; margin-top: 6px; background: var(--bg); border: 1px 
 
 <dialog id="resetModal">
   <form method="dialog" id="resetForm">
-    <h2 data-i18n="reset_title">تغيير الباسورد</h2>
-    <label><span data-i18n="new_pass">الباسورد الجديد</span><input type="password" name="newpass" id="newPass" required minlength="4"></label>
+    <h2>Reset Password</h2>
+    <label>New Password<input type="password" name="newpass" id="newPass" required minlength="4"></label>
     <div style="display:flex;gap:10px;margin-top:20px">
-      <button class="b pri" value="ok" style="flex:1; justify-content:center;" data-i18n="save">حفظ</button>
-      <button class="b" value="x" formnovalidate style="flex:1; justify-content:center;" data-i18n="cancel">إلغاء</button>
+      <button class="b pri" value="ok" style="flex:1; justify-content:center;">Save</button>
+      <button class="b" value="x" formnovalidate style="flex:1; justify-content:center;">Cancel</button>
     </div>
   </form>
 </dialog>
@@ -251,37 +300,29 @@ dialog input { width: 100%; margin-top: 6px; background: var(--bg); border: 1px 
 
 <script>
 const MY_KEY = "{{ my_key | default('Overseer') }}";
-let currentLang = 'ar';
 let isUpdating = false;
-let currentData = []; // تخزين البيانات الحالية
-let sortStates = { name: 0, level: 0, money: 0 };
+let currentData = [];
 
-const translations = {
-    ar: {
-        lang_ar: "عربي", lang_en: "English", accounts: "حسابات", live: "متصل", refresh: "تحديث", live_status: "مباشر",
-        copy_script: "نسخ السكربت", reset_pass: "تغيير الباسورد", sign_out: "تسجيل خروج", dashboard_title: "Farmledger Dashboard",
-        pocket_money: "الكاش (Pocket)", total_cash_sub: "إجمالي الكاش", bank_money: "البنك (Bank)", total_bank_sub: "إجمالي البنك",
-        total_money: "إجمالي الثروة", total_money_sub: "الكاش + البنك", session_profit: "أرباح الجلسة", session_profit_sub: "المجمع مؤخراً",
-        total_acc: "إجمالي الحسابات", total_acc_sub: "حسابات مسجلة", online_status: "متصل الآن", active: "نشط",
-        search_placeholder: "ابحث عن اسم الحساب...", copy_selected: "نسخ المحدد", delete_selected: "حذف المحدد",
-        th_account: "الحساب", th_level: "المستوى", th_skills: "المهارات", online: "متصل", offline: "غير متصل", no_skills: "لا يوجد مهارات",
-        reset_title: "تغيير الباسورد", new_pass: "الباسورد الجديد", save: "حفظ", cancel: "إلغاء", success: "تم بنجاح", error: "خطأ", copied: "تم النسخ",
-        copy_success: "تم النسخ بنجاح!", delete_confirm: "هل أنت متأكد من حذف الحسابات المحددة؟", pass_changed: "تم تغيير الباسورد بنجاح!", yes: "نعم", no: "إلغاء"
-    },
-    en: {
-        lang_ar: "عربي", lang_en: "English", accounts: "accounts", live: "online", refresh: "Refresh", live_status: "Live",
-        copy_script: "Copy Script", reset_pass: "Reset Password", sign_out: "Sign Out", dashboard_title: "Farmledger Dashboard",
-        pocket_money: "Pocket Money", total_cash_sub: "Total in all accounts", bank_money: "Bank Money", total_bank_sub: "Total in bank",
-        total_money: "Total Money", total_money_sub: "Cash + Bank", session_profit: "Session Profit", session_profit_sub: "Farmed recently",
-        total_acc: "Total Accounts", total_acc_sub: "Registered accounts", online_status: "Online Accounts", active: "active",
-        search_placeholder: "Search account name...", copy_selected: "Copy Selected", delete_selected: "Delete Selected",
-        th_account: "ACCOUNT", th_level: "LEVEL", th_skills: "SKILLS", online: "Online", offline: "Offline", no_skills: "No skills",
-        reset_title: "Reset Password", new_pass: "New Password", save: "Save", cancel: "Cancel", success: "Success", error: "Error", copied: "Copied",
-        copy_success: "Copied successfully!", delete_confirm: "Are you sure you want to delete selected accounts?", pass_changed: "Password changed successfully!", yes: "Yes", no: "Cancel"
-    }
+const icons = {
+    none: `<svg viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>`,
+    asc: `<svg viewBox="0 0 24 24"><path d="m7 9 5-5 5 5"/><path d="M12 4v16"/></svg>`,
+    desc: `<svg viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="M12 4v16"/></svg>`
 };
 
-// 🔴 السحر كله هنا: تحديث الجدول بدون ما يهنج المتصفح
+let sortStates = { name: 0, level: 0, uptime: 0, farmed: 0, cash: 0, bank: 0, total: 0 };
+
+function updateSortIcons() {
+    for (let key in sortStates) {
+        let el = document.getElementById('icon-' + key);
+        if (el) {
+            el.innerHTML = icons.none;
+            el.classList.remove('active');
+            if (sortStates[key] === 1) { el.innerHTML = icons.asc; el.classList.add('active'); }
+            if (sortStates[key] === 2) { el.innerHTML = icons.desc; el.classList.add('active'); }
+        }
+    }
+}
+
 function renderTable(data) {
     const tbody = document.getElementById('table-body');
     const existingRows = {};
@@ -296,13 +337,10 @@ function renderTable(data) {
         incomingNames.add(acc.name);
         let tr = existingRows[acc.name];
 
-        // إذا كان الحساب جديد، ننشئ له صف
         if (!tr) {
             tr = document.createElement('tr');
             tr.className = 'account-row';
             tr.dataset.name = acc.name;
-            tr.dataset.level = acc.level;
-            tr.dataset.money = acc.total;
             
             tr.innerHTML = `
                 <td><input type="checkbox" class="row-checkbox" value="${acc.name}"></td>
@@ -313,7 +351,7 @@ function renderTable(data) {
                         <span class="badge pc">${acc.pc}</span>
                     </div>
                 </td>
-                <td><span class="val-level" style="color:var(--ac); font-weight:800; font-size:14px;"></span></td>
+                <td><span class="val-level" style="color:var(--ac); font-weight:700; font-size:14px;"></span></td>
                 <td class="val-skills"></td>
                 <td><span class="uptime-badge val-uptime"></span></td>
                 <td><div class="val-farmed"></div></td>
@@ -324,31 +362,34 @@ function renderTable(data) {
             fragment.appendChild(tr);
         }
         
-        // تحديث البيانات في الصف الموجود أو الجديد
         const statusBadge = tr.querySelector('.status-badge');
         if(acc.online) {
             statusBadge.className = 'badge status-badge online';
-            statusBadge.innerText = translations[currentLang].online;
+            statusBadge.innerText = 'Online';
         } else {
             statusBadge.className = 'badge status-badge offline';
-            statusBadge.innerText = translations[currentLang].offline;
+            statusBadge.innerText = 'Offline';
         }
         
         tr.querySelector('.val-level').innerText = acc.level;
         
-        // المهارات
         const skillsTd = tr.querySelector('.val-skills');
         if (acc.skills && Object.keys(acc.skills).length > 0) {
             let skillStr = '';
             for (const [k, v] of Object.entries(acc.skills)) {
-                skillStr += `<span style="color:var(--mute); font-size:12px;">${k}:</span><span style="color:var(--ink); font-size:12px; font-weight:700; margin-right:6px;">${v}</span>`;
+                let skillName = k.charAt(0).toUpperCase() + k.slice(1);
+                skillStr += `<span style="color:var(--mute); font-size:12px;">${skillName}:</span><span style="color:var(--ink); font-size:12px; font-weight:600; margin-right:6px; margin-left:2px;">${v}</span>`;
             }
             skillsTd.innerHTML = skillStr;
         } else {
-            skillsTd.innerHTML = `<span style="color:var(--mute); font-size:12px;">${translations[currentLang].no_skills}</span>`;
+            skillsTd.innerHTML = `<span style="color:var(--mute); font-size:12px;">None</span>`;
         }
 
-        tr.querySelector('.val-uptime').innerText = acc.uptime;
+        let uptimeText = acc.uptime;
+        if (uptimeText === "أقل من دقيقة") uptimeText = "< 1m";
+        else uptimeText = uptimeText.replace('س', 'h').replace('د', 'm');
+        
+        tr.querySelector('.val-uptime').innerText = uptimeText;
         
         const farmedDiv = tr.querySelector('.val-farmed');
         farmedDiv.className = acc.farmed >= 0 ? 'farmed-up' : 'farmed-down';
@@ -358,12 +399,14 @@ function renderTable(data) {
         tr.querySelector('.val-bank').innerText = '$' + Number(acc.bank).toLocaleString();
         tr.querySelector('.val-total').innerText = '$' + Number(acc.total).toLocaleString();
 
-        // تحديث قيم الترتيب
         tr.dataset.level = acc.level;
-        tr.dataset.money = acc.total;
+        tr.dataset.cash = acc.cash;
+        tr.dataset.bank = acc.bank;
+        tr.dataset.total = acc.total;
+        tr.dataset.farmed = acc.farmed;
+        tr.dataset.uptime = uptimeText; 
     });
 
-    // حذف الحسابات اللي اختفت
     Object.keys(existingRows).forEach(name => {
         if (!incomingNames.has(name)) {
             existingRows[name].remove();
@@ -375,11 +418,10 @@ function renderTable(data) {
     }
     
     bindCheckboxes();
-    applySort(); // إعادة الترتيب لو كان المستخدم مفعل ترتيب
-    document.getElementById('searchInput').dispatchEvent(new Event('input')); // إعادة تفعيل الفلتر
+    applySort();
+    document.getElementById('searchInput').dispatchEvent(new Event('input'));
 }
 
-// سحب البيانات من السيرفر كل 3 ثواني
 async function fetchData() {
     if (isUpdating) return;
     isUpdating = true;
@@ -389,7 +431,6 @@ async function fetchData() {
         
         if(data.error) return;
 
-        // تحديث البطاقات العلوية
         document.getElementById('stat-cash').innerText = '$' + Number(data.total_cash).toLocaleString();
         document.getElementById('stat-bank').innerText = '$' + Number(data.total_bank).toLocaleString();
         document.getElementById('stat-worth').innerText = '$' + Number(data.total_worth).toLocaleString();
@@ -401,17 +442,16 @@ async function fetchData() {
         document.getElementById('meta-live').innerText = data.online_count;
         
         if(data.total_accounts > 0) {
-            document.getElementById('stat-active-percent').innerHTML = Math.round((data.online_count / data.total_accounts) * 100) + '% <span data-i18n="active">' + translations[currentLang].active + '</span>';
+            document.getElementById('stat-active-percent').innerHTML = Math.round((data.online_count / data.total_accounts) * 100) + '% active';
         }
 
-        // تحديث الجدول
-        renderTable(data.accounts);
+        currentData = data.accounts;
+        renderTable(currentData);
         
     } catch (e) { console.error(e); }
     isUpdating = false;
 }
 
-// تشغيل التحديث التلقائي كل 3 ثواني
 setInterval(fetchData, 3000);
 document.addEventListener("DOMContentLoaded", fetchData);
 
@@ -429,16 +469,15 @@ function applySort() {
             valA = a.dataset.name.toLowerCase();
             valB = b.dataset.name.toLowerCase();
             return state === 1 ? valB.localeCompare(valA) : valA.localeCompare(valB);
-        } else if (activeCol === 'level') {
-            valA = parseFloat(a.dataset.level) || 0;
-            valB = parseFloat(b.dataset.level) || 0;
-            return state === 1 ? valB - valA : valA - valB;
-        } else if (activeCol === 'money') {
-            valA = parseFloat(a.dataset.money) || 0;
-            valB = parseFloat(b.dataset.money) || 0;
+        } else if (activeCol === 'uptime') {
+            valA = a.dataset.uptime;
+            valB = b.dataset.uptime;
+            return state === 1 ? valB.localeCompare(valA) : valA.localeCompare(valB);
+        } else {
+            valA = parseFloat(a.dataset[activeCol]) || 0;
+            valB = parseFloat(b.dataset[activeCol]) || 0;
             return state === 1 ? valB - valA : valA - valB;
         }
-        return 0;
     });
 
     tbody.innerHTML = '';
@@ -448,48 +487,21 @@ function applySort() {
 function sortTable(col) {
     sortStates[col] = (sortStates[col] + 1) % 3;
     Object.keys(sortStates).forEach(k => { if(k !== col) sortStates[k] = 0; });
+    updateSortIcons();
     applySort();
-}
-
-function applyLanguage(lang) {
-    currentLang = lang;
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) el.innerText = translations[lang][key];
-    });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        if (translations[lang][key]) el.placeholder = translations[lang][key];
-    });
-    
-    if (lang === 'ar') {
-        document.body.setAttribute('dir', 'rtl');
-        document.getElementById('current-lang-flag').innerText = '🇸🇦';
-    } else {
-        document.body.setAttribute('dir', 'ltr');
-        document.getElementById('current-lang-flag').innerText = '🇺🇸';
-    }
-    
-    // إعادة رسم الجدول لتحديث اللغات (Online/Offline etc)
-    if(currentData.length > 0) renderTable(currentData);
-}
-
-function changeLanguage(lang) {
-    applyLanguage(lang);
-    document.getElementById('langDropdown').classList.remove('show');
 }
 
 let confirmCallback = null;
 function showAlert(titleKey, msgKey, isConfirm = false, onConfirm = null) {
     document.getElementById('customAlert').classList.add('show');
-    document.getElementById('alertTitle').innerText = translations[currentLang][titleKey] || titleKey;
-    document.getElementById('alertMessage').innerText = translations[currentLang][msgKey] || msgKey;
+    document.getElementById('alertTitle').innerText = titleKey;
+    document.getElementById('alertMessage').innerText = msgKey;
     
     const actions = document.getElementById('alertActions');
     if (isConfirm && onConfirm) {
         actions.innerHTML = `
-            <button class="alert-btn cancel" onclick="closeAlert()">${translations[currentLang].no}</button>
-            <button class="alert-btn" style="background:var(--bad);" onclick="confirmAction()">${translations[currentLang].yes}</button>
+            <button class="alert-btn cancel" onclick="closeAlert()">Cancel</button>
+            <button class="alert-btn" style="background:var(--bad);" onclick="confirmAction()">Yes</button>
         `;
         confirmCallback = onConfirm;
     } else {
@@ -506,7 +518,6 @@ function openResetModal() {
 }
 window.addEventListener('click', function(e) {
     if (!e.target.closest('.user-menu')) document.getElementById('uDropdown')?.classList.remove('show');
-    if (!e.target.closest('.lang-menu')) document.getElementById('langDropdown')?.classList.remove('show');
 });
 
 document.getElementById('selectAll').addEventListener('change', function(e) {
@@ -529,12 +540,12 @@ function updateSelectionButtons() {
 function deleteSelected() {
     const checked = document.querySelectorAll('.row-checkbox:checked');
     if (checked.length === 0) return;
-    showAlert("delete_selected", "delete_confirm", true, async () => {
+    showAlert("Delete Selected", "Are you sure you want to delete selected accounts?", true, async () => {
         const names = Array.from(checked).map(cb => cb.value);
         for (let name of names) {
             await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name}) });
         }
-        fetchData(); // تحديث فوري
+        fetchData();
         document.getElementById('selectAll').checked = false;
         updateSelectionButtons();
     });
@@ -544,8 +555,8 @@ function copySelected() {
     if (checked.length === 0) return;
     const names = Array.from(checked).map(cb => cb.value).join(", ");
     navigator.clipboard.writeText(names).then(() => {
-        showAlert("copied", "copy_success");
-    }).catch(err => { showAlert("error", "copy_success"); });
+        showAlert("Copied", "Copied successfully!");
+    }).catch(err => { showAlert("Error", "Failed to copy."); });
 }
 
 document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -570,8 +581,8 @@ document.getElementById("copy-script").addEventListener("click", function(e) {
     textArea.select();
     try {
         document.execCommand('copy');
-        showAlert("success", "copy_success");
-    } catch (err) { showAlert("error", "copy_success"); }
+        showAlert("Success", "Script copied successfully!");
+    } catch (err) { showAlert("Error", "Failed to copy script."); }
     document.body.removeChild(textArea);
 });
 
@@ -589,15 +600,14 @@ document.getElementById('resetForm').onsubmit = async function(e) {
         if(res.ok) { 
             document.getElementById("resetModal").close(); 
             document.getElementById("newPass").value = ""; 
-            showAlert("success", "pass_changed");
+            showAlert("Success", "Password changed successfully!");
         }
     } catch(err) {}
 };
 
-applyLanguage('ar');
+updateSortIcons();
 </script>
 <style>
-@keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(46, 160, 67, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0); } }
 </style>
 </body>
