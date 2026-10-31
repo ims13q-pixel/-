@@ -225,7 +225,7 @@ def report():
     users, passwords, discord_profiles, accounts = load_db()
 
     if not username_key or username_key not in users:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"error": "Unauthorized", "reason": "user not registered"}), 401
 
     name = data.get("n", "Unknown")
     now = time.time()
@@ -258,6 +258,30 @@ def report():
 
     save_db(users, passwords, discord_profiles, accounts)
     return jsonify({"ok": True})
+
+
+@app.route("/api/debug")
+def debug():
+    if not redis:
+        return jsonify({
+            "redis_connected": False,
+            "message": "Redis is not connected. Add KV_REST_API_URL and KV_REST_API_TOKEN to Vercel Environment Variables."
+        })
+    try:
+        users = json.loads(redis.get("users") or "{}")
+        accounts = json.loads(redis.get("accounts") or "{}")
+        return jsonify({
+            "redis_connected": True,
+            "redis_url_set": bool(REDIS_URL),
+            "redis_token_set": bool(REDIS_TOKEN),
+            "users_count": len(users),
+            "users_keys": list(users.keys()),
+            "accounts_count": len(accounts),
+            "accounts_keys": list(accounts.keys()),
+            "accounts_data": accounts
+        })
+    except Exception as e:
+        return jsonify({"redis_connected": True, "error": str(e)}), 500
 
 
 if __name__ == "__main__":
