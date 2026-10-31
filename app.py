@@ -15,7 +15,6 @@ REDIS_URL = os.environ.get("KV_REST_API_URL") or os.environ.get("UPSTASH_REDIS_R
 REDIS_TOKEN = os.environ.get("KV_REST_API_TOKEN") or os.environ.get("UPSTASH_REDIS_REST_TOKEN")
 redis = Redis(url=REDIS_URL, token=REDIS_TOKEN) if REDIS_URL and REDIS_TOKEN else None
 
-# 🔴 دوال قراءة وحفظ البيانات
 def load_db():
     if redis:
         u = redis.get("users")
@@ -129,25 +128,18 @@ def index():
 
     _, _, _, accounts = load_db()
 
-    # 🔴 حساب الإحصائيات للبطاقات العلوية
     online_count = 0
-    offline_count = 0
     total_farmed = 0
 
     for name, a in accounts.items():
         if not is_admin and a.get("key") != my_key: continue
-        
-        # حالة الاتصال
         is_online = (now - a.get("last_seen", 0)) < 60 
         if is_online: online_count += 1
-        else: offline_count += 1
         
-        # الفلوس
         cash = int(a.get("cash", 0) or 0)
         bank = int(a.get("bank", 0) or 0)
         total = cash + bank
         
-        # حساب الوقت والمجمع
         start_time = a.get("session_start_time", now)
         start_money = a.get("session_start_money", total)
         
@@ -155,7 +147,6 @@ def index():
         farmed = total - start_money
         total_farmed += farmed
         
-        # تنسيق الوقت
         if uptime_sec < 60:
             uptime_str = "أقل من دقيقة"
         else:
@@ -163,7 +154,6 @@ def index():
             minutes = (uptime_sec % 3600) // 60
             uptime_str = f"{hours}س {minutes}د" if hours > 0 else f"{minutes}د"
         
-        # تجهيز البيانات للـ HTML
         acc_copy = a.copy()
         acc_copy["name"] = name
         acc_copy["online"] = is_online
@@ -173,41 +163,83 @@ def index():
         acc_copy["bank"] = bank
         acc_copy["uptime_str"] = uptime_str
         acc_copy["farmed"] = farmed
-        
-        if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict): 
-            acc_copy["skills"] = {}
-            
+        if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict): acc_copy["skills"] = {}
         display_accounts.append(acc_copy)
         
-    return render_template(
-        "index.html", 
-        my_key=my_key, 
-        accounts=display_accounts, 
-        online_count=online_count, 
-        offline_count=offline_count, 
-        total_farmed=total_farmed
-    )
+    return render_template("index.html", my_key=my_key, accounts=display_accounts, online_count=online_count, total_farmed=total_farmed)
+
+# 🔴 API مخصص للتحديث السريع بدون تحميل الصفحة (مهم جداً للحسابات الكثيرة)
+@app.route("/api/data")
+def api_data():
+    if "user" not in session: return jsonify({"error": "Unauthorized"}), 401
+    my_key = session["user"]
+    is_admin = (my_key == "admin")
+    now = time.time()
+    
+    _, _, _, accounts = load_db()
+    
+    online_count = 0
+    total_cash = 0
+    total_bank = 0
+    total_farmed = 0
+    accs_list = []
+    
+    for name, a in accounts.items():
+        if not is_admin and a.get("key") != my_key: continue
+        is_online = (now - a.get("last_seen", 0)) < 60 
+        if is_online: online_count += 1
+        
+        cash = int(a.get("cash", 0) or 0)
+        bank = int(a.get("bank", 0) or 0)
+        total = cash + bank
+        
+        start_time = a.get("session_start_time", now)
+        start_money = a.get("session_start_money", total)
+        
+        uptime_sec = int(now - start_time)
+        farmed = total - start_money
+        
+        total_cash += cash
+        total_bank += bank
+        total_farmed += farmed
+        
+        if uptime_sec < 60:
+            uptime_str = "أقل من دقيقة"
+        else:
+            hours = uptime_sec // 3600
+            minutes = (uptime_sec % 3600) // 60
+            uptime_str = f"{hours}س {minutes}د" if hours > 0 else f"{minutes}د"
+            
+        accs_list.append({
+            "name": name, "online": is_online, "level": int(a.get("total_level", 0) or 0),
+            "cash": cash, "bank": bank, "total": total, "farmed": farmed,
+            "uptime": uptime_str, "pc": a.get("pc", "PC"), "skills": a.get("skills", {})
+        })
+        
+    return jsonify({
+        "online_count": online_count,
+        "total_accounts": len(accs_list),
+        "total_cash": total_cash,
+        "total_bank": total_bank,
+        "total_worth": total_cash + total_bank,
+        "total_farmed": total_farmed,
+        "accounts": accs_list
+    })
 
 @app.route("/admin")
 def admin_panel():
     if session.get("user") != "admin": return "Access Denied", 403
-    
     users, passwords, discord_profiles, accounts = load_db()
-    
     visits = int(redis.get("visits") or 0) if redis else 0
-    
     normal_users = [{"username": u, "password": p} for u, p in passwords.items() if p != "DISCORD_OAUTH" and u != "admin"]
     d_users = [{"username": u, "id": data["id"], "avatar": data["avatar"]} for u, data in discord_profiles.items()]
-    
     return render_template("admin.html", visits=visits, normal_users=normal_users, discord_users=d_users, total_accounts=len(accounts))
 
 @app.route("/api/delete", methods=["POST"])
 def delete_account():
     data = request.get_json(force=True, silent=True) or {}
     name = data.get("name")
-    
     users, passwords, discord_profiles, accounts = load_db()
-    
     if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
         if name in accounts:
             del accounts[name]
@@ -220,9 +252,7 @@ def reset_password():
     data = request.get_json(force=True, silent=True) or {}
     username = data.get("username")
     new_password = data.get("new_password")
-    
     users, passwords, discord_profiles, _ = load_db()
-    
     if username in users:
         users[username] = hashlib.sha256(new_password.encode()).hexdigest()
         passwords[username] = new_password
@@ -234,7 +264,6 @@ def reset_password():
 def report():
     data = request.get_json(force=True, silent=True) or {}
     username_key = data.get("k")
-    
     users, passwords, discord_profiles, accounts = load_db()
     
     if not username_key or username_key not in users: 
@@ -254,44 +283,20 @@ def report():
             if isinstance(sk, dict) and "name" in sk:
                 skills_dict[sk["name"]] = int(sk.get("level", 0))
 
-    # 🔴 بدء جلسة جديدة إذا كان الحساب جديد أو توقف السكربت لأكثر من دقيقتين
     if name not in accounts or (now - accounts[name].get("last_seen", 0)) > 120:
-        if name not in accounts: 
-            accounts[name] = {}
+        if name not in accounts: accounts[name] = {}
         accounts[name]["session_start_time"] = now
         accounts[name]["session_start_money"] = total_money
 
-    # تحديث بيانات الحساب
     accounts[name].update({
-        "key": username_key, 
-        "pc": data.get("pc", "MR 1"),
-        "cash": cash, 
-        "bank": bank, 
-        "total_money": total_money, 
-        "total_level": level,
-        "skills": skills_dict, 
-        "display_name": data.get("dn", name),
-        "user_id": str(data.get("u", "")), 
-        "last_seen": now
+        "key": username_key, "pc": data.get("pc", "MR 1"),
+        "cash": cash, "bank": bank, "total_money": total_money, "total_level": level,
+        "skills": skills_dict, "display_name": data.get("dn", name),
+        "user_id": str(data.get("u", "")), "last_seen": now
     })
     
     save_db(users, passwords, discord_profiles, accounts)
     return jsonify({"ok": True})
-
-@app.route("/api/debug")
-def debug():
-    if not redis:
-        return jsonify({"redis_connected": False, "message": "Redis is not connected."})
-    try:
-        users = json.loads(redis.get("users") or "{}")
-        accounts = json.loads(redis.get("accounts") or "{}")
-        return jsonify({
-            "redis_connected": True,
-            "users_count": len(users),
-            "accounts_count": len(accounts)
-        })
-    except Exception as e:
-        return jsonify({"redis_connected": True, "error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(port=5000)
