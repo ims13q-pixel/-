@@ -123,9 +123,6 @@ dialog input:focus { border-color: var(--ac); }
         <button class="b pri" id="copy-script" type="button">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Script
         </button>
-        {% if my_key == 'admin' %}
-        <a href="/admin" class="b" style="color: var(--gold); border-color: rgba(227, 179, 65, 0.3); background: rgba(227, 179, 65, 0.05);">Admin</a>
-        {% endif %}
         <div class="user-menu">
             <div class="user-trigger" onclick="document.getElementById('uDropdown').classList.toggle('show')">
                 <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
@@ -155,8 +152,6 @@ dialog input:focus { border-color: var(--ac); }
 
     <div class="toolbar">
         <input type="search" id="searchInput" placeholder="Search account name...">
-        <button class="b" id="copySelectedBtn" onclick="copySelected()" style="color:var(--ac); display:none;">Copy Selected (<span id="selectedCountCopy">0</span>)</button>
-        <button class="b" id="deleteSelectedBtn" onclick="deleteSelected()" style="color:var(--bad); display:none;">Delete Selected (<span id="selectedCount">0</span>)</button>
     </div>
 
     <div class="table-container">
@@ -174,7 +169,9 @@ dialog input:focus { border-color: var(--ac); }
                     <th onclick="sortTable('total')">All (Total) <span id="icon-total" class="sort-icon"></span></th>
                 </tr>
             </thead>
-            <tbody id="table-body"></tbody>
+            <tbody id="table-body">
+                <!-- 🟢 هنا كان الخطأ: لا تضع أي أكواد Jinja هنا، الجافاسكربت يعبيها -->
+            </tbody>
         </table>
     </div>
 </div>
@@ -382,27 +379,10 @@ function bindCheckboxes() {
 
 function updateSelectionButtons() {
     const count = document.querySelectorAll('.row-checkbox:checked').length;
-    document.getElementById('selectedCount').innerText = count;
-    document.getElementById('selectedCountCopy').innerText = count;
-    document.getElementById('deleteSelectedBtn').style.display = count > 0 ? 'inline-flex' : 'none';
-    document.getElementById('copySelectedBtn').style.display = count > 0 ? 'inline-flex' : 'none';
-}
-function deleteSelected() {
-    const checked = document.querySelectorAll('.row-checkbox:checked');
-    if (checked.length === 0) return;
-    showAlert("Delete Selected", "Are you sure you want to delete selected accounts?", true, async () => {
-        const names = Array.from(checked).map(cb => cb.value);
-        for (let name of names) {
-            await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name}) });
-        }
-        fetchData(); document.getElementById('selectAll').checked = false; updateSelectionButtons();
-    });
-}
-function copySelected() {
-    const checked = document.querySelectorAll('.row-checkbox:checked');
-    if (checked.length === 0) return;
-    const names = Array.from(checked).map(cb => cb.value).join(", ");
-    navigator.clipboard.writeText(names).then(() => { showAlert("Copied", "Copied successfully!"); }).catch(err => { showAlert("Error", "Failed to copy."); });
+    const delBtn = document.getElementById('deleteSelectedBtn');
+    const copyBtn = document.getElementById('copySelectedBtn');
+    if(delBtn) delBtn.style.display = count > 0 ? 'inline-flex' : 'none';
+    if(copyBtn) copyBtn.style.display = count > 0 ? 'inline-flex' : 'none';
 }
 
 document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -412,7 +392,7 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 
-// 🔴 السكربت الذكي جداً: يلتقط الأرقام من الاسم أو النص
+// 🔴 السكربت المحدث (يطبع الفلوس اللي قرأها في الـ Console عشان تتأكد)
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
@@ -460,25 +440,21 @@ task.spawn(function()
                     local t = tostring(o.Text):lower()
                     local n_name = tostring(o.Name):lower()
                     
-                    -- 1. Server
                     if n_name:match("server") or n_name:match("srv") or t:match("server") or t:match("srv") then
                         local sv = t:match("(%d+)") or n_name:match("(%d+)")
                         if sv then srv_num = sv end
                     end
 
-                    -- 2. Bank
                     if n_name:match("bank") or t:match("bank") then
                         local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
                         if num then ba = n(num) end
                     end
                     
-                    -- 3. Cash
                     if n_name:match("cash") or n_name:match("money") or n_name:match("pocket") or n_name:match("hand") or t:match("cash") or t:match("money") or t:match("pocket") or t:match("hand") then
                         local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
                         if num then ca = n(num) end
                     end
                     
-                    -- 4. Level
                     if n_name:match("level") or n_name:match("lvl") or t:match("level") or t:match("lvl") then
                         if not n_name:match("max") and not t:match("max") and not n_name:match("req") and not t:match("req") then
                             local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
@@ -492,6 +468,9 @@ task.spawn(function()
         if srv_num == "1" and game.JobId ~= "" then
             srv_num = string.sub(game.JobId, 1, 4)
         end
+        
+        -- 🔴 يطبع لك الفلوس اللي قرأها عشان تتأكد
+        print("[OVERSEER] Found -> Cash: $" .. ca .. " | Bank: $" .. ba .. " | Level: " .. lv)
 
         local payload = {
             k = accountKey, c = ca, b = ba, l = lv, s = sk, n = player.Name, pc = pcName,
