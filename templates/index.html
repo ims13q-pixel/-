@@ -6,11 +6,9 @@
 <title>Farmledger Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- الخطوط الجديدة -->
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root {
-    /* لون الباك قراوند اللي طلبته */
     --bg: #212232; 
     --panel: #2a2c40;
     --panel-hover: #34364d;
@@ -35,7 +33,6 @@
 * { 
     box-sizing: border-box; 
     transition: all 0.2s ease; 
-    /* تطبيق الخط الجديد */
     font-family: 'Space Grotesk', sans-serif; 
 }
 
@@ -97,7 +94,6 @@ body {
 .stat-title { color: var(--mute); font-size: 13px; font-weight: 600; }
 .stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
 .stat-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-/* خط الأرقام الجديد */
 .stat-value { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 26px; letter-spacing: -0.5px; margin-bottom: 4px; }
 .stat-sub { font-size: 12px; color: var(--mute); font-weight: 500; }
 
@@ -134,7 +130,6 @@ th:hover .sort-icon { opacity: 0.7; }
 .badge.offline { background: rgba(248, 81, 73, 0.15); color: var(--bad); }
 .badge.pc { background: #3b3e59; color: #cbd5e1; }
 
-/* خط الأرقام في الجدول */
 .money-col { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 16px; letter-spacing: 0px; }
 .money-cash { color: var(--c-pocket); }
 .money-bank { color: var(--c-bank); }
@@ -567,11 +562,12 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 
+// 🔴 هنا وضعنا السكربت الذكي الجديد
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
     const key = MY_KEY; 
-    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["ACCOUNT_NAME"] = "${key}",\n    ["PC_NAME"] = "DDC 1",\n    ["URL"] = "${domain}/api/report"\n}\n\nloadstring([[c=getgenv().OverseerConfig k=c.ACCOUNT_NAME w=c.URL pc=c.PC_NAME p=game:GetService"Players".LocalPlayer h=game:GetService"HttpService" function gR()local f=request or http_request or(getgenv()and getgenv().request)or(syn and syn.request)or(krnl and krnl.request)or(fluxus and fluxus.request)or(http and http.request)return f end local r=gR() if not r then return warn("[OVERSEER] No HTTP function found on this executor!") end function n(s)return tonumber(s:gsub(",",""))or 0 end task.spawn(function()while task.wait(1)do local ca,ba,lv=0,0,0 local sk={} local g=p:FindFirstChild("PlayerGui")if g then for _,o in next,g:GetDescendants()do if o:IsA"TextLabel"then local t=o.Text local bm=t:match("Bank Balance:%s*%$?([%d,]+)")if bm then ba=n(bm)end local cm=t:match("Hand Balance:%s*%$?([%d,]+)")or t:match("Cash:%s*%$?([%d,]+)")or t:match("Money:%s*%$?([%d,]+)")if cm then ca=n(cm)end local lm=t:match("^Total Level:%s*([%d,]+)")if lm then lv=n(lm)end local sn,sl=t:match("([%a%s]+):%s*([%d,]+)")if sn and sl then local cn=sn:gsub("%s",""):lower()local al={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1}if al[cn]then table.insert(sk,{name=cn,level=n(sl)})end end end end end pcall(function()r({Url=w,Method="POST",Headers={["Content-Type"]="application/json"},Body=h:JSONEncode({k=k,c=ca,b=ba,l=lv,s=sk,n=p.Name,pc=pc})})end)end end)]])()`;
+    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["ACCOUNT_NAME"] = "${key}",\n    ["PC_NAME"] = "DDC 1",\n    ["URL"] = "${domain}/api/report"\n}\n\nloadstring([[c=getgenv().OverseerConfig k=c.ACCOUNT_NAME w=c.URL pc=c.PC_NAME p=game:GetService"Players".LocalPlayer h=game:GetService"HttpService" function gR()local f=request or http_request or(getgenv()and getgenv().request)or(syn and syn.request)or(krnl and krnl.request)or(fluxus and fluxus.request)or(http and http.request)return f end local r=gR() if not r then return warn("[OVERSEER] No HTTP function found on this executor!") end function n(s)return tonumber(s:gsub("[^%d%.]",""))or 0 end task.spawn(function()while task.wait(1)do local ca,ba,lv=0,0,0 local sk={} local g=p:FindFirstChild("PlayerGui")if g then for _,o in next,g:GetDescendants()do if o:IsA"TextLabel"then local t=o.Text:lower() local bm=t:match("bank[:%s%$]*([%d,]+)") or t:match("bank balance[:%s%$]*([%d,]+)") if bm then ba=n(bm) end local cm=t:match("cash[:%s%$]*([%d,]+)") or t:match("hand balance[:%s%$]*([%d,]+)") or t:match("pocket[:%s%$]*([%d,]+)") or t:match("money[:%s%$]*([%d,]+)") if cm then ca=n(cm) end local lm=t:match("level[:%s]*([%d,]+)") or t:match("total level[:%s]*([%d,]+)") if lm then lv=n(lm) end local sn,sl=t:match("([%a%s]+)[:%s]+([%d,]+)") if sn and sl then local cn=sn:gsub("%s","") local al={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} if al[cn] then table.insert(sk,{name=cn,level=n(sl)}) end end end end end pcall(function()r({Url=w,Method="POST",Headers={["Content-Type"]="application/json"},Body=h:JSONEncode({k=k,c=ca,b=ba,l=lv,s=sk,n=p.Name,pc=pc})})end)end end)]])()`;
     
     let textArea = document.createElement("textarea");
     textArea.value = script;
