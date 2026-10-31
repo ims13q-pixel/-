@@ -109,8 +109,7 @@ def api_data():
         accs_list.append({
             "name": name, "online": is_online, "level": int(a.get("total_level", 0) or 0),
             "cash": cash, "bank": bank, "total": total, "farmed": farmed,
-            "uptime": uptime_str, "pc": a.get("pc", "PC"), "skills": a.get("skills", {}),
-            "srv_num": a.get("srv_num", "1"), "srv_ver": a.get("srv_ver", "Unknown")
+            "uptime": uptime_str, "pc": a.get("pc", "PC"), "skills": a.get("skills", {})
         })
         
     return jsonify({
@@ -143,9 +142,7 @@ def report():
     cash = int(data.get("c", 0) or 0); bank = int(data.get("b", 0) or 0); total_money = cash + bank
     level = int(data.get("l", 0) or 0)
     
-    srv_num = data.get("srv_num", "1"); srv_ver = data.get("srv_ver", "Unknown")
     raw_skills = data.get("s", [])
-    
     skills_dict = {}
     if isinstance(raw_skills, list):
         for sk in raw_skills:
@@ -160,8 +157,7 @@ def report():
         "key": username_key, "pc": data.get("pc", "DDC 1"),
         "cash": cash, "bank": bank, "total_money": total_money, "total_level": level,
         "skills": skills_dict, "display_name": data.get("dn", name),
-        "user_id": str(data.get("u", "")), "last_seen": now,
-        "srv_num": srv_num, "srv_ver": srv_ver
+        "user_id": str(data.get("u", "")), "last_seen": now
     })
     
     save_db(users, passwords, discord_profiles, accounts)
