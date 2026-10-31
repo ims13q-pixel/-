@@ -71,8 +71,6 @@ th:hover .sort-icon { opacity: 0.7; }
 .badge.online { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); }
 .badge.offline { background: rgba(248, 81, 73, 0.15); color: var(--bad); }
 .badge.pc { background: #3b3e59; color: #cbd5e1; }
-.badge.srv { background: rgba(96, 165, 250, 0.15); color: var(--c-total); }
-.badge.ver { background: rgba(192, 132, 252, 0.15); color: var(--c-bank); }
 .money-col { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 16px; letter-spacing: 0px; }
 .money-cash { color: var(--c-pocket); }
 .money-bank { color: var(--c-bank); }
@@ -170,7 +168,7 @@ dialog input:focus { border-color: var(--ac); }
                 </tr>
             </thead>
             <tbody id="table-body">
-                <!-- 🟢 هنا كان الخطأ: لا تضع أي أكواد Jinja هنا، الجافاسكربت يعبيها -->
+                <!-- JS يملأ هذا -->
             </tbody>
         </table>
     </div>
@@ -239,11 +237,9 @@ function renderTable(data) {
                 <td><input type="checkbox" class="row-checkbox" value="${acc.name}"></td>
                 <td>
                     <div class="acc-name">${acc.name}</div>
-                    <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                    <div>
                         <span class="badge status-badge"></span>
                         <span class="badge pc">${acc.pc}</span>
-                        <span class="badge srv">Srv: ${acc.srv_num}</span>
-                        <span class="badge ver">Ver: ${acc.srv_ver}</span>
                     </div>
                 </td>
                 <td><span class="val-level" style="color:var(--ac); font-weight:700; font-size:14px;"></span></td>
@@ -392,7 +388,7 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 
-// 🔴 السكربت المحدث (يطبع الفلوس اللي قرأها في الـ Console عشان تتأكد)
+// 🔴 زر النسخ - السكربت اللي يقرأ الفلوس صح (بدون loadstring)
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
@@ -420,61 +416,46 @@ if not r then
     return
 end
 
+-- إصلاح الخطأ البرمجي
 local function n(s)
     if not s then return 0 end
-    return tonumber(s:gsub("[^%d]", "")) or 0
+    local clean_str = string.gsub(s, "[^%d]", "")
+    return tonumber(clean_str) or 0
 end
-
-local srv_ver = tostring(game.PlaceVersion)
 
 task.spawn(function()
     while task.wait(1) do
         local ca, ba, lv = 0, 0, 0
-        local srv_num = "1"
         local sk = {}
         local g = player:FindFirstChild("PlayerGui")
         
         if g then
             for _, o in next, g:GetDescendants() do
-                if o:IsA("TextLabel") or o:IsA("TextButton") then
-                    local t = tostring(o.Text):lower()
-                    local n_name = tostring(o.Name):lower()
+                if o:IsA("TextLabel") then
+                    local t = o.Text
                     
-                    if n_name:match("server") or n_name:match("srv") or t:match("server") or t:match("srv") then
-                        local sv = t:match("(%d+)") or n_name:match("(%d+)")
-                        if sv then srv_num = sv end
-                    end
-
-                    if n_name:match("bank") or t:match("bank") then
-                        local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
-                        if num then ba = n(num) end
-                    end
+                    -- الكود القديم حقك بالضبط
+                    local bm = t:match("Bank Balance:%s*%$?([%d,]+)")
+                    if bm then ba = n(bm) end
                     
-                    if n_name:match("cash") or n_name:match("money") or n_name:match("pocket") or n_name:match("hand") or t:match("cash") or t:match("money") or t:match("pocket") or t:match("hand") then
-                        local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
-                        if num then ca = n(num) end
-                    end
+                    local cm = t:match("Hand Balance:%s*%$?([%d,]+)") or t:match("Cash:%s*%$?([%d,]+)") or t:match("Money:%s*%$?([%d,]+)")
+                    if cm then ca = n(cm) end
                     
-                    if n_name:match("level") or n_name:match("lvl") or t:match("level") or t:match("lvl") then
-                        if not n_name:match("max") and not t:match("max") and not n_name:match("req") and not t:match("req") then
-                            local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
-                            if num then lv = n(num) end
-                        end
+                    local lm = t:match("^Total Level:%s*([%d,]+)")
+                    if lm then lv = n(lm) end
+                    
+                    local sn, sl = t:match("([%a%s]+):%s*([%d,]+)")
+                    if sn and sl then
+                        local cn = sn:gsub("%s", ""):lower()
+                        local al = {fishing=1, stamina=1, shelfstocker=1, janitor=1, swiper=1, farming=1, cook=1}
+                        if al[cn] then table.insert(sk, {name=cn, level=n(sl)}) end
                     end
                 end
             end
         end
-
-        if srv_num == "1" and game.JobId ~= "" then
-            srv_num = string.sub(game.JobId, 1, 4)
-        end
         
-        -- 🔴 يطبع لك الفلوس اللي قرأها عشان تتأكد
-        print("[OVERSEER] Found -> Cash: $" .. ca .. " | Bank: $" .. ba .. " | Level: " .. lv)
-
         local payload = {
-            k = accountKey, c = ca, b = ba, l = lv, s = sk, n = player.Name, pc = pcName,
-            srv_num = srv_num, srv_ver = srv_ver
+            k = accountKey, c = ca, b = ba, l = lv, s = sk, n = player.Name, pc = pcName
         }
 
         pcall(function()
