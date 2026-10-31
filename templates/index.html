@@ -9,67 +9,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 :root {
-    --bg: #212232; 
-    --panel: #2a2c40;
-    --panel-hover: #34364d;
-    --line: #3b3e59;
-    --ink: #ffffff;
-    --mute: #9ca3af;
-    
-    --ac: #5c5cff; 
-    --ac-hover: #4b4bff;
-    --ok: #2ea043; 
-    --bad: #f85149; 
-    --gold: #e3b341;
-    
-    --c-pocket: #2ea043; 
-    --c-bank: #c084fc; 
-    --c-total: #60a5fa; 
-    --c-profit: #10b981; 
-    --c-acc: #f97316; 
-    --c-online: #14b8a6;
+    --bg: #212232; --panel: #2a2c40; --panel-hover: #34364d; --line: #3b3e59;
+    --ink: #ffffff; --mute: #9ca3af; --ac: #5c5cff; --ac-hover: #4b4bff;
+    --ok: #2ea043; --bad: #f85149; --gold: #e3b341;
+    --c-pocket: #2ea043; --c-bank: #c084fc; --c-total: #60a5fa; --c-profit: #10b981; --c-acc: #f97316; --c-online: #14b8a6;
 }
-
-* { 
-    box-sizing: border-box; 
-    transition: all 0.2s ease; 
-    font-family: 'Space Grotesk', sans-serif; 
-}
-
-body { 
-    margin: 0; 
-    background: var(--bg); 
-    color: var(--ink); 
-    font-size: 14px; 
-    line-height: 1.5;
-}
-
+* { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Space Grotesk', sans-serif; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5; }
 .w { max-width: 1400px; margin: 0 auto; padding: 30px 20px 60px; }
-
-/* Top Bar */
 .bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
 .logo { font-weight: 700; font-size: 24px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
 .logo i { width: 30px; height: 30px; border-radius: 8px; background: conic-gradient(from 200deg, var(--ac), #3a46c8, var(--ok), var(--ac)); display: block; }
 .sp { flex: 1; }
-
-/* الأزرار */
 .b { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 16px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none;}
 .b:hover { background: var(--panel-hover); border-color: #4b4e6b; }
-
-/* زر نسخ السكربت */
-.b.pri { 
-    background: var(--ac); 
-    border: none; 
-    color: #fff; 
-    box-shadow: 0 4px 14px rgba(92, 92, 255, 0.3); 
-}
-.b.pri:hover { 
-    background: var(--ac-hover); 
-    transform: translateY(-1px); 
-    box-shadow: 0 6px 20px rgba(92, 92, 255, 0.4); 
-}
-
-/* Dropdowns */
+.b.pri { background: var(--ac); border: none; color: #fff; box-shadow: 0 4px 14px rgba(92, 92, 255, 0.3); }
+.b.pri:hover { background: var(--ac-hover); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(92, 92, 255, 0.4); }
 .user-menu { position: relative; }
 .user-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; font-size: 14px; }
 .user-trigger:hover { border-color: #4b4e6b; }
@@ -80,13 +35,9 @@ body {
 .dropdown button:hover { background: var(--panel-hover); }
 .dropdown a:hover { background: rgba(248,81,73,0.1); color: var(--bad); }
 .dropdown-divider { height: 1px; background: var(--line); margin: 4px 0; }
-
-/* Header Title */
 .header-title { margin-bottom: 24px; }
 .header-title h1 { font-size: 28px; font-weight: 700; margin: 0 0 5px 0; letter-spacing: -0.5px; }
 .header-title p { color: var(--mute); font-size: 14px; margin: 0; font-weight: 500; }
-
-/* Stat Cards */
 .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
 .stat-card:hover { border-color: #4b4e6b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
@@ -96,61 +47,46 @@ body {
 .stat-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .stat-value { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 26px; letter-spacing: -0.5px; margin-bottom: 4px; }
 .stat-sub { font-size: 12px; color: var(--mute); font-weight: 500; }
-
 .c-pocket .stat-icon { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); } .c-pocket .stat-value { color: var(--c-pocket); }
 .c-bank .stat-icon { background: rgba(192, 132, 252, 0.15); color: var(--c-bank); } .c-bank .stat-value { color: var(--c-bank); }
 .c-total .stat-icon { background: rgba(96, 165, 250, 0.15); color: var(--c-total); } .c-total .stat-value { color: var(--c-total); }
 .c-profit .stat-icon { background: rgba(16, 185, 129, 0.15); color: var(--c-profit); } .c-profit .stat-value { color: var(--c-profit); }
 .c-acc .stat-icon { background: rgba(249, 115, 22, 0.15); color: var(--c-acc); } .c-acc .stat-value { color: var(--c-acc); }
 .c-online .stat-icon { background: rgba(20, 184, 166, 0.15); color: var(--c-online); } .c-online .stat-value { color: var(--c-online); }
-
-/* Toolbar */
 .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
 .toolbar input[type=search] { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; min-width: 300px; color: white; outline: none; font-size: 14px; }
 .toolbar input[type=search]:focus { border-color: var(--ac); box-shadow: 0 0 0 2px rgba(92, 92, 255, 0.2); }
-
-/* Table */
 .table-container { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: auto; max-height: 750px; }
 table { width: 100%; border-collapse: collapse; }
 th { text-align: left; padding: 16px; color: var(--mute); font-size: 13px; font-weight: 600; border-bottom: 1px solid var(--line); cursor: pointer; position: sticky; top: 0; background: var(--panel); z-index: 10; user-select: none; text-transform: uppercase; letter-spacing: 0.5px;}
 th:hover { color: var(--ink); }
 td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
 tr:hover { background: var(--panel-hover); }
-
-/* Sort Icons */
 .sort-icon { display: inline-block; width: 12px; height: 12px; margin-left: 6px; opacity: 0.3; vertical-align: middle; }
 .sort-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 th:hover .sort-icon { opacity: 0.7; }
 .sort-icon.active { opacity: 1; color: var(--ac); }
-
-/* Table Content */
 .acc-name { font-weight: 600; color: var(--ink); font-size: 15px; }
 .badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 6px; }
 .badge.online { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); }
 .badge.offline { background: rgba(248, 81, 73, 0.15); color: var(--bad); }
 .badge.pc { background: #3b3e59; color: #cbd5e1; }
-
 .money-col { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 16px; letter-spacing: 0px; }
 .money-cash { color: var(--c-pocket); }
 .money-bank { color: var(--c-bank); }
 .money-total { color: var(--c-total); }
-
 .farmed-up { color: var(--c-profit); font-family: 'Share Tech Mono', monospace; font-size: 15px; }
 .farmed-down { color: var(--bad); font-family: 'Share Tech Mono', monospace; font-size: 15px; }
 .uptime-badge { background: rgba(227, 179, 65, 0.15); color: var(--gold); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; display: inline-block;}
-
 input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 2px solid var(--mute); border-radius: 4px; background: transparent; cursor: pointer; position: relative; outline: none; }
 input[type="checkbox"]:checked { background: var(--ac); border-color: var(--ac); }
 input[type="checkbox"]:checked::after { content: "✓"; position: absolute; top: -2px; left: 2px; color: white; font-size: 13px; font-weight: bold; }
-
-/* Modals */
 dialog { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 24px; width: min(400px, 92vw); }
 dialog::backdrop { background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
 dialog h2 { margin: 0 0 16px; font-size: 20px; font-weight: 700; }
 dialog label { display: block; margin-bottom: 12px; color: var(--mute); font-size: 13px; font-weight: 500; }
 dialog input { width: 100%; margin-top: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: white; outline: none; }
 dialog input:focus { border-color: var(--ac); }
-
 .custom-alert { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
 .custom-alert.show { display: flex; opacity: 1; }
 .alert-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; width: min(400px, 90vw); padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.2s; }
@@ -160,7 +96,6 @@ dialog input:focus { border-color: var(--ac); }
 .alert-actions { display: flex; justify-content: flex-end; gap: 10px; }
 .alert-btn { background: var(--ac); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .alert-btn.cancel { background: transparent; border: 1px solid var(--line); color: var(--ink); }
-
 @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) {
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -180,21 +115,15 @@ dialog input:focus { border-color: var(--ac); }
     <div class="bar">
         <div class="logo"><i></i>Farmledger</div>
         <div class="sp"></div>
-
         <div id="live-indicator" class="b" style="border-color: rgba(46, 160, 67, 0.3); color: var(--c-pocket); background: rgba(46, 160, 67, 0.1); cursor: default;">
-            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--c-pocket); animation:pulse 1.5s infinite;"></span>
-            Live
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--c-pocket); animation:pulse 1.5s infinite;"></span> Live
         </div>
-
         <button class="b pri" id="copy-script" type="button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copy Script
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Script
         </button>
-
         {% if my_key == 'admin' %}
         <a href="/admin" class="b" style="color: var(--gold); border-color: rgba(227, 179, 65, 0.3); background: rgba(227, 179, 65, 0.05);">Admin</a>
         {% endif %}
-
         <div class="user-menu">
             <div class="user-trigger" onclick="document.getElementById('uDropdown').classList.toggle('show')">
                 <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
@@ -214,36 +143,12 @@ dialog input:focus { border-color: var(--ac); }
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card c-pocket">
-            <div class="stat-top"><div class="stat-title">Pocket Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div></div>
-            <div class="stat-value" id="stat-cash">$0</div>
-            <div class="stat-sub">Total in all accounts</div>
-        </div>
-        <div class="stat-card c-bank">
-            <div class="stat-top"><div class="stat-title">Bank Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div></div>
-            <div class="stat-value" id="stat-bank">$0</div>
-            <div class="stat-sub">Total in bank accounts</div>
-        </div>
-        <div class="stat-card c-total">
-            <div class="stat-top"><div class="stat-title">Total Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/></svg></div></div>
-            <div class="stat-value" id="stat-worth">$0</div>
-            <div class="stat-sub">Cash + Bank</div>
-        </div>
-        <div class="stat-card c-profit">
-            <div class="stat-top"><div class="stat-title">Session Profit</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 17l9.2-9.2"/><path d="M7 7h10v10"/></svg></div></div>
-            <div class="stat-value" id="stat-farmed">$0</div>
-            <div class="stat-sub">Farmed recently</div>
-        </div>
-        <div class="stat-card c-acc">
-            <div class="stat-top"><div class="stat-title">Total Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
-            <div class="stat-value" id="stat-acc">0</div>
-            <div class="stat-sub">Registered accounts</div>
-        </div>
-        <div class="stat-card c-online">
-            <div class="stat-top"><div class="stat-title">Online Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
-            <div class="stat-value" id="stat-online">0</div>
-            <div class="stat-sub" id="stat-active-percent">0% active</div>
-        </div>
+        <div class="stat-card c-pocket"><div class="stat-top"><div class="stat-title">Pocket Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div></div><div class="stat-value" id="stat-cash">$0</div><div class="stat-sub">Total in all accounts</div></div>
+        <div class="stat-card c-bank"><div class="stat-top"><div class="stat-title">Bank Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div></div><div class="stat-value" id="stat-bank">$0</div><div class="stat-sub">Total in bank accounts</div></div>
+        <div class="stat-card c-total"><div class="stat-top"><div class="stat-title">Total Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/></svg></div></div><div class="stat-value" id="stat-worth">$0</div><div class="stat-sub">Cash + Bank</div></div>
+        <div class="stat-card c-profit"><div class="stat-top"><div class="stat-title">Session Profit</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 17l9.2-9.2"/><path d="M7 7h10v10"/></svg></div></div><div class="stat-value" id="stat-farmed">$0</div><div class="stat-sub">Farmed recently</div></div>
+        <div class="stat-card c-acc"><div class="stat-top"><div class="stat-title">Total Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div><div class="stat-value" id="stat-acc">0</div><div class="stat-sub">Registered accounts</div></div>
+        <div class="stat-card c-online"><div class="stat-top"><div class="stat-title">Online Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div><div class="stat-value" id="stat-online">0</div><div class="stat-sub" id="stat-active-percent">0% active</div></div>
     </div>
 
     <div class="toolbar">
@@ -267,9 +172,7 @@ dialog input:focus { border-color: var(--ac); }
                     <th onclick="sortTable('total')">All (Total) <span id="icon-total" class="sort-icon"></span></th>
                 </tr>
             </thead>
-            <tbody id="table-body">
-                <!-- Filled via JavaScript -->
-            </tbody>
+            <tbody id="table-body"></tbody>
         </table>
     </div>
 </div>
@@ -321,10 +224,7 @@ function updateSortIcons() {
 function renderTable(data) {
     const tbody = document.getElementById('table-body');
     const existingRows = {};
-    Array.from(tbody.querySelectorAll('tr.account-row')).forEach(tr => {
-        existingRows[tr.dataset.name] = tr;
-    });
-
+    Array.from(tbody.querySelectorAll('tr.account-row')).forEach(tr => { existingRows[tr.dataset.name] = tr; });
     const incomingNames = new Set();
     const fragment = document.createDocumentFragment();
 
@@ -336,15 +236,11 @@ function renderTable(data) {
             tr = document.createElement('tr');
             tr.className = 'account-row';
             tr.dataset.name = acc.name;
-            
             tr.innerHTML = `
                 <td><input type="checkbox" class="row-checkbox" value="${acc.name}"></td>
                 <td>
                     <div class="acc-name">${acc.name}</div>
-                    <div>
-                        <span class="badge status-badge"></span>
-                        <span class="badge pc">${acc.pc}</span>
-                    </div>
+                    <div><span class="badge status-badge"></span><span class="badge pc">${acc.pc}</span></div>
                 </td>
                 <td><span class="val-level" style="color:var(--ac); font-weight:700; font-size:14px;"></span></td>
                 <td class="val-skills"></td>
@@ -358,13 +254,8 @@ function renderTable(data) {
         }
         
         const statusBadge = tr.querySelector('.status-badge');
-        if(acc.online) {
-            statusBadge.className = 'badge status-badge online';
-            statusBadge.innerText = 'Online';
-        } else {
-            statusBadge.className = 'badge status-badge offline';
-            statusBadge.innerText = 'Offline';
-        }
+        if(acc.online) { statusBadge.className = 'badge status-badge online'; statusBadge.innerText = 'Online'; } 
+        else { statusBadge.className = 'badge status-badge offline'; statusBadge.innerText = 'Offline'; }
         
         tr.querySelector('.val-level').innerText = acc.level;
         
@@ -376,14 +267,9 @@ function renderTable(data) {
                 skillStr += `<span style="color:var(--mute); font-size:12px;">${skillName}:</span><span style="color:var(--ink); font-size:12px; font-weight:600; margin-right:6px; margin-left:2px;">${v}</span>`;
             }
             skillsTd.innerHTML = skillStr;
-        } else {
-            skillsTd.innerHTML = `<span style="color:var(--mute); font-size:12px;">None</span>`;
-        }
+        } else { skillsTd.innerHTML = `<span style="color:var(--mute); font-size:12px;">None</span>`; }
 
-        let uptimeText = acc.uptime;
-        if (uptimeText === "أقل من دقيقة") uptimeText = "< 1m";
-        else uptimeText = uptimeText.replace('س', 'h').replace('د', 'm');
-        
+        let uptimeText = acc.uptime === "أقل من دقيقة" ? "< 1m" : acc.uptime.replace('س', 'h').replace('د', 'm');
         tr.querySelector('.val-uptime').innerText = uptimeText;
         
         const farmedDiv = tr.querySelector('.val-farmed');
@@ -394,27 +280,14 @@ function renderTable(data) {
         tr.querySelector('.val-bank').innerText = '$' + Number(acc.bank).toLocaleString();
         tr.querySelector('.val-total').innerText = '$' + Number(acc.total).toLocaleString();
 
-        tr.dataset.level = acc.level;
-        tr.dataset.cash = acc.cash;
-        tr.dataset.bank = acc.bank;
-        tr.dataset.total = acc.total;
-        tr.dataset.farmed = acc.farmed;
-        tr.dataset.uptime = uptimeText; 
+        tr.dataset.level = acc.level; tr.dataset.cash = acc.cash; tr.dataset.bank = acc.bank;
+        tr.dataset.total = acc.total; tr.dataset.farmed = acc.farmed; tr.dataset.uptime = uptimeText; 
     });
 
-    Object.keys(existingRows).forEach(name => {
-        if (!incomingNames.has(name)) {
-            existingRows[name].remove();
-        }
-    });
-
-    if(fragment.children.length > 0) {
-        tbody.appendChild(fragment);
-    }
+    Object.keys(existingRows).forEach(name => { if (!incomingNames.has(name)) existingRows[name].remove(); });
+    if(fragment.children.length > 0) tbody.appendChild(fragment);
     
-    bindCheckboxes();
-    applySort();
-    document.getElementById('searchInput').dispatchEvent(new Event('input'));
+    bindCheckboxes(); applySort(); document.getElementById('searchInput').dispatchEvent(new Event('input'));
 }
 
 async function fetchData() {
@@ -423,7 +296,6 @@ async function fetchData() {
     try {
         const res = await fetch('/api/data');
         const data = await res.json();
-        
         if(data.error) return;
 
         document.getElementById('stat-cash').innerText = '$' + Number(data.total_cash).toLocaleString();
@@ -432,17 +304,13 @@ async function fetchData() {
         document.getElementById('stat-farmed').innerText = '$' + Number(data.total_farmed).toLocaleString();
         document.getElementById('stat-acc').innerText = data.total_accounts;
         document.getElementById('stat-online').innerText = data.online_count;
-        
         document.getElementById('meta-acc').innerText = data.total_accounts;
         document.getElementById('meta-live').innerText = data.online_count;
         
-        if(data.total_accounts > 0) {
-            document.getElementById('stat-active-percent').innerHTML = Math.round((data.online_count / data.total_accounts) * 100) + '% active';
-        }
+        if(data.total_accounts > 0) document.getElementById('stat-active-percent').innerHTML = Math.round((data.online_count / data.total_accounts) * 100) + '% active';
 
         currentData = data.accounts;
         renderTable(currentData);
-        
     } catch (e) { console.error(e); }
     isUpdating = false;
 }
@@ -454,36 +322,22 @@ function applySort() {
     let activeCol = null, state = 0;
     for (let k in sortStates) { if (sortStates[k] !== 0) { activeCol = k; state = sortStates[k]; break; } }
     if (!activeCol) return;
-    
     const tbody = document.getElementById('table-body');
     const rows = Array.from(tbody.querySelectorAll('tr.account-row'));
-    
     rows.sort((a, b) => {
         let valA, valB;
-        if (activeCol === 'name') {
-            valA = a.dataset.name.toLowerCase();
-            valB = b.dataset.name.toLowerCase();
-            return state === 1 ? valB.localeCompare(valA) : valA.localeCompare(valB);
-        } else if (activeCol === 'uptime') {
-            valA = a.dataset.uptime;
-            valB = b.dataset.uptime;
-            return state === 1 ? valB.localeCompare(valA) : valA.localeCompare(valB);
-        } else {
-            valA = parseFloat(a.dataset[activeCol]) || 0;
-            valB = parseFloat(b.dataset[activeCol]) || 0;
-            return state === 1 ? valB - valA : valA - valB;
-        }
+        if (activeCol === 'name') return state === 1 ? b.dataset.name.localeCompare(a.dataset.name) : a.dataset.name.localeCompare(b.dataset.name);
+        if (activeCol === 'uptime') return state === 1 ? b.dataset.uptime.localeCompare(a.dataset.uptime) : a.dataset.uptime.localeCompare(b.dataset.uptime);
+        valA = parseFloat(a.dataset[activeCol]) || 0; valB = parseFloat(b.dataset[activeCol]) || 0;
+        return state === 1 ? valB - valA : valA - valB;
     });
-
-    tbody.innerHTML = '';
-    rows.forEach(row => tbody.appendChild(row));
+    tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
 }
 
 function sortTable(col) {
     sortStates[col] = (sortStates[col] + 1) % 3;
     Object.keys(sortStates).forEach(k => { if(k !== col) sortStates[k] = 0; });
-    updateSortIcons();
-    applySort();
+    updateSortIcons(); applySort();
 }
 
 let confirmCallback = null;
@@ -491,13 +345,9 @@ function showAlert(titleKey, msgKey, isConfirm = false, onConfirm = null) {
     document.getElementById('customAlert').classList.add('show');
     document.getElementById('alertTitle').innerText = titleKey;
     document.getElementById('alertMessage').innerText = msgKey;
-    
     const actions = document.getElementById('alertActions');
     if (isConfirm && onConfirm) {
-        actions.innerHTML = `
-            <button class="alert-btn cancel" onclick="closeAlert()">Cancel</button>
-            <button class="alert-btn" style="background:var(--bad);" onclick="confirmAction()">Yes</button>
-        `;
+        actions.innerHTML = `<button class="alert-btn cancel" onclick="closeAlert()">Cancel</button><button class="alert-btn" style="background:var(--bad);" onclick="confirmAction()">Yes</button>`;
         confirmCallback = onConfirm;
     } else {
         actions.innerHTML = `<button class="alert-btn" onclick="closeAlert()">OK</button>`;
@@ -520,9 +370,7 @@ document.getElementById('selectAll').addEventListener('change', function(e) {
     updateSelectionButtons();
 });
 function bindCheckboxes() {
-    document.querySelectorAll('.row-checkbox').forEach(cb => {
-        cb.addEventListener('change', updateSelectionButtons);
-    });
+    document.querySelectorAll('.row-checkbox').forEach(cb => cb.addEventListener('change', updateSelectionButtons));
 }
 
 function updateSelectionButtons() {
@@ -540,35 +388,111 @@ function deleteSelected() {
         for (let name of names) {
             await fetch('/api/delete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name}) });
         }
-        fetchData();
-        document.getElementById('selectAll').checked = false;
-        updateSelectionButtons();
+        fetchData(); document.getElementById('selectAll').checked = false; updateSelectionButtons();
     });
 }
 function copySelected() {
     const checked = document.querySelectorAll('.row-checkbox:checked');
     if (checked.length === 0) return;
     const names = Array.from(checked).map(cb => cb.value).join(", ");
-    navigator.clipboard.writeText(names).then(() => {
-        showAlert("Copied", "Copied successfully!");
-    }).catch(err => { showAlert("Error", "Failed to copy."); });
+    navigator.clipboard.writeText(names).then(() => { showAlert("Copied", "Copied successfully!"); }).catch(err => { showAlert("Error", "Failed to copy."); });
 }
 
 document.getElementById('searchInput').addEventListener('input', function(e) {
     const val = e.target.value.toLowerCase();
     document.querySelectorAll('.account-row').forEach(row => {
-        const name = row.dataset.name.toLowerCase();
-        row.style.display = name.includes(val) ? '' : 'none';
+        row.style.display = row.dataset.name.toLowerCase().includes(val) ? '' : 'none';
     });
 });
 
-// 🔴 هنا وضعنا السكربت الذكي الجديد
+// 🔴 التعديل الجديد: سكربت بدون loadstring ويدعم Delta
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
     const key = MY_KEY; 
-    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["ACCOUNT_NAME"] = "${key}",\n    ["PC_NAME"] = "DDC 1",\n    ["URL"] = "${domain}/api/report"\n}\n\nloadstring([[c=getgenv().OverseerConfig k=c.ACCOUNT_NAME w=c.URL pc=c.PC_NAME p=game:GetService"Players".LocalPlayer h=game:GetService"HttpService" function gR()local f=request or http_request or(getgenv()and getgenv().request)or(syn and syn.request)or(krnl and krnl.request)or(fluxus and fluxus.request)or(http and http.request)return f end local r=gR() if not r then return warn("[OVERSEER] No HTTP function found on this executor!") end function n(s)return tonumber(s:gsub("[^%d%.]",""))or 0 end task.spawn(function()while task.wait(1)do local ca,ba,lv=0,0,0 local sk={} local g=p:FindFirstChild("PlayerGui")if g then for _,o in next,g:GetDescendants()do if o:IsA"TextLabel"then local t=o.Text:lower() local bm=t:match("bank[:%s%$]*([%d,]+)") or t:match("bank balance[:%s%$]*([%d,]+)") if bm then ba=n(bm) end local cm=t:match("cash[:%s%$]*([%d,]+)") or t:match("hand balance[:%s%$]*([%d,]+)") or t:match("pocket[:%s%$]*([%d,]+)") or t:match("money[:%s%$]*([%d,]+)") if cm then ca=n(cm) end local lm=t:match("level[:%s]*([%d,]+)") or t:match("total level[:%s]*([%d,]+)") if lm then lv=n(lm) end local sn,sl=t:match("([%a%s]+)[:%s]+([%d,]+)") if sn and sl then local cn=sn:gsub("%s","") local al={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1} if al[cn] then table.insert(sk,{name=cn,level=n(sl)}) end end end end end pcall(function()r({Url=w,Method="POST",Headers={["Content-Type"]="application/json"},Body=h:JSONEncode({k=k,c=ca,b=ba,l=lv,s=sk,n=p.Name,pc=pc})})end)end end)]])()`;
     
+    const script = `repeat task.wait() until game:IsLoaded()
+print("[OVERSEER] Starting script...")
+
+getgenv().OverseerConfig = {
+    ["ACCOUNT_NAME"] = "${key}",
+    ["PC_NAME"] = "DDC 1",
+    ["URL"] = "${domain}/api/report"
+}
+
+local config = getgenv().OverseerConfig
+local accountKey = config.ACCOUNT_NAME
+local url = config.URL
+local pcName = config.PC_NAME
+local player = game:GetService("Players").LocalPlayer
+local httpService = game:GetService("HttpService")
+
+local r = (syn and syn.request) or (http and http.request) or http_request or request
+if not r then
+    warn("[OVERSEER] ❌ No HTTP function found!")
+    return
+end
+print("[OVERSEER] ✅ HTTP function found.")
+
+local function n(s)
+    if not s then return 0 end
+    return tonumber(s:gsub("[^%d%.]", "")) or 0
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        local ca, ba, lv = 0, 0, 0
+        local sk = {}
+        local g = player:FindFirstChild("PlayerGui")
+        
+        if g then
+            for _, o in next, g:GetDescendants() do
+                if o:IsA("TextLabel") then
+                    local t = o.Text:lower()
+                    
+                    -- استخراج البنك
+                    local bm = t:match("bank[:%s%$]*([%d,]+)") or t:match("bank balance[:%s%$]*([%d,]+)")
+                    if bm then ba = n(bm) end
+                    
+                    -- استخراج الكاش
+                    local cm = t:match("cash[:%s%$]*([%d,]+)") or t:match("hand balance[:%s%$]*([%d,]+)") or t:match("pocket[:%s%$]*([%d,]+)") or t:match("money[:%s%$]*([%d,]+)")
+                    if cm then ca = n(cm) end
+                    
+                    -- استخراج المستوى
+                    local lm = t:match("level[:%s]*([%d,]+)") or t:match("total level[:%s]*([%d,]+)")
+                    if lm then lv = n(lm) end
+                    
+                    -- المهارات
+                    local sn, sl = t:match("([%a%s]+)[:%s]+([%d,]+)")
+                    if sn and sl then
+                        local cn = sn:gsub("%s", "")
+                        local al = {fishing=1, stamina=1, shelfstocker=1, janitor=1, swiper=1, farming=1, cook=1}
+                        if al[cn] then table.insert(sk, {name=cn, level=n(sl)}) end
+                    end
+                end
+            end
+        end
+
+        local payload = {
+            k = accountKey, c = ca, b = ba, l = lv, s = sk, n = player.Name, pc = pcName
+        }
+
+        local ok, err = pcall(function()
+            local res = r({
+                Url = url,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = httpService:JSONEncode(payload)
+            })
+            if not getgenv()._overseerLogged then
+                getgenv()._overseerLogged = true
+                print("[OVERSEER] 📡 Status:", res.StatusCode, "Response:", res.Body)
+            end
+        end)
+    end
+end)
+print("[OVERSEER] 🚀 Script running!")`;
+
     let textArea = document.createElement("textarea");
     textArea.value = script;
     textArea.style.position = "fixed";
