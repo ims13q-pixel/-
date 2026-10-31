@@ -16,7 +16,7 @@
 }
 * { box-sizing: border-box; transition: all 0.2s ease; font-family: 'Space Grotesk', sans-serif; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5; }
-.w { max-width: 1400px; margin: 0 auto; padding: 30px 20px 60px; }
+.w { max-width: 1500px; margin: 0 auto; padding: 30px 20px 60px; }
 .bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
 .logo { font-weight: 700; font-size: 24px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
 .logo i { width: 30px; height: 30px; border-radius: 8px; background: conic-gradient(from 200deg, var(--ac), #3a46c8, var(--ok), var(--ac)); display: block; }
@@ -71,6 +71,8 @@ th:hover .sort-icon { opacity: 0.7; }
 .badge.online { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); }
 .badge.offline { background: rgba(248, 81, 73, 0.15); color: var(--bad); }
 .badge.pc { background: #3b3e59; color: #cbd5e1; }
+.badge.srv { background: rgba(96, 165, 250, 0.15); color: var(--c-total); }
+.badge.ver { background: rgba(192, 132, 252, 0.15); color: var(--c-bank); }
 .money-col { font-family: 'Share Tech Mono', monospace; font-weight: 400; font-size: 16px; letter-spacing: 0px; }
 .money-cash { color: var(--c-pocket); }
 .money-bank { color: var(--c-bank); }
@@ -236,11 +238,17 @@ function renderTable(data) {
             tr = document.createElement('tr');
             tr.className = 'account-row';
             tr.dataset.name = acc.name;
+            // إضافة السيرفر والإصدار تحت الاسم
             tr.innerHTML = `
                 <td><input type="checkbox" class="row-checkbox" value="${acc.name}"></td>
                 <td>
                     <div class="acc-name">${acc.name}</div>
-                    <div><span class="badge status-badge"></span><span class="badge pc">${acc.pc}</span></div>
+                    <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                        <span class="badge status-badge"></span>
+                        <span class="badge pc">${acc.pc}</span>
+                        <span class="badge srv">SRV: ${acc.srv}</span>
+                        <span class="badge ver">v${acc.ver}</span>
+                    </div>
                 </td>
                 <td><span class="val-level" style="color:var(--ac); font-weight:700; font-size:14px;"></span></td>
                 <td class="val-skills"></td>
@@ -405,14 +413,14 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 
-// 🔴 التعديل الجديد: سكربت بدون loadstring ويدعم Delta
+// 🔴 السكربت الجديد: يرسل السيرفر والإصدار + فلوس مقروءة صح
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
     const key = MY_KEY; 
     
     const script = `repeat task.wait() until game:IsLoaded()
-print("[OVERSEER] Starting script...")
+print("[OVERSEER] Starting script v1.2.0...")
 
 getgenv().OverseerConfig = {
     ["ACCOUNT_NAME"] = "${key}",
@@ -432,11 +440,11 @@ if not r then
     warn("[OVERSEER] ❌ No HTTP function found!")
     return
 end
-print("[OVERSEER] ✅ HTTP function found.")
 
 local function n(s)
     if not s then return 0 end
-    return tonumber(s:gsub("[^%d%.]", "")) or 0
+    local str = s:gsub("[^%d%.]", "")
+    return tonumber(str) or 0
 end
 
 task.spawn(function()
@@ -450,19 +458,15 @@ task.spawn(function()
                 if o:IsA("TextLabel") then
                     local t = o.Text:lower()
                     
-                    -- استخراج البنك
                     local bm = t:match("bank[:%s%$]*([%d,]+)") or t:match("bank balance[:%s%$]*([%d,]+)")
                     if bm then ba = n(bm) end
                     
-                    -- استخراج الكاش
                     local cm = t:match("cash[:%s%$]*([%d,]+)") or t:match("hand balance[:%s%$]*([%d,]+)") or t:match("pocket[:%s%$]*([%d,]+)") or t:match("money[:%s%$]*([%d,]+)")
                     if cm then ca = n(cm) end
                     
-                    -- استخراج المستوى
                     local lm = t:match("level[:%s]*([%d,]+)") or t:match("total level[:%s]*([%d,]+)")
                     if lm then lv = n(lm) end
                     
-                    -- المهارات
                     local sn, sl = t:match("([%a%s]+)[:%s]+([%d,]+)")
                     if sn and sl then
                         local cn = sn:gsub("%s", "")
@@ -473,8 +477,13 @@ task.spawn(function()
             end
         end
 
+        -- استخراج رقم السيرفر (آخر 4 أرقام من JobId)
+        local srv = string.sub(tostring(game.JobId), -4)
+        local ver = "1.2.0" -- إصدار السكربت
+
         local payload = {
-            k = accountKey, c = ca, b = ba, l = lv, s = sk, n = player.Name, pc = pcName
+            k = accountKey, c = ca, b = ba, l = lv, s = sk, n = player.Name, pc = pcName,
+            srv = srv, ver = ver -- إرسال السيرفر والإصدار
         }
 
         local ok, err = pcall(function()
@@ -484,10 +493,6 @@ task.spawn(function()
                 Headers = {["Content-Type"] = "application/json"},
                 Body = httpService:JSONEncode(payload)
             })
-            if not getgenv()._overseerLogged then
-                getgenv()._overseerLogged = true
-                print("[OVERSEER] 📡 Status:", res.StatusCode, "Response:", res.Body)
-            end
         end)
     end
 end)
