@@ -183,8 +183,8 @@ def api_data():
             "uptime": uptime_str, 
             "pc": a.get("pc", "PC"), 
             "skills": a.get("skills", {}),
-            "srv": a.get("srv", "Unknown"),  # 🔴 السيرفر الجديد
-            "ver": a.get("ver", "Unknown")   # 🔴 الإصدار الجديد
+            "srv_num": a.get("srv_num", "Unknown"),
+            "srv_ver": a.get("srv_ver", "Unknown")
         })
         
     return jsonify({
@@ -239,9 +239,8 @@ def report():
     total_money = cash + bank
     level = int(data.get("l", 0) or 0)
     
-    # استقبال السيرفر والإصدار
-    srv_id = data.get("srv", "Unknown")
-    ver = data.get("ver", "Unknown")
+    srv_num = data.get("srv_num", "Unknown")
+    srv_ver = data.get("srv_ver", "Unknown")
 
     raw_skills = data.get("s", [])
     skills_dict = {}
@@ -266,8 +265,8 @@ def report():
         "display_name": data.get("dn", name),
         "user_id": str(data.get("u", "")), 
         "last_seen": now,
-        "srv": srv_id,    # حفظ السيرفر
-        "ver": ver        # حفظ الإصدار
+        "srv_num": srv_num,
+        "srv_ver": srv_ver
     })
     
     save_db(users, passwords, discord_profiles, accounts)
