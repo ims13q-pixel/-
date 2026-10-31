@@ -3,119 +3,156 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Farmledger - Account Log</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Bricolage+Grotesque:wght@600;800&family=JetBrains+Mono:wght@500&display=swap">
+<title>Farmledger Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0b14;--p:#12141f;--p2:#181b29;--line:#252a3d;--ink:#eceffa;--mute:#7d86a6;--ac:#7c8cff;--ac2:#3a46c8;--gold:#ffc15a;--ok:#3ddc97;--bad:#ff6b7d;--warn:#ffb347;--glow:rgba(124,140,255,.16);color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box; transition: all 0.2s ease;}
-body{margin:0;background:var(--bg);color:var(--ink);font:500 14px/1.5 Manrope,system-ui,sans-serif; font-family: 'Manrope', 'Tahoma', sans-serif;}
-.w{max-width:1280px;margin:0 auto;padding:18px 18px 60px}
-button,input{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+:root {
+    --bg: #0b0e14;
+    --panel: #121620;
+    --panel-hover: #181d29;
+    --line: #1f2533;
+    --ink: #ffffff;
+    --mute: #8b949e;
+    --ac: #7c8cff;
+    --ok: #2ea043;
+    --bad: #f85149;
+    --gold: #e3b341;
+    
+    /* ألوان البطاقات (مقتبسة من مثالك) */
+    --c-pocket: #2ea043;
+    --c-bank: #3b82f6;
+    --c-total: #a855f7;
+    --c-profit: #10b981;
+    --c-acc: #f97316;
+    --c-online: #14b8a6;
+}
 
-.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px;position:relative;z-index:1000}
-.logo{font:800 20px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
-.logo i{width:26px;height:26px;border-radius:8px;background:conic-gradient(from 200deg,var(--ac),var(--ac2),var(--ok),var(--ac));display:block}
-.meta{color:var(--mute);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}.meta b{color:var(--ink)}
-.sp{flex:1}
+* { box-sizing: border-box; transition: all 0.2s ease; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 500 14px/1.5 'Manrope', sans-serif; }
 
-.b{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:700;font-size:13px; display:inline-flex; align-items:center; gap:6px;}
-.b:hover{border-color:var(--ac); transform: translateY(-1px);} .b.pri{background:var(--ac);border-color:var(--ac);color:#fff}
-.b.live.on{border-color:var(--ok);color:var(--ok)}
+.w { max-width: 1400px; margin: 0 auto; padding: 30px 20px 60px; }
 
-.icon { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-.sort-icon { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; opacity: 0.4; display: inline-block; vertical-align: middle; margin-right: 6px;}
-th:hover .sort-icon { opacity: 1; }
+/* التوب بار */
+.bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+.logo { font: 800 24px 'Manrope', sans-serif; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+.logo i { width: 30px; height: 30px; border-radius: 8px; background: conic-gradient(from 200deg, var(--ac), #3a46c8, var(--ok), var(--ac)); display: block; }
+.sp { flex: 1; }
 
-.lang-menu { position: relative; display: inline-block; }
-.lang-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 7px 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--p); font-weight: 700; font-size: 13px; color: var(--ink); transition: 0.2s;}
-.lang-trigger:hover { border-color: var(--ac); }
-.lang-dropdown { display: none; position: absolute; top: calc(100% + 5px); right: 0; background: var(--p2); border: 1px solid var(--line); border-radius: 10px; padding: 5px; min-width: 140px; z-index: 99999; box-shadow: 0 10px 30px rgba(0,0,0,0.5); flex-direction: column; gap: 2px;}
-.lang-dropdown.show { display: flex; }
-.lang-dropdown button { background: none; border: none; color: var(--ink); padding: 10px 12px; text-align: right; cursor: pointer; font-size: 13px; border-radius: 6px; font-weight: 600; display: flex; align-items: center; gap: 8px;}
-.lang-dropdown button:hover { background: rgba(255,255,255,0.05); }
+.b { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none;}
+.b:hover { background: var(--panel-hover); border-color: #30384b; }
+.b.pri { background: var(--ac); border-color: var(--ac); color: #fff; }
+.b.pri:hover { background: #6b7aff; }
 
-.user-menu{position:relative;margin-left:10px; z-index: 9999;}
-.user-trigger{display:flex;align-items:center;gap:10px;cursor:pointer;padding:5px 10px;border-radius:10px;border:1px solid transparent;}
-.user-trigger:hover{background:var(--p);border-color:var(--line);}
-.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;}
-.user-name{font-weight:700;font-size:14px;}
-.user-dropdown{position:absolute;top:calc(100% + 8px);left:0; background:var(--p2);border:1px solid var(--line);border-radius:12px;width:200px;padding:6px;display:none;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index: 99999; opacity: 0; transform: translateY(-10px);}
-.user-dropdown.show{display:flex; opacity: 1; transform: translateY(0);}
-.user-dropdown button, .user-dropdown a{display:flex;width:100%;text-align:start;padding:10px 12px;border:none;background:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink);text-decoration:none; display:flex; align-items: center; gap: 8px;}
-.user-dropdown button:hover{background:var(--p);}
-.user-dropdown a:hover{background:rgba(255,107,125,0.1);color:var(--bad);}
-.dropdown-divider{height:1px;background:var(--line);margin:4px 0;}
+/* قوائم منسدلة */
+.lang-menu, .user-menu { position: relative; }
+.lang-trigger, .user-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); font-weight: 700; font-size: 13px; }
+.lang-trigger:hover, .user-trigger:hover { border-color: #30384b; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3a46c8, var(--ac)); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+.dropdown { display: none; position: absolute; top: calc(100% + 8px); left: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; min-width: 180px; z-index: 9999; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.dropdown.show { display: flex; }
+.dropdown button, .dropdown a { width: 100%; text-align: right; padding: 10px 12px; border: none; background: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.dropdown button:hover { background: var(--panel-hover); }
+.dropdown a:hover { background: rgba(248,81,73,0.1); color: var(--bad); }
+.dropdown-divider { height: 1px; background: var(--line); margin: 4px 0; }
 
-.hero{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px}
-.card{background:var(--p);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative;overflow:hidden}
-.net{background:radial-gradient(120% 140% at 0% 0%,var(--glow),transparent 60%),var(--p)}
-.lbl{color:var(--mute);font-size:12px;font-weight:700}
-.big{font:800 clamp(38px,6vw,64px)/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em;margin:6px 0 2px}
-.sub{color:var(--mute);font-size:13px;margin-top:5px;}
-.kp{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.kp .card{padding:16px}.kv{font:800 26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
-.up{color:var(--ok)}.gd{color:var(--gold)}
+/* العنوان الرئيسي */
+.header-title { margin-bottom: 24px; }
+.header-title h1 { font-size: 28px; font-weight: 800; margin: 0 0 5px 0; letter-spacing: -0.5px; }
+.header-title p { color: var(--mute); font-size: 13px; margin: 0; font-weight: 600; }
 
-.tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.tb input[type=search]{background:var(--p);border:1px solid var(--line);border-radius:9px;padding:10px 15px;min-width:300px;color:white;outline:none;}
-.tb input[type=search]:focus{border-color:var(--ac);}
+/* البطاقات العلوية (الستايل الجديد) */
+.stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
+.stat-card:hover { border-color: #30384b; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.stat-title { color: var(--mute); font-size: 13px; font-weight: 700; }
+.stat-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+.stat-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.stat-value { font: 800 28px 'JetBrains Mono', monospace; letter-spacing: -1px; margin-bottom: 4px; }
+.stat-sub { font-size: 11px; color: var(--mute); font-weight: 600; }
 
-.tw{background:var(--p);border:1px solid var(--line);border-radius:16px;overflow:auto;max-height:640px;}
+/* ألوان البطاقات */
+.c-pocket .stat-icon { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); }
+.c-pocket .stat-value { color: var(--c-pocket); }
+.c-bank .stat-icon { background: rgba(59, 130, 246, 0.15); color: var(--c-bank); }
+.c-bank .stat-value { color: var(--c-bank); }
+.c-total .stat-icon { background: rgba(168, 85, 247, 0.15); color: var(--c-total); }
+.c-total .stat-value { color: var(--c-total); }
+.c-profit .stat-icon { background: rgba(16, 185, 129, 0.15); color: var(--c-profit); }
+.c-profit .stat-value { color: var(--c-profit); }
+.c-acc .stat-icon { background: rgba(249, 115, 22, 0.15); color: var(--c-acc); }
+.c-acc .stat-value { color: var(--c-acc); }
+.c-online .stat-icon { background: rgba(20, 184, 166, 0.15); color: var(--c-online); }
+.c-online .stat-value { color: var(--c-online); }
+
+/* شريط الأدوات (بحث + أزرار) */
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.toolbar input[type=search] { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 16px; min-width: 300px; color: white; outline: none; font-family: 'Manrope', sans-serif; }
+.toolbar input[type=search]:focus { border-color: var(--ac); }
+
+/* الجدول */
+.table-container { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: auto; max-height: 700px; }
 table { width: 100%; border-collapse: collapse; }
-th { text-align: right; padding: 14px 16px; color: var(--mute); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--line); cursor: pointer; user-select: none; }
+th { text-align: right; padding: 16px; color: var(--mute); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--line); cursor: pointer; position: sticky; top: 0; background: var(--panel); z-index: 10;}
 th:hover { color: var(--ink); }
-td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
-tr:hover { background: rgba(255,255,255,0.02); }
+td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
+tr:hover { background: var(--panel-hover); }
 
-input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 2px solid var(--mute); border-radius: 4px; background: transparent; cursor: pointer; position: relative; outline: none; transition: 0.2s; }
+/* تنسيقات داخل الجدول */
+.acc-name { font-weight: 700; color: var(--ink); font-size: 14px; }
+.badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+.badge.online { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); }
+.badge.offline { background: rgba(248, 81, 73, 0.15); color: var(--bad); }
+.badge.pc { background: #1f2533; color: #a1a1aa; }
+
+/* تلوين الأموال مثل المثال (بنفسجي وأزرق) */
+.money-bank { font: 700 14px 'JetBrains Mono', monospace; color: #a855f7; } 
+.money-cash { font: 700 14px 'JetBrains Mono', monospace; color: #3b82f6; }
+.money-total { font: 800 15px 'JetBrains Mono', monospace; color: #fff; }
+.money-sub { font-size: 11px; color: var(--mute); margin-top: 4px; font-family: 'Manrope', sans-serif; font-weight: 600;}
+
+.farmed-up { color: var(--c-profit); font: 700 14px 'JetBrains Mono', monospace; }
+.farmed-down { color: var(--bad); font: 700 14px 'JetBrains Mono', monospace; }
+.uptime-badge { background: rgba(227, 179, 65, 0.15); color: var(--gold); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; display: inline-block; }
+
+/* Checkbox */
+input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 2px solid var(--mute); border-radius: 4px; background: transparent; cursor: pointer; position: relative; outline: none; }
 input[type="checkbox"]:checked { background: var(--ac); border-color: var(--ac); }
 input[type="checkbox"]:checked::after { content: "✓"; position: absolute; top: -2px; left: 2px; color: white; font-size: 13px; font-weight: bold; }
-input[type="checkbox"]:hover { border-color: var(--ac); }
 
-.acc-name { font-weight: 700; color: var(--ink); font-size: 14px; }
-.badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
-.badge.online { background: rgba(62,224,163,0.1); color: var(--ok); }
-.badge.offline { background: rgba(255,107,125,0.1); color: var(--bad); }
-.badge.pc { background: #1a2235; color: #a0aec0; }
-.level-badge { background: rgba(59,130,246,0.1); color: var(--ac); padding: 4px 10px; border-radius: 6px; font-weight: 800; display: inline-block;}
-.skill-box { display: inline-block; margin-left: 8px; font-size: 12px; }
-.money-main { font-size: 15px; font-weight: 800; color: var(--ink); }
-.money-sub { font-size: 11px; color: var(--mute); margin-top: 2px; }
+/* المودالات والتنبيهات */
+dialog { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; padding: 24px; width: min(400px, 92vw); }
+dialog::backdrop { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+dialog h2 { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
+dialog label { display: block; margin-bottom: 12px; color: var(--mute); font-size: 13px; font-weight: 700; }
+dialog input { width: 100%; margin-top: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: white; outline: none; }
+dialog input:focus { border-color: var(--ac); }
 
-dialog{background:var(--p);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(400px,92vw);}dialog::backdrop{background:rgba(0,0,0,.6)}
-dialog h2{margin:0 0 12px;font:800 20px 'Bricolage Grotesque'}dialog label{display:block;margin-bottom:10px;color:var(--mute);font-size:12px;font-weight:700}
-dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:white;}
-
-.custom-alert { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+.custom-alert { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999999; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
 .custom-alert.show { display: flex; opacity: 1; }
-.alert-box { background: var(--p2); border: 1px solid var(--line); border-radius: 16px; width: min(400px, 90vw); padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; transform: translateY(20px); transition: transform 0.3s ease; }
+.alert-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; width: min(400px, 90vw); padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.2s; }
 .custom-alert.show .alert-box { transform: translateY(0); }
-.alert-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: var(--ok); }
-.alert-message { font-size: 14px; color: var(--ink); margin-bottom: 20px; word-break: break-all; }
+.alert-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--c-pocket); }
+.alert-message { font-size: 14px; color: var(--ink); margin-bottom: 24px; }
 .alert-actions { display: flex; justify-content: flex-end; gap: 10px; }
 .alert-btn { background: var(--ac); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-.alert-btn:hover { background: var(--ac2); }
+.alert-btn:hover { background: #6b7aff; }
 .alert-btn.cancel { background: transparent; border: 1px solid var(--line); color: var(--ink); }
-.alert-btn.cancel:hover { background: var(--p); }
 
-@media (max-width: 992px) {
-    .hero { grid-template-columns: 1fr; } 
-    .kp { grid-template-columns: 1fr 1fr; }
-}
+/* التجاوب مع الشاشات */
+@media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) {
-    .w { padding: 12px 10px 40px; }
-    .bar { flex-direction: column; align-items: stretch; gap: 10px; }
-    .sp { display: none; }
-    .lang-menu, .user-menu { width: 100%; margin: 0; }
-    .lang-trigger, .user-trigger { width: 100%; justify-content: space-between; padding: 10px; }
-    .bar > .b { width: 100%; justify-content: center; padding: 10px; }
-    .kp { grid-template-columns: 1fr; gap: 10px; }
-    .tb { flex-direction: column; align-items: stretch; gap: 10px; }
-    .tb input[type=search] { width: 100%; min-width: 100%; }
-    .tb .b { width: 100%; justify-content: center; padding: 12px; }
-    th { padding: 12px 10px; font-size: 11px; }
-    td { padding: 12px 10px; font-size: 12px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .bar { flex-direction: column; align-items: stretch; }
+    .lang-menu, .user-menu { width: 100%; }
+    .lang-trigger, .user-trigger { justify-content: space-between; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar input[type=search] { width: 100%; }
+    .bar > .b { width: 100%; justify-content: center; }
 }
+@media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -123,176 +160,243 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 {% set total_worth = accounts | sum(attribute='total_money') %}
 {% set total_cash = accounts | sum(attribute='cash') %}
 {% set total_bank = accounts | sum(attribute='bank') %}
-{% set online_count = accounts | selectattr('online') | list | length %}
-{% set health_percent = (online_count / accounts|length * 100)|round|int if accounts|length > 0 else 0 %}
 
 <div class="w">
-<div class="bar">
-  <div class="logo"><i></i>Farmledger</div>
-  <div class="meta"><span><b id="meta-acc">{{ accounts|length }}</b> <span data-i18n="accounts">حسابات</span></span><span><b id="meta-live">{{ online_count }}</b> <span data-i18n="live">متصل</span></span></div>
-  <div class="sp"></div>
-  
-  <div class="lang-menu">
-    <div class="lang-trigger" onclick="toggleLangMenu(event)">
-      <span id="current-lang-flag">🇸🇦</span>
-      <span id="current-lang-name" data-i18n="lang_ar">عربي</span>
-      <svg class="icon" style="width:10px; height:10px;" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+    <!-- التوب بار -->
+    <div class="bar">
+        <div class="logo"><i></i>Farmledger</div>
+        <div class="sp"></div>
+        
+        <div class="lang-menu">
+            <div class="lang-trigger" onclick="document.getElementById('langDropdown').classList.toggle('show')">
+                <span id="current-lang-flag">🇸🇦</span>
+                <span data-i18n="lang_ar">عربي</span>
+            </div>
+            <div class="dropdown" id="langDropdown">
+                <button onclick="changeLanguage('ar')">🇸🇦 <span data-i18n="lang_ar">عربي</span></button>
+                <button onclick="changeLanguage('en')">🇺🇸 <span data-i18n="lang_en">English</span></button>
+            </div>
+        </div>
+
+        <button class="b" type="button" onclick="refreshData(this)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.02 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            <span data-i18n="refresh">تحديث</span>
+        </button>
+
+        <button class="b pri" id="copy-script" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span data-i18n="copy_script">نسخ السكربت</span>
+        </button>
+
+        {% if my_key == 'admin' %}
+        <a href="/admin" class="b" style="color: var(--gold); border-color: var(--gold);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>الإدارة</span>
+        </a>
+        {% endif %}
+
+        <div class="user-menu">
+            <div class="user-trigger" onclick="document.getElementById('uDropdown').classList.toggle('show')">
+                <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
+                <div style="font-weight: 700;">{{ my_key | default('Overseer') }}</div>
+            </div>
+            <div class="dropdown" id="uDropdown">
+                <button type="button" onclick="openResetModal()">
+                    <span data-i18n="reset_pass">تغيير الباسورد</span>
+                </button>
+                <div class="dropdown-divider"></div>
+                <a href="/logout">
+                    <span data-i18n="sign_out">تسجيل خروج</span>
+                </a>
+            </div>
+        </div>
     </div>
-    <div class="lang-dropdown" id="langDropdown">
-      <button onclick="changeLanguage('ar')">🇸🇦 <span data-i18n="lang_ar">عربي</span></button>
-      <button onclick="changeLanguage('en')">🇺🇸 <span data-i18n="lang_en">English</span></button>
-      <button onclick="changeLanguage('th')">🇹🇭 <span data-i18n="lang_th">Thailand</span></button>
+
+    <!-- العنوان الرئيسي -->
+    <div class="header-title">
+        <h1 data-i18n="dashboard_title">Farmledger Dashboard</h1>
+        <p>
+            <span>{{ accounts|length }}</span> <span data-i18n="accounts">حسابات</span> • 
+            <span>{{ online_count }}</span> <span data-i18n="live">متصل</span>
+        </p>
     </div>
-  </div>
 
-  <button class="b live on" type="button"><span class="dot"></span><span data-i18n="live_status">مباشر</span></button>
-  
-  <button class="b" type="button" onclick="refreshData(this)">
-    <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.02 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-    <span data-i18n="refresh">تحديث</span>
-  </button>
-  
-  <button class="b pri" id="copy-script" type="button">
-    <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-    <span data-i18n="copy_script">نسخ السكربت</span>
-  </button>
+    <!-- البطاقات العلوية (الستايل الجديد) -->
+    <div class="stats-grid">
+        <!-- الكاش -->
+        <div class="stat-card c-pocket">
+            <div class="stat-top">
+                <div class="stat-title" data-i18n="pocket_money">الكاش (Pocket)</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                </div>
+            </div>
+            <div class="stat-value">${{ "{:,.0f}".format(total_cash) }}</div>
+            <div class="stat-sub" data-i18n="total_cash_sub">إجمالي الكاش في الحسابات</div>
+        </div>
 
-  {% if my_key == 'admin' %}
-  <a href="/admin" class="b" style="color: var(--gold); border-color: var(--gold);">
-    <svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-    <span>لوحة الإدارة</span>
-  </a>
-  {% endif %}
+        <!-- البنك -->
+        <div class="stat-card c-bank">
+            <div class="stat-top">
+                <div class="stat-title" data-i18n="bank_money">البنك (Bank)</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg>
+                </div>
+            </div>
+            <div class="stat-value">${{ "{:,.0f}".format(total_bank) }}</div>
+            <div class="stat-sub" data-i18n="total_bank_sub">إجمالي البنك في الحسابات</div>
+        </div>
 
-  <div class="user-menu">
-    <div class="user-trigger" onclick="toggleUserMenu(event)">
-      <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
-      <div class="user-name">{{ my_key | default('Overseer') }}</div>
+        <!-- الإجمالي -->
+        <div class="stat-card c-total">
+            <div class="stat-top">
+                <div class="stat-title" data-i18n="total_money">إجمالي الثروة</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/></svg>
+                </div>
+            </div>
+            <div class="stat-value">${{ "{:,.0f}".format(total_worth) }}</div>
+            <div class="stat-sub" data-i18n="total_money_sub">الكاش + البنك</div>
+        </div>
+
+        <!-- المجمع -->
+        <div class="stat-card c-profit">
+            <div class="stat-top">
+                <div class="stat-title" data-i18n="session_profit">أرباح الجلسة</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M7 17l9.2-9.2"/><path d="M7 7h10v10"/></svg>
+                </div>
+            </div>
+            <div class="stat-value">${{ "{:,.0f}".format(total_farmed) }}</div>
+            <div class="stat-sub" data-i18n="session_profit_sub">المجمع من بداية التشغيل</div>
+        </div>
+
+        <!-- الحسابات -->
+        <div class="stat-card c-acc">
+            <div class="stat-top">
+                <div class="stat-title" data-i18n="total_acc">إجمالي الحسابات</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+            </div>
+            <div class="stat-value">{{ accounts|length }}</div>
+            <div class="stat-sub" data-i18n="total_acc_sub">حسابات مسجلة</div>
+        </div>
+
+        <!-- المتصلين -->
+        <div class="stat-card c-online">
+            <div class="stat-top">
+                <div class="stat-title" data-i18n="online_status">متصل الآن</div>
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+            </div>
+            <div class="stat-value">{{ online_count }}</div>
+            <div class="stat-sub">
+                {% if accounts|length > 0 %}
+                {{ (online_count / accounts|length * 100)|round|int }}% <span data-i18n="active">نشط</span>
+                {% else %}
+                0% <span data-i18n="active">نشط</span>
+                {% endif %}
+            </div>
+        </div>
     </div>
-    <div class="user-dropdown" id="uDropdown">
-      <button type="button" onclick="openResetModal(event)">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-        <span data-i18n="reset_pass">تغيير الباسورد</span>
-      </button>
-      <div class="dropdown-divider"></div>
-      <a href="/logout">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        <span data-i18n="sign_out">تسجيل خروج</span>
-      </a>
+
+    <!-- شريط الأدوات -->
+    <div class="toolbar">
+        <input type="search" id="searchInput" placeholder="ابحث عن اسم الحساب..." data-i18n-placeholder="search_placeholder">
+        
+        <button class="b" id="copySelectedBtn" onclick="copySelected()" style="color:var(--ac); display:none;">
+            <span data-i18n="copy_selected">نسخ المحدد</span> (<span id="selectedCountCopy">0</span>)
+        </button>
+        <button class="b" id="deleteSelectedBtn" onclick="deleteSelected()" style="color:var(--bad); display:none;">
+            <span data-i18n="delete_selected">حذف المحدد</span> (<span id="selectedCount">0</span>)
+        </button>
     </div>
-  </div>
-</div>
 
-<div class="hero">
-  <div class="card net">
-    <div class="lbl" data-i18n="total_worth">إجمالي الثروة</div>
-    <div class="big" id="stat-worth">${{ "{:,.0f}".format(total_worth) }}</div>
-    <div class="sub" data-i18n="avg_worth">المتوسط لكل حساب</div>
-  </div>
-  <div class="kp">
-    <div class="card"><div class="lbl" data-i18n="total_cash">إجمالي الكاش</div><div class="kv up" id="stat-cash">${{ "{:,.0f}".format(total_cash) }}</div></div>
-    <div class="card"><div class="lbl" data-i18n="total_bank">إجمالي البنك</div><div class="kv up" style="color:var(--ac)" id="stat-bank">${{ "{:,.0f}".format(total_bank) }}</div></div>
-    <div class="card"><div class="lbl" data-i18n="total_acc">إجمالي الحسابات</div><div class="kv gd" id="stat-acc">{{ accounts|length }}</div></div>
-    <div class="card" style="display:flex;align-items:center;gap:14px;">
-      <svg width="62" height="62" viewBox="0 0 62 62">
-        <circle cx="31" cy="31" r="25" fill="none" stroke="var(--p2)" stroke-width="7"/>
-        <circle id="stat-health-circle" cx="31" cy="31" r="25" fill="none" stroke="var(--ok)" stroke-width="7" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="{{ 157 - (157 * (health_percent / 100)) }}" transform="rotate(-90 31 31)"/>
-      </svg>
-      <div><div class="lbl" data-i18n="health">الحالة</div><div class="kv" id="stat-health-text">{{ health_percent }}%</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="tb">
-    <input type="search" id="searchInput" placeholder="ابحث عن اسم الحساب..." data-i18n-placeholder="search_placeholder">
-    
-    <button class="b" id="copySelectedBtn" onclick="copySelected()" style="color:var(--ac); display:none;">
-      <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      <span data-i18n="copy_selected">نسخ المحدد</span> (<span id="selectedCountCopy">0</span>)
-    </button>
-    <button class="b" id="deleteSelectedBtn" onclick="deleteSelected()" style="color:var(--bad); display:none;">
-      <svg class="icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      <span data-i18n="delete_selected">حذف المحدد</span> (<span id="selectedCount">0</span>)
-    </button>
-</div>
-
-<div class="tw">
-    <table>
-        <thead>
-            <tr>
-                <th style="width:40px; cursor: default;"><input type="checkbox" id="selectAll"></th>
-                <th onclick="sortTable('name')">
-                    <div style="display:flex; align-items:center; justify-content:flex-end;">
-                        <span data-i18n="th_account">الحساب</span>
-                        <span id="icon-name" class="sort-icon"></span>
-                    </div>
-                </th>
-                <th onclick="sortTable('level')">
-                    <div style="display:flex; align-items:center; justify-content:flex-end;">
-                        <span data-i18n="th_level">المستوى</span>
-                        <span id="icon-level" class="sort-icon"></span>
-                    </div>
-                </th>
-                <th data-i18n="th_skills" style="cursor: default;">المهارات</th>
-                <th style="cursor: default;">الوقت</th> <!-- 🔴 العمود الجديد -->
-                <th style="cursor: default;">المجمع</th> <!-- 🔴 العمود الجديد -->
-                <th onclick="sortTable('money')">
-                    <div style="display:flex; align-items:center; justify-content:flex-end;">
-                        <span data-i18n="th_money">الفلوس</span>
-                        <span id="icon-money" class="sort-icon"></span>
-                    </div>
-                </th>
-            </tr>
-        </thead>
-        <tbody id="table-body">
-            {% for a in accounts %}
-            <tr class="account-row" data-level="{{ a.total_level or 0 }}" data-money="{{ a.total_money or 0 }}">
-                <td><input type="checkbox" class="row-checkbox" value="{{ a.name }}"></td>
-                <td>
-                    <div class="acc-name">{{ a.name }}</div>
-                    <div style="margin-top:4px;">
-                        {% if a.online %}
-                            <span class="badge online" data-i18n="online">متصل</span>
+    <!-- الجدول -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:40px; cursor: default;"><input type="checkbox" id="selectAll"></th>
+                    <th onclick="sortTable('name')">
+                        <div style="display:flex; align-items:center; justify-content:flex-end;">
+                            <span data-i18n="th_account">الحساب</span>
+                        </div>
+                    </th>
+                    <th onclick="sortTable('level')">
+                        <div style="display:flex; align-items:center; justify-content:flex-end;">
+                            <span data-i18n="th_level">المستوى</span>
+                        </div>
+                    </th>
+                    <th data-i18n="th_skills" style="cursor: default;">المهارات</th>
+                    <th style="cursor: default;">الوقت</th>
+                    <th style="cursor: default;">المجمع</th>
+                    <th onclick="sortTable('money')">
+                        <div style="display:flex; align-items:center; justify-content:flex-end;">
+                            <span data-i18n="th_money">الفلوس</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                {% for a in accounts %}
+                <tr class="account-row" data-level="{{ a.total_level or 0 }}" data-money="{{ a.total_money or 0 }}">
+                    <td><input type="checkbox" class="row-checkbox" value="{{ a.name }}"></td>
+                    <td>
+                        <div class="acc-name">{{ a.name }}</div>
+                        <div>
+                            {% if a.online %}
+                                <span class="badge online" data-i18n="online">متصل</span>
+                            {% else %}
+                                <span class="badge offline" data-i18n="offline">غير متصل</span>
+                            {% endif %}
+                            <span class="badge pc">{{ a.pc }}</span>
+                        </div>
+                    </td>
+                    <td><span style="color:var(--ac); font-weight:800; font-size:14px;">{{ a.total_level or 0 }}</span></td>
+                    <td>
+                        {% if a.skills %}
+                            {% for skill_name, skill_level in a.skills.items() %}
+                                <span style="color:var(--mute); font-size:12px;">{{ skill_name | capitalize }}:</span><span style="color:var(--ink); font-size:12px; font-weight:700; margin-right:6px;">{{ skill_level }}</span>
+                            {% endfor %}
                         {% else %}
-                            <span class="badge offline" data-i18n="offline">غير متصل</span>
+                            <span style="color:var(--mute); font-size:12px;" data-i18n="no_skills">لا يوجد مهارات</span>
                         {% endif %}
-                        <span class="badge pc">{{ a.pc }}</span>
-                    </div>
-                </td>
-                <td><span class="level-badge">{{ a.total_level or 0 }}</span></td>
-                <td>
-                    {% if a.skills %}
-                        {% for skill_name, skill_level in a.skills.items() %}
-                            <span class="skill-box" style="color:var(--mute);">{{ skill_name | capitalize }}:</span><span class="skill-box" style="color:var(--ink);">{{ skill_level }}</span>
-                        {% endfor %}
-                    {% else %}
-                        <span style="color:var(--mute);" data-i18n="no_skills">لا يوجد مهارات</span>
-                    {% endif %}
-                </td>
-                <td><span class="level-badge" style="background:rgba(255,193,90,0.1); color:var(--gold);">{{ a.uptime_str }}</span></td> <!-- 🔴 الوقت -->
-                <td><div style="font-size:14px; font-weight:800; color: {% if a.farmed >= 0 %}var(--ok){% else %}var(--bad){% endif %};">{% if a.farmed >= 0 %}+{% endif %}${{ "{:,.0f}".format(a.farmed or 0) }}</div></td> <!-- 🔴 المجمع -->
-                <td>
-                    <div class="money-main">${{ "{:,.0f}".format(a.total_money or 0) }}</div>
-                    <div class="money-sub">Cash: ${{ "{:,.0f}".format(a.cash or 0) }} | Bank: ${{ "{:,.0f}".format(a.bank or 0) }}</div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    {% if not accounts %}
-        <div style="text-align:center; padding:40px; color:var(--mute);" data-i18n="waiting">لا توجد حسابات، في انتظار السكربت...</div>
-    {% endif %}
-</div>
+                    </td>
+                    <td><span class="uptime-badge">{{ a.uptime_str }}</span></td>
+                    <td>
+                        <div class="{% if a.farmed >= 0 %}farmed-up{% else %}farmed-down{% endif %}">
+                            {% if a.farmed >= 0 %}+{% endif %}${{ "{:,.0f}".format(a.farmed or 0) }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="money-total">${{ "{:,.0f}".format(a.total_money or 0) }}</div>
+                        <div class="money-sub">
+                            Cash: <span class="money-cash">${{ "{:,.0f}".format(a.cash or 0) }}</span> | 
+                            Bank: <span class="money-bank">${{ "{:,.0f}".format(a.bank or 0) }}</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if not accounts %}
+            <div style="text-align:center; padding:60px; color:var(--mute);" data-i18n="waiting">لا توجد حسابات، في انتظار السكربت...</div>
+        {% endif %}
+    </div>
 </div>
 
+<!-- المودالات -->
 <dialog id="resetModal">
   <form method="dialog" id="resetForm">
     <h2 data-i18n="reset_title">تغيير الباسورد</h2>
     <label><span data-i18n="new_pass">الباسورد الجديد</span><input type="password" name="newpass" id="newPass" required minlength="4"></label>
-    <div style="display:flex;gap:8px;margin-top:15px">
-      <button class="b pri" value="ok" style="flex:1" data-i18n="save">حفظ</button>
-      <button class="b" value="x" formnovalidate style="flex:1" data-i18n="cancel">إلغاء</button>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="b pri" value="ok" style="flex:1; justify-content:center;" data-i18n="save">حفظ</button>
+      <button class="b" value="x" formnovalidate style="flex:1; justify-content:center;" data-i18n="cancel">إلغاء</button>
     </div>
   </form>
 </dialog>
@@ -311,70 +415,50 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 const MY_KEY = "{{ my_key | default('Overseer') }}";
 let currentLang = 'ar';
 
-const sortIcons = {
-    none: `<svg viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>`,
-    asc: `<svg viewBox="0 0 24 24"><path d="m7 9 5-5 5 5"/><path d="M12 4v16"/></svg>`,
-    desc: `<svg viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="M12 4v16"/></svg>`
-};
-
 const translations = {
     ar: {
-        lang_ar: "عربي", lang_en: "English", lang_th: "Thailand",
-        accounts: "حسابات", live: "متصل", live_status: "مباشر", refresh: "تحديث",
+        lang_ar: "عربي", lang_en: "English",
+        accounts: "حسابات", live: "متصل", refresh: "تحديث",
         copy_script: "نسخ السكربت", reset_pass: "تغيير الباسورد", sign_out: "تسجيل خروج",
-        total_worth: "إجمالي الثروة", avg_worth: "المتوسط لكل حساب",
-        total_cash: "إجمالي الكاش", total_bank: "إجمالي البنك", total_acc: "إجمالي الحسابات",
-        health: "الحالة", search_placeholder: "ابحث عن اسم الحساب...",
-        copy_selected: "نسخ المحدد", delete_selected: "حذف المحدد",
+        dashboard_title: "Farmledger Dashboard",
+        pocket_money: "الكاش (Pocket)", total_cash_sub: "إجمالي الكاش في الحسابات",
+        bank_money: "البنك (Bank)", total_bank_sub: "إجمالي البنك في الحسابات",
+        total_money: "إجمالي الثروة", total_money_sub: "الكاش + البنك",
+        session_profit: "أرباح الجلسة", session_profit_sub: "المجمع من بداية التشغيل",
+        total_acc: "إجمالي الحسابات", total_acc_sub: "حسابات مسجلة",
+        online_status: "متصل الآن", active: "نشط",
+        search_placeholder: "ابحث عن اسم الحساب...", copy_selected: "نسخ المحدد", delete_selected: "حذف المحدد",
         th_account: "الحساب", th_level: "المستوى", th_skills: "المهارات", th_money: "الفلوس",
         online: "متصل", offline: "غير متصل", no_skills: "لا يوجد مهارات",
         waiting: "لا توجد حسابات، في انتظار السكربت...",
         reset_title: "تغيير الباسورد", new_pass: "الباسورد الجديد", save: "حفظ", cancel: "إلغاء",
-        success: "تم بنجاح", error: "خطأ", copied: "تم النسخ", deleted: "تم الحذف",
+        success: "تم بنجاح", error: "خطأ", copied: "تم النسخ",
         copy_success: "تم النسخ بنجاح!", delete_confirm: "هل أنت متأكد من حذف الحسابات المحددة؟",
         pass_changed: "تم تغيير الباسورد بنجاح!", yes: "نعم", no: "إلغاء"
     },
     en: {
-        lang_ar: "عربي", lang_en: "English", lang_th: "Thailand",
-        accounts: "accounts", live: "live", live_status: "Live", refresh: "Refresh",
+        lang_ar: "عربي", lang_en: "English",
+        accounts: "accounts", live: "online", refresh: "Refresh",
         copy_script: "Copy Script", reset_pass: "Reset Password", sign_out: "Sign Out",
-        total_worth: "Total net worth", avg_worth: "Average per account",
-        total_cash: "Total Cash", total_bank: "Total Bank", total_acc: "Total Accounts",
-        health: "Health", search_placeholder: "Search account name...",
-        copy_selected: "Copy Selected", delete_selected: "Delete Selected",
+        dashboard_title: "Farmledger Dashboard",
+        pocket_money: "Pocket Money", total_cash_sub: "Total in all accounts",
+        bank_money: "Bank Money", total_bank_sub: "Total in bank accounts",
+        total_money: "Total Money", total_money_sub: "Cash + Bank",
+        session_profit: "Session Profit", session_profit_sub: "Farmed since start",
+        total_acc: "Total Accounts", total_acc_sub: "Registered accounts",
+        online_status: "Online Accounts", active: "active",
+        search_placeholder: "Search account name...", copy_selected: "Copy Selected", delete_selected: "Delete Selected",
         th_account: "ACCOUNT", th_level: "LEVEL", th_skills: "SKILLS", th_money: "MONEY",
         online: "Online", offline: "Offline", no_skills: "No skills",
         waiting: "No accounts found, waiting for script...",
         reset_title: "Reset Password", new_pass: "New Password", save: "Save", cancel: "Cancel",
-        success: "Success", error: "Error", copied: "Copied", deleted: "Deleted",
+        success: "Success", error: "Error", copied: "Copied",
         copy_success: "Copied successfully!", delete_confirm: "Are you sure you want to delete selected accounts?",
         pass_changed: "Password changed successfully!", yes: "Yes", no: "Cancel"
-    },
-    th: {
-        lang_ar: "عربي", lang_en: "English", lang_th: "Thailand",
-        accounts: "บัญชี", live: "ออนไลน์", live_status: "ไลฟ์", refresh: "รีเฟรช",
-        copy_script: "คัดลอกสคริปต์", reset_pass: "เปลี่ยนรหัสผ่าน", sign_out: "ออกจากระบบ",
-        total_worth: "มูลค่ารวม", avg_worth: "ค่าเฉลี่ยต่อบัญชี",
-        total_cash: "เงินสดรวม", total_bank: "ธนาคารรวม", total_acc: "บัญชีทั้งหมด",
-        health: "สถานะ", search_placeholder: "ค้นหาชื่อบัญชี...",
-        copy_selected: "คัดลอกที่เลือก", delete_selected: "ลบที่เลือก",
-        th_account: "บัญชี", th_level: "เลเวล", th_skills: "สกิล", th_money: "เงิน",
-        online: "ออนไลน์", offline: "ออฟไลน์", no_skills: "ไม่มีสกิล",
-        waiting: "ไม่พบบัญชี กำลังรอสคริปต์...",
-        reset_title: "เปลี่ยนรหัสผ่าน", new_pass: "รหัสผ่านใหม่", save: "บันทึก", cancel: "ยกเลิก",
-        success: "สำเร็จ", error: "ข้อผิดพลาด", copied: "คัดลอกแล้ว", deleted: "ลบแล้ว",
-        copy_success: "คัดลอกสำเร็จ!", delete_confirm: "แน่ใจหรือไม่ว่าต้องการลบบัญชีที่เลือก?",
-        pass_changed: "เปลี่ยนรหัสผ่านสำเร็จ!", yes: "ใช่", no: "ยกเลิก"
     }
 };
 
 let sortStates = { name: 0, level: 0, money: 0 };
-
-function updateSortIcons() {
-    document.getElementById('icon-name').innerHTML = sortIcons[sortStates.name === 1 ? 'desc' : sortStates.name === 2 ? 'asc' : 'none'];
-    document.getElementById('icon-level').innerHTML = sortIcons[sortStates.level === 1 ? 'desc' : sortStates.level === 2 ? 'asc' : 'none'];
-    document.getElementById('icon-money').innerHTML = sortIcons[sortStates.money === 1 ? 'desc' : sortStates.money === 2 ? 'asc' : 'none'];
-}
 
 function applyCurrentSort() {
     let activeCol = null, state = 0;
@@ -409,37 +493,32 @@ function applyCurrentSort() {
 function sortTable(col) {
     sortStates[col] = (sortStates[col] + 1) % 3;
     Object.keys(sortStates).forEach(k => { if(k !== col) sortStates[k] = 0; });
-    updateSortIcons();
     applyCurrentSort();
 }
 
 async function refreshData(btn) {
     const originalText = btn.innerHTML;
-    btn.innerHTML = `<svg class="icon" style="animation: spin 1s linear infinite;" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.02 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`;
+    btn.innerHTML = `<svg width="14" height="14" class="icon" style="animation: spin 1s linear infinite;" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1.02 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`;
     
     try {
         const res = await fetch(window.location.href);
         const text = await res.text();
         const doc = new DOMParser().parseFromString(text, 'text/html');
-
+        
+        // تحديث الجدول
         document.getElementById('table-body').innerHTML = doc.getElementById('table-body').innerHTML;
-        document.getElementById('stat-worth').innerText = doc.getElementById('stat-worth').innerText;
-        document.getElementById('stat-cash').innerText = doc.getElementById('stat-cash').innerText;
-        document.getElementById('stat-bank').innerText = doc.getElementById('stat-bank').innerText;
-        document.getElementById('stat-acc').innerText = doc.getElementById('stat-acc').innerText;
-        document.getElementById('stat-health-text').innerText = doc.getElementById('stat-health-text').innerText;
-        document.getElementById('stat-health-circle').setAttribute('stroke-dashoffset', doc.getElementById('stat-health-circle').getAttribute('stroke-dashoffset'));
-        document.getElementById('meta-acc').innerText = doc.getElementById('meta-acc').innerText;
-        document.getElementById('meta-live').innerText = doc.getElementById('meta-live').innerText;
-
+        
+        // تحديث البطاقات العلوية
+        const statsGrid = document.querySelector('.stats-grid');
+        const newStatsGrid = doc.querySelector('.stats-grid');
+        if (statsGrid && newStatsGrid) statsGrid.innerHTML = newStatsGrid.innerHTML;
+        
         bindCheckboxes();
         applyLanguage(currentLang);
         applyCurrentSort();
         document.getElementById('searchInput').dispatchEvent(new Event('input'));
         
-    } catch (e) {
-        console.error("Refresh failed", e);
-    }
+    } catch (e) { console.error("Refresh failed", e); }
     btn.innerHTML = originalText;
 }
 
@@ -457,24 +536,12 @@ function applyLanguage(lang) {
     if (lang === 'ar') {
         document.body.setAttribute('dir', 'rtl');
         document.getElementById('current-lang-flag').innerText = '🇸🇦';
-        document.getElementById('current-lang-name').innerText = 'عربي';
-    } else if (lang === 'en') {
-        document.body.setAttribute('dir', 'ltr');
-        document.getElementById('current-lang-flag').innerText = '🇺🇸';
-        document.getElementById('current-lang-name').innerText = 'English';
     } else {
         document.body.setAttribute('dir', 'ltr');
-        document.getElementById('current-lang-flag').innerText = '🇹🇭';
-        document.getElementById('current-lang-name').innerText = 'Thailand';
+        document.getElementById('current-lang-flag').innerText = '🇺🇸';
     }
-    updateSortIcons();
 }
 
-function toggleLangMenu(e) {
-    if(e) e.stopPropagation();
-    document.getElementById('langDropdown').classList.toggle('show');
-    document.getElementById('uDropdown').classList.remove('show');
-}
 function changeLanguage(lang) {
     applyLanguage(lang);
     document.getElementById('langDropdown').classList.remove('show');
@@ -501,19 +568,13 @@ function showAlert(titleKey, msgKey, isConfirm = false, onConfirm = null) {
 function confirmAction() { closeAlert(); if (confirmCallback) confirmCallback(); }
 function closeAlert() { document.getElementById('customAlert').classList.remove('show'); }
 
-function toggleUserMenu(e) {
-    if(e) e.stopPropagation();
-    document.getElementById('uDropdown').classList.toggle("show");
-    document.getElementById('langDropdown').classList.remove("show");
-}
-function openResetModal(e) {
-    if(e) e.stopPropagation();
+function openResetModal() {
     document.getElementById('uDropdown').classList.remove("show");
     document.getElementById("resetModal").showModal();
 }
 window.addEventListener('click', function(e) {
-    if (!e.target.closest('.user-menu')) document.getElementById('uDropdown').classList.remove('show');
-    if (!e.target.closest('.lang-menu')) document.getElementById('langDropdown').classList.remove('show');
+    if (!e.target.closest('.user-menu')) document.getElementById('uDropdown')?.classList.remove('show');
+    if (!e.target.closest('.lang-menu')) document.getElementById('langDropdown')?.classList.remove('show');
 });
 
 document.getElementById('selectAll').addEventListener('change', function(e) {
