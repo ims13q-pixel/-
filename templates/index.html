@@ -62,10 +62,6 @@ th { text-align: left; padding: 16px; color: var(--mute); font-size: 13px; font-
 th:hover { color: var(--ink); }
 td { padding: 16px; border-bottom: 1px solid var(--line); vertical-align: middle; white-space: nowrap; }
 tr:hover { background: var(--panel-hover); }
-.sort-icon { display: inline-block; width: 12px; height: 12px; margin-left: 6px; opacity: 0.3; vertical-align: middle; }
-.sort-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-th:hover .sort-icon { opacity: 0.7; }
-.sort-icon.active { opacity: 1; color: var(--ac); }
 .acc-name { font-weight: 600; color: var(--ink); font-size: 15px; }
 .badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-top: 6px; }
 .badge.online { background: rgba(46, 160, 67, 0.15); color: var(--c-pocket); }
@@ -111,6 +107,10 @@ dialog input:focus { border-color: var(--ac); }
 </head>
 <body>
 
+{% set total_worth = accounts | sum(attribute='total_money') %}
+{% set total_cash = accounts | sum(attribute='cash') %}
+{% set total_bank = accounts | sum(attribute='bank') %}
+
 <div class="w">
     <div class="bar">
         <div class="logo"><i></i>Farmledger</div>
@@ -127,7 +127,7 @@ dialog input:focus { border-color: var(--ac); }
                 <div>{{ my_key | default('Overseer') }}</div>
             </div>
             <div class="dropdown" id="uDropdown">
-                <button type="button" onclick="openResetModal()">Reset Password</button>
+                <button type="button" onclick="document.getElementById('resetModal').showModal()">Reset Password</button>
                 <div class="dropdown-divider"></div>
                 <a href="/logout">Sign Out</a>
             </div>
@@ -136,16 +136,40 @@ dialog input:focus { border-color: var(--ac); }
 
     <div class="header-title">
         <h1>Farmledger Dashboard</h1>
-        <p><span id="meta-acc">0</span> accounts • <span id="meta-live">0</span> online</p>
+        <p><span id="meta-acc">{{ accounts|length }}</span> accounts • <span id="meta-live">-</span> online</p>
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card c-pocket"><div class="stat-top"><div class="stat-title">Pocket Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div></div><div class="stat-value" id="stat-cash">$0</div><div class="stat-sub">Total in all accounts</div></div>
-        <div class="stat-card c-bank"><div class="stat-top"><div class="stat-title">Bank Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div></div><div class="stat-value" id="stat-bank">$0</div><div class="stat-sub">Total in bank accounts</div></div>
-        <div class="stat-card c-total"><div class="stat-top"><div class="stat-title">Total Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/></svg></div></div><div class="stat-value" id="stat-worth">$0</div><div class="stat-sub">Cash + Bank</div></div>
-        <div class="stat-card c-profit"><div class="stat-top"><div class="stat-title">Session Profit</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 17l9.2-9.2"/><path d="M7 7h10v10"/></svg></div></div><div class="stat-value" id="stat-farmed">$0</div><div class="stat-sub">Farmed recently</div></div>
-        <div class="stat-card c-acc"><div class="stat-top"><div class="stat-title">Total Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div><div class="stat-value" id="stat-acc">0</div><div class="stat-sub">Registered accounts</div></div>
-        <div class="stat-card c-online"><div class="stat-top"><div class="stat-title">Online Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div><div class="stat-value" id="stat-online">0</div><div class="stat-sub" id="stat-active-percent">0% active</div></div>
+        <div class="stat-card c-pocket">
+            <div class="stat-top"><div class="stat-title">Pocket Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div></div>
+            <div class="stat-value">${{ "{:,.0f}".format(total_cash) }}</div>
+            <div class="stat-sub">Total in all accounts</div>
+        </div>
+        <div class="stat-card c-bank">
+            <div class="stat-top"><div class="stat-title">Bank Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div></div>
+            <div class="stat-value">${{ "{:,.0f}".format(total_bank) }}</div>
+            <div class="stat-sub">Total in bank accounts</div>
+        </div>
+        <div class="stat-card c-total">
+            <div class="stat-top"><div class="stat-title">Total Money</div><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/></svg></div></div>
+            <div class="stat-value">${{ "{:,.0f}".format(total_worth) }}</div>
+            <div class="stat-sub">Cash + Bank</div>
+        </div>
+        <div class="stat-card c-profit">
+            <div class="stat-top"><div class="stat-title">Session Profit</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M7 17l9.2-9.2"/><path d="M7 7h10v10"/></svg></div></div>
+            <div class="stat-value">$0</div>
+            <div class="stat-sub">Farmed recently</div>
+        </div>
+        <div class="stat-card c-acc">
+            <div class="stat-top"><div class="stat-title">Total Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
+            <div class="stat-value">{{ accounts|length }}</div>
+            <div class="stat-sub">Registered accounts</div>
+        </div>
+        <div class="stat-card c-online">
+            <div class="stat-top"><div class="stat-title">Online Accounts</div><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></div>
+            <div class="stat-value">{{ accounts|selectattr('online')|list|length }}</div>
+            <div class="stat-sub">Active accounts</div>
+        </div>
     </div>
 
     <div class="toolbar">
@@ -157,20 +181,54 @@ dialog input:focus { border-color: var(--ac); }
             <thead>
                 <tr>
                     <th style="width:40px; cursor: default;"><input type="checkbox" id="selectAll"></th>
-                    <th onclick="sortTable('name')">Account <span id="icon-name" class="sort-icon"></span></th>
-                    <th onclick="sortTable('level')">Level <span id="icon-level" class="sort-icon"></span></th>
-                    <th style="cursor: default;">Skills</th>
-                    <th onclick="sortTable('uptime')">Uptime <span id="icon-uptime" class="sort-icon"></span></th>
-                    <th onclick="sortTable('farmed')">Farmed <span id="icon-farmed" class="sort-icon"></span></th>
-                    <th onclick="sortTable('cash')">Cash <span id="icon-cash" class="sort-icon"></span></th>
-                    <th onclick="sortTable('bank')">Bank <span id="icon-bank" class="sort-icon"></span></th>
-                    <th onclick="sortTable('total')">All (Total) <span id="icon-total" class="sort-icon"></span></th>
+                    <th>Account</th>
+                    <th>Level</th>
+                    <th>Skills</th>
+                    <th>Uptime</th>
+                    <th>Farmed</th>
+                    <th>Cash</th>
+                    <th>Bank</th>
+                    <th>All (Total)</th>
                 </tr>
             </thead>
             <tbody id="table-body">
-                <!-- JS يملأ هذا -->
+                {% for a in accounts %}
+                <tr class="account-row" data-level="{{ a.total_level or 0 }}" data-money="{{ a.total_money or 0 }}">
+                    <td><input type="checkbox" class="row-checkbox" value="{{ a.name }}"></td>
+                    <td>
+                        <div class="acc-name">{{ a.name }}</div>
+                        <div>
+                            {% if a.online %}
+                                <span class="badge online">Online</span>
+                            {% else %}
+                                <span class="badge offline">Offline</span>
+                            {% endif %}
+                            <span class="badge pc">{{ a.pc }}</span>
+                        </div>
+                    </td>
+                    <td><span style="color:var(--ac); font-weight:700; font-size:14px;">{{ a.total_level or 0 }}</span></td>
+                    <td>
+                        {% if a.skills %}
+                            {% for skill_name, skill_level in a.skills.items() %}
+                                <span style="color:var(--mute); font-size:12px;">{{ skill_name | capitalize }}:</span><span style="color:var(--ink); font-size:12px; font-weight:600; margin-right:6px; margin-left:2px;">{{ skill_level }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span style="color:var(--mute); font-size:12px;">None</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="uptime-badge">{{ a.uptime_str }}</span></td>
+                    <td><div class="{% if a.farmed >= 0 %}farmed-up{% else %}farmed-down{% endif %}">{% if a.farmed >= 0 %}+{% endif %}${{ "{:,.0f}".format(a.farmed or 0) }}</div></td>
+                    <td><div class="money-col money-cash">${{ "{:,.0f}".format(a.cash or 0) }}</div></td>
+                    <td><div class="money-col money-bank">${{ "{:,.0f}".format(a.bank or 0) }}</div></td>
+                    <td><div class="money-col money-total">${{ "{:,.0f}".format(a.total_money or 0) }}</div></td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
+        
+        {% if not accounts %}
+            <div style="text-align:center; padding:40px; color:var(--mute);">No accounts found, waiting for script...</div>
+        {% endif %}
     </div>
 </div>
 
@@ -195,200 +253,8 @@ dialog input:focus { border-color: var(--ac); }
 
 <script>
 const MY_KEY = "{{ my_key | default('Overseer') }}";
-let isUpdating = false;
-let currentData = [];
 
-const icons = {
-    none: `<svg viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>`,
-    asc: `<svg viewBox="0 0 24 24"><path d="m7 9 5-5 5 5"/><path d="M12 4v16"/></svg>`,
-    desc: `<svg viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"/><path d="M12 4v16"/></svg>`
-};
-
-let sortStates = { name: 0, level: 0, uptime: 0, farmed: 0, cash: 0, bank: 0, total: 0 };
-
-function updateSortIcons() {
-    for (let key in sortStates) {
-        let el = document.getElementById('icon-' + key);
-        if (el) {
-            el.innerHTML = icons.none;
-            el.classList.remove('active');
-            if (sortStates[key] === 1) { el.innerHTML = icons.asc; el.classList.add('active'); }
-            if (sortStates[key] === 2) { el.innerHTML = icons.desc; el.classList.add('active'); }
-        }
-    }
-}
-
-function renderTable(data) {
-    const tbody = document.getElementById('table-body');
-    const existingRows = {};
-    Array.from(tbody.querySelectorAll('tr.account-row')).forEach(tr => { existingRows[tr.dataset.name] = tr; });
-    const incomingNames = new Set();
-    const fragment = document.createDocumentFragment();
-
-    data.forEach(acc => {
-        incomingNames.add(acc.name);
-        let tr = existingRows[acc.name];
-
-        if (!tr) {
-            tr = document.createElement('tr');
-            tr.className = 'account-row';
-            tr.dataset.name = acc.name;
-            tr.innerHTML = `
-                <td><input type="checkbox" class="row-checkbox" value="${acc.name}"></td>
-                <td>
-                    <div class="acc-name">${acc.name}</div>
-                    <div>
-                        <span class="badge status-badge"></span>
-                        <span class="badge pc">${acc.pc}</span>
-                    </div>
-                </td>
-                <td><span class="val-level" style="color:var(--ac); font-weight:700; font-size:14px;"></span></td>
-                <td class="val-skills"></td>
-                <td><span class="uptime-badge val-uptime"></span></td>
-                <td><div class="val-farmed"></div></td>
-                <td><div class="money-col money-cash val-cash"></div></td>
-                <td><div class="money-col money-bank val-bank"></div></td>
-                <td><div class="money-col money-total val-total"></div></td>
-            `;
-            fragment.appendChild(tr);
-        }
-        
-        const statusBadge = tr.querySelector('.status-badge');
-        if(acc.online) { statusBadge.className = 'badge status-badge online'; statusBadge.innerText = 'Online'; } 
-        else { statusBadge.className = 'badge status-badge offline'; statusBadge.innerText = 'Offline'; }
-        
-        tr.querySelector('.val-level').innerText = acc.level;
-        
-        const skillsTd = tr.querySelector('.val-skills');
-        if (acc.skills && Object.keys(acc.skills).length > 0) {
-            let skillStr = '';
-            for (const [k, v] of Object.entries(acc.skills)) {
-                let skillName = k.charAt(0).toUpperCase() + k.slice(1);
-                skillStr += `<span style="color:var(--mute); font-size:12px;">${skillName}:</span><span style="color:var(--ink); font-size:12px; font-weight:600; margin-right:6px; margin-left:2px;">${v}</span>`;
-            }
-            skillsTd.innerHTML = skillStr;
-        } else { skillsTd.innerHTML = `<span style="color:var(--mute); font-size:12px;">None</span>`; }
-
-        let uptimeText = acc.uptime === "أقل من دقيقة" ? "< 1m" : acc.uptime.replace('س', 'h').replace('د', 'm');
-        tr.querySelector('.val-uptime').innerText = uptimeText;
-        
-        const farmedDiv = tr.querySelector('.val-farmed');
-        farmedDiv.className = acc.farmed >= 0 ? 'farmed-up' : 'farmed-down';
-        farmedDiv.innerText = (acc.farmed >= 0 ? '+' : '') + '$' + Number(acc.farmed).toLocaleString();
-
-        tr.querySelector('.val-cash').innerText = '$' + Number(acc.cash).toLocaleString();
-        tr.querySelector('.val-bank').innerText = '$' + Number(acc.bank).toLocaleString();
-        tr.querySelector('.val-total').innerText = '$' + Number(acc.total).toLocaleString();
-
-        tr.dataset.level = acc.level; tr.dataset.cash = acc.cash; tr.dataset.bank = acc.bank;
-        tr.dataset.total = acc.total; tr.dataset.farmed = acc.farmed; tr.dataset.uptime = uptimeText; 
-    });
-
-    Object.keys(existingRows).forEach(name => { if (!incomingNames.has(name)) existingRows[name].remove(); });
-    if(fragment.children.length > 0) tbody.appendChild(fragment);
-    
-    bindCheckboxes(); applySort(); document.getElementById('searchInput').dispatchEvent(new Event('input'));
-}
-
-async function fetchData() {
-    if (isUpdating) return;
-    isUpdating = true;
-    try {
-        const res = await fetch('/api/data');
-        const data = await res.json();
-        if(data.error) return;
-
-        document.getElementById('stat-cash').innerText = '$' + Number(data.total_cash).toLocaleString();
-        document.getElementById('stat-bank').innerText = '$' + Number(data.total_bank).toLocaleString();
-        document.getElementById('stat-worth').innerText = '$' + Number(data.total_worth).toLocaleString();
-        document.getElementById('stat-farmed').innerText = '$' + Number(data.total_farmed).toLocaleString();
-        document.getElementById('stat-acc').innerText = data.total_accounts;
-        document.getElementById('stat-online').innerText = data.online_count;
-        document.getElementById('meta-acc').innerText = data.total_accounts;
-        document.getElementById('meta-live').innerText = data.online_count;
-        
-        if(data.total_accounts > 0) document.getElementById('stat-active-percent').innerHTML = Math.round((data.online_count / data.total_accounts) * 100) + '% active';
-
-        currentData = data.accounts;
-        renderTable(currentData);
-    } catch (e) { console.error(e); }
-    isUpdating = false;
-}
-
-setInterval(fetchData, 3000);
-document.addEventListener("DOMContentLoaded", fetchData);
-
-function applySort() {
-    let activeCol = null, state = 0;
-    for (let k in sortStates) { if (sortStates[k] !== 0) { activeCol = k; state = sortStates[k]; break; } }
-    if (!activeCol) return;
-    const tbody = document.getElementById('table-body');
-    const rows = Array.from(tbody.querySelectorAll('tr.account-row'));
-    rows.sort((a, b) => {
-        let valA, valB;
-        if (activeCol === 'name') return state === 1 ? b.dataset.name.localeCompare(a.dataset.name) : a.dataset.name.localeCompare(b.dataset.name);
-        if (activeCol === 'uptime') return state === 1 ? b.dataset.uptime.localeCompare(a.dataset.uptime) : a.dataset.uptime.localeCompare(b.dataset.uptime);
-        valA = parseFloat(a.dataset[activeCol]) || 0; valB = parseFloat(b.dataset[activeCol]) || 0;
-        return state === 1 ? valB - valA : valA - valB;
-    });
-    tbody.innerHTML = ''; rows.forEach(row => tbody.appendChild(row));
-}
-
-function sortTable(col) {
-    sortStates[col] = (sortStates[col] + 1) % 3;
-    Object.keys(sortStates).forEach(k => { if(k !== col) sortStates[k] = 0; });
-    updateSortIcons(); applySort();
-}
-
-let confirmCallback = null;
-function showAlert(titleKey, msgKey, isConfirm = false, onConfirm = null) {
-    document.getElementById('customAlert').classList.add('show');
-    document.getElementById('alertTitle').innerText = titleKey;
-    document.getElementById('alertMessage').innerText = msgKey;
-    const actions = document.getElementById('alertActions');
-    if (isConfirm && onConfirm) {
-        actions.innerHTML = `<button class="alert-btn cancel" onclick="closeAlert()">Cancel</button><button class="alert-btn" style="background:var(--bad);" onclick="confirmAction()">Yes</button>`;
-        confirmCallback = onConfirm;
-    } else {
-        actions.innerHTML = `<button class="alert-btn" onclick="closeAlert()">OK</button>`;
-        confirmCallback = null;
-    }
-}
-function confirmAction() { closeAlert(); if (confirmCallback) confirmCallback(); }
-function closeAlert() { document.getElementById('customAlert').classList.remove('show'); }
-
-function openResetModal() {
-    document.getElementById('uDropdown').classList.remove("show");
-    document.getElementById("resetModal").showModal();
-}
-window.addEventListener('click', function(e) {
-    if (!e.target.closest('.user-menu')) document.getElementById('uDropdown')?.classList.remove('show');
-});
-
-document.getElementById('selectAll').addEventListener('change', function(e) {
-    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = e.target.checked);
-    updateSelectionButtons();
-});
-function bindCheckboxes() {
-    document.querySelectorAll('.row-checkbox').forEach(cb => cb.addEventListener('change', updateSelectionButtons));
-}
-
-function updateSelectionButtons() {
-    const count = document.querySelectorAll('.row-checkbox:checked').length;
-    const delBtn = document.getElementById('deleteSelectedBtn');
-    const copyBtn = document.getElementById('copySelectedBtn');
-    if(delBtn) delBtn.style.display = count > 0 ? 'inline-flex' : 'none';
-    if(copyBtn) copyBtn.style.display = count > 0 ? 'inline-flex' : 'none';
-}
-
-document.getElementById('searchInput').addEventListener('input', function(e) {
-    const val = e.target.value.toLowerCase();
-    document.querySelectorAll('.account-row').forEach(row => {
-        row.style.display = row.dataset.name.toLowerCase().includes(val) ? '' : 'none';
-    });
-});
-
-// 🔴 زر النسخ - السكربت اللي يقرأ الفلوس صح (بدون loadstring)
+// 🔴 زر النسخ - السكربت اللي يقرأ الفلوس صح (بدون loadstring وبدون أخطاء)
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
@@ -416,7 +282,6 @@ if not r then
     return
 end
 
--- إصلاح الخطأ البرمجي
 local function n(s)
     if not s then return 0 end
     local clean_str = string.gsub(s, "[^%d]", "")
@@ -434,7 +299,6 @@ task.spawn(function()
                 if o:IsA("TextLabel") then
                     local t = o.Text
                     
-                    -- الكود القديم حقك بالضبط
                     local bm = t:match("Bank Balance:%s*%$?([%d,]+)")
                     if bm then ba = n(bm) end
                     
@@ -478,8 +342,8 @@ print("[OVERSEER] 🚀 Script running!")`;
     textArea.select();
     try {
         document.execCommand('copy');
-        showAlert("Success", "Script copied successfully!");
-    } catch (err) { showAlert("Error", "Failed to copy script."); }
+        alert("Script copied successfully!");
+    } catch (err) { alert("Failed to copy script."); }
     document.body.removeChild(textArea);
 });
 
@@ -497,12 +361,21 @@ document.getElementById('resetForm').onsubmit = async function(e) {
         if(res.ok) { 
             document.getElementById("resetModal").close(); 
             document.getElementById("newPass").value = ""; 
-            showAlert("Success", "Password changed successfully!");
+            alert("Password changed successfully!");
         }
     } catch(err) {}
 };
 
-updateSortIcons();
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const val = e.target.value.toLowerCase();
+    document.querySelectorAll('.account-row').forEach(row => {
+        const name = row.querySelector('.acc-name').innerText.toLowerCase();
+        row.style.display = name.includes(val) ? '' : 'none';
+    });
+});
+
+// تحديث الصفحة كل 3 ثواني عشان الأرقام تتحدث تلقائياً
+setTimeout(() => { location.reload(); }, 3000);
 </script>
 <style>
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(46, 160, 67, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0); } }
