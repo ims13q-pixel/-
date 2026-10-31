@@ -162,7 +162,6 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
     <span data-i18n="refresh">تحديث</span>
   </button>
   
-  <!-- 🔴 زر النسخ -->
   <button class="b pri" id="copy-script" type="button">
     <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
     <span data-i18n="copy_script">نسخ السكربت</span>
@@ -315,7 +314,6 @@ dialog input{width:100%;margin-top:4px;background:var(--bg);border:1px solid var
 </div>
 
 <script>
-// 🔴 هنا السر: السيرفر يمرر اسم المستخدم (my_key) للمتغير هذا
 const MY_KEY = "{{ my_key | default('Overseer') }}";
 let currentLang = 'ar';
 
@@ -572,14 +570,14 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 
-// 🔴 هنا التعديل: زر النسخ يعبي اسم المستخدم والرابط تلقائياً
+// 🔴 هنا التعديل: اسم البيسي صار DDC 1 + كود يشتغل على كل المنفذات
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const btn = this;
-    const domain = window.location.origin; // ياخذ رابط الموقع اللي فاتحه
-    const key = MY_KEY; // ياخذ اسم المستخدم من الجلسة
+    const domain = window.location.origin;
+    const key = MY_KEY;
 
-    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["ACCOUNT_NAME"] = "${key}",\n    ["PC_NAME"] = "MR 1",\n    ["URL"] = "${domain}/api/report"\n}\n\nloadstring([[c=getgenv().OverseerConfig k=c.ACCOUNT_NAME w=c.URL pc=c.PC_NAME p=game:GetService"Players".LocalPlayer h=game:GetService"HttpService" r=request or http_request function n(s)return tonumber(s:gsub(",",""))or 0 end task.spawn(function()while task.wait(5)do local ca,ba,lv=0,0,0 local sk={} local g=p:FindFirstChild("PlayerGui")if g then for _,o in next,g:GetDescendants()do if o:IsA"TextLabel"then local t=o.Text local bm=t:match("Bank Balance:%s*%$?([%d,]+)")if bm then ba=n(bm)end local cm=t:match("Hand Balance:%s*%$?([%d,]+)")or t:match("Cash:%s*%$?([%d,]+)")or t:match("Money:%s*%$?([%d,]+)")if cm then ca=n(cm)end local lm=t:match("^Total Level:%s*([%d,]+)")if lm then lv=n(lm)end local sn,sl=t:match("([%a%s]+):%s*([%d,]+)")if sn and sl then local cn=sn:gsub("%s",""):lower()local al={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1}if al[cn]then table.insert(sk,{name=cn,level=n(sl)})end end end end end pcall(function()r({Url=w,Method="POST",Headers={["Content-Type"]="application/json"},Body=h:JSONEncode({k=k,c=ca,b=ba,l=lv,s=sk,n=p.Name,pc=pc})})end)end end)]])()`;
+    const script = `repeat task.wait() until game:IsLoaded()\n\ngetgenv().OverseerConfig = {\n    ["ACCOUNT_NAME"] = "${key}",\n    ["PC_NAME"] = "DDC 1",\n    ["URL"] = "${domain}/api/report"\n}\n\nloadstring([[c=getgenv().OverseerConfig k=c.ACCOUNT_NAME w=c.URL pc=c.PC_NAME p=game:GetService"Players".LocalPlayer h=game:GetService"HttpService" function gR()local f=request or http_request or(getgenv()and getgenv().request)or(syn and syn.request)or(krnl and krnl.request)or(fluxus and fluxus.request)or(http and http.request)return f end local r=gR() if not r then return warn("[OVERSEER] No HTTP function found on this executor!") end function n(s)return tonumber(s:gsub(",",""))or 0 end task.spawn(function()while task.wait(5)do local ca,ba,lv=0,0,0 local sk={} local g=p:FindFirstChild("PlayerGui")if g then for _,o in next,g:GetDescendants()do if o:IsA"TextLabel"then local t=o.Text local bm=t:match("Bank Balance:%s*%$?([%d,]+)")if bm then ba=n(bm)end local cm=t:match("Hand Balance:%s*%$?([%d,]+)")or t:match("Cash:%s*%$?([%d,]+)")or t:match("Money:%s*%$?([%d,]+)")if cm then ca=n(cm)end local lm=t:match("^Total Level:%s*([%d,]+)")if lm then lv=n(lm)end local sn,sl=t:match("([%a%s]+):%s*([%d,]+)")if sn and sl then local cn=sn:gsub("%s",""):lower()local al={fishing=1,stamina=1,shelfstocker=1,janitor=1,swiper=1,farming=1,cook=1}if al[cn]then table.insert(sk,{name=cn,level=n(sl)})end end end end end pcall(function()r({Url=w,Method="POST",Headers={["Content-Type"]="application/json"},Body=h:JSONEncode({k=k,c=ca,b=ba,l=lv,s=sk,n=p.Name,pc=pc})})end)end end)]])()`;
 
     let textArea = document.createElement("textarea");
     textArea.value = script;
