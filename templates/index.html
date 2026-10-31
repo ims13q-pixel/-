@@ -238,7 +238,6 @@ function renderTable(data) {
             tr = document.createElement('tr');
             tr.className = 'account-row';
             tr.dataset.name = acc.name;
-            // إضافة السيرفر والإصدار تحت الاسم
             tr.innerHTML = `
                 <td><input type="checkbox" class="row-checkbox" value="${acc.name}"></td>
                 <td>
@@ -246,8 +245,8 @@ function renderTable(data) {
                     <div style="display:flex; gap:4px; flex-wrap:wrap;">
                         <span class="badge status-badge"></span>
                         <span class="badge pc">${acc.pc}</span>
-                        <span class="badge srv">SRV: ${acc.srv}</span>
-                        <span class="badge ver">v${acc.ver}</span>
+                        <span class="badge srv">Srv: ${acc.srv_num}</span>
+                        <span class="badge ver">Ver: ${acc.srv_ver}</span>
                     </div>
                 </td>
                 <td><span class="val-level" style="color:var(--ac); font-weight:700; font-size:14px;"></span></td>
@@ -413,14 +412,14 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 
-// 🔴 السكربت الجديد: يرسل السيرفر والإصدار + فلوس مقروءة صح
+// 🔴 السكربت الجديد: يقرأ الفلوس واللفل بدقة عالية + يلتقط السيرفر من الشاشة
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
     const key = MY_KEY; 
     
     const script = `repeat task.wait() until game:IsLoaded()
-print("[OVERSEER] Starting script v1.2.0...")
+print("[OVERSEER] Starting script...")
 
 getgenv().OverseerConfig = {
     ["ACCOUNT_NAME"] = "${key}",
@@ -447,27 +446,42 @@ local function n(s)
     return tonumber(str) or 0
 end
 
+-- إصدار اللعبة
+local srv_ver = tostring(game.PlaceVersion)
+
 task.spawn(function()
     while task.wait(1) do
         local ca, ba, lv = 0, 0, 0
+        local srv_num = "1" -- القيمة الافتراضية
         local sk = {}
         local g = player:FindFirstChild("PlayerGui")
         
         if g then
             for _, o in next, g:GetDescendants() do
                 if o:IsA("TextLabel") then
-                    local t = o.Text:lower()
+                    local t = o.Text
+                    local tl = t:lower()
                     
-                    local bm = t:match("bank[:%s%$]*([%d,]+)") or t:match("bank balance[:%s%$]*([%d,]+)")
+                    -- 1. البحث عن السيرفر (Server: 1 أو Srv: 2)
+                    local sv = tl:match("server[:%s]*([%d]+)") or tl:match("srv[:%s]*([%d]+)")
+                    if sv then srv_num = sv end
+
+                    -- 2. البحث عن البنك
+                    local bm = tl:match("bank[:%s%$]*([%d,]+)") or tl:match("bank balance[:%s%$]*([%d,]+)")
                     if bm then ba = n(bm) end
                     
-                    local cm = t:match("cash[:%s%$]*([%d,]+)") or t:match("hand balance[:%s%$]*([%d,]+)") or t:match("pocket[:%s%$]*([%d,]+)") or t:match("money[:%s%$]*([%d,]+)")
+                    -- 3. البحث عن الكاش
+                    local cm = tl:match("cash[:%s%$]*([%d,]+)") or tl:match("hand balance[:%s%$]*([%d,]+)") or tl:match("pocket[:%s%$]*([%d,]+)") or tl:match("money[:%s%$]*([%d,]+)")
                     if cm then ca = n(cm) end
                     
-                    local lm = t:match("level[:%s]*([%d,]+)") or t:match("total level[:%s]*([%d,]+)")
-                    if lm then lv = n(lm) end
+                    -- 4. البحث عن المستوى (تجاهل كلمة Max أو Required)
+                    if not tl:match("max") and not tl:match("req") then
+                        local lm = tl:match("total level[:%s]*([%d,]+)") or tl:match("^level[:%s]*([%d,]+)") or tl:match("lvl[:%s]*([%d,]+)")
+                        if lm then lv = n(lm) end
+                    end
                     
-                    local sn, sl = t:match("([%a%s]+)[:%s]+([%d,]+)")
+                    -- 5. المهارات
+                    local sn, sl = tl:match("([%a%s]+)[:%s]+([%d,]+)")
                     if sn and sl then
                         local cn = sn:gsub("%s", "")
                         local al = {fishing=1, stamina=1, shelfstocker=1, janitor=1, swiper=1, farming=1, cook=1}
@@ -477,13 +491,14 @@ task.spawn(function()
             end
         end
 
-        -- استخراج رقم السيرفر (آخر 4 أرقام من JobId)
-        local srv = string.sub(tostring(game.JobId), -4)
-        local ver = "1.2.0" -- إصدار السكربت
+        -- إذا ما لقى السيرفر في الشاشة، يعطي كود فريد من JobId
+        if srv_num == "1" and game.JobId ~= "" then
+            srv_num = string.sub(game.JobId, 1, 4)
+        end
 
         local payload = {
             k = accountKey, c = ca, b = ba, l = lv, s = sk, n = player.Name, pc = pcName,
-            srv = srv, ver = ver -- إرسال السيرفر والإصدار
+            srv_num = srv_num, srv_ver = srv_ver
         }
 
         local ok, err = pcall(function()
