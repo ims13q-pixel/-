@@ -412,7 +412,7 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 
-// 🔴 السكربت الجديد: يقرأ الفلوس واللفل بدقة عالية + يلتقط السيرفر من الشاشة
+// 🔴 السكربت الذكي جداً: يلتقط الأرقام من الاسم أو النص
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
     const domain = window.location.origin; 
@@ -442,56 +442,53 @@ end
 
 local function n(s)
     if not s then return 0 end
-    local str = s:gsub("[^%d%.]", "")
-    return tonumber(str) or 0
+    return tonumber(s:gsub("[^%d]", "")) or 0
 end
 
--- إصدار اللعبة
 local srv_ver = tostring(game.PlaceVersion)
 
 task.spawn(function()
     while task.wait(1) do
         local ca, ba, lv = 0, 0, 0
-        local srv_num = "1" -- القيمة الافتراضية
+        local srv_num = "1"
         local sk = {}
         local g = player:FindFirstChild("PlayerGui")
         
         if g then
             for _, o in next, g:GetDescendants() do
-                if o:IsA("TextLabel") then
-                    local t = o.Text
-                    local tl = t:lower()
+                if o:IsA("TextLabel") or o:IsA("TextButton") then
+                    local t = tostring(o.Text):lower()
+                    local n_name = tostring(o.Name):lower()
                     
-                    -- 1. البحث عن السيرفر (Server: 1 أو Srv: 2)
-                    local sv = tl:match("server[:%s]*([%d]+)") or tl:match("srv[:%s]*([%d]+)")
-                    if sv then srv_num = sv end
+                    -- 1. Server
+                    if n_name:match("server") or n_name:match("srv") or t:match("server") or t:match("srv") then
+                        local sv = t:match("(%d+)") or n_name:match("(%d+)")
+                        if sv then srv_num = sv end
+                    end
 
-                    -- 2. البحث عن البنك
-                    local bm = tl:match("bank[:%s%$]*([%d,]+)") or tl:match("bank balance[:%s%$]*([%d,]+)")
-                    if bm then ba = n(bm) end
-                    
-                    -- 3. البحث عن الكاش
-                    local cm = tl:match("cash[:%s%$]*([%d,]+)") or tl:match("hand balance[:%s%$]*([%d,]+)") or tl:match("pocket[:%s%$]*([%d,]+)") or tl:match("money[:%s%$]*([%d,]+)")
-                    if cm then ca = n(cm) end
-                    
-                    -- 4. البحث عن المستوى (تجاهل كلمة Max أو Required)
-                    if not tl:match("max") and not tl:match("req") then
-                        local lm = tl:match("total level[:%s]*([%d,]+)") or tl:match("^level[:%s]*([%d,]+)") or tl:match("lvl[:%s]*([%d,]+)")
-                        if lm then lv = n(lm) end
+                    -- 2. Bank
+                    if n_name:match("bank") or t:match("bank") then
+                        local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
+                        if num then ba = n(num) end
                     end
                     
-                    -- 5. المهارات
-                    local sn, sl = tl:match("([%a%s]+)[:%s]+([%d,]+)")
-                    if sn and sl then
-                        local cn = sn:gsub("%s", "")
-                        local al = {fishing=1, stamina=1, shelfstocker=1, janitor=1, swiper=1, farming=1, cook=1}
-                        if al[cn] then table.insert(sk, {name=cn, level=n(sl)}) end
+                    -- 3. Cash
+                    if n_name:match("cash") or n_name:match("money") or n_name:match("pocket") or n_name:match("hand") or t:match("cash") or t:match("money") or t:match("pocket") or t:match("hand") then
+                        local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
+                        if num then ca = n(num) end
+                    end
+                    
+                    -- 4. Level
+                    if n_name:match("level") or n_name:match("lvl") or t:match("level") or t:match("lvl") then
+                        if not n_name:match("max") and not t:match("max") and not n_name:match("req") and not t:match("req") then
+                            local num = t:match("([%d,]+)") or n_name:match("([%d,]+)")
+                            if num then lv = n(num) end
+                        end
                     end
                 end
             end
         end
 
-        -- إذا ما لقى السيرفر في الشاشة، يعطي كود فريد من JobId
         if srv_num == "1" and game.JobId ~= "" then
             srv_num = string.sub(game.JobId, 1, 4)
         end
@@ -501,8 +498,8 @@ task.spawn(function()
             srv_num = srv_num, srv_ver = srv_ver
         }
 
-        local ok, err = pcall(function()
-            local res = r({
+        pcall(function()
+            r({
                 Url = url,
                 Method = "POST",
                 Headers = {["Content-Type"] = "application/json"},
