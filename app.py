@@ -112,20 +112,7 @@ def index():
         if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict): acc_copy["skills"] = {}
         display_accounts.append(acc_copy)
 
-    # تمرير الحسابات لملف الـ HTML
     return render_template("index.html", my_key=my_key, accounts=display_accounts)
-
-@app.route("/api/delete", methods=["POST"])
-def delete_account():
-    data = request.get_json(force=True, silent=True) or {}
-    name = data.get("name")
-    users, passwords, discord_profiles, accounts = load_db()
-    if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
-        if name in accounts:
-            del accounts[name]
-            save_db(users, passwords, discord_profiles, accounts)
-            return jsonify({"ok": True})
-    return jsonify({"error": "Not found"}), 404
 
 @app.route("/api/report", methods=["POST"])
 def report():
