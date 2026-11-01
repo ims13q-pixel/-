@@ -25,11 +25,7 @@
 }
 
 * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-body { 
-    margin: 0; background: var(--bg); color: var(--text-primary); 
-    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; line-height: 1.5; 
-    -webkit-font-smoothing: antialiased;
-}
+body { margin: 0; background: var(--bg); color: var(--text-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
 
 body::before {
     content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none;
@@ -40,7 +36,6 @@ body::before {
 }
 
 .w { max-width: 1480px; margin: 0 auto; padding: 40px 24px 80px; }
-
 .bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; }
 .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 12px; }
 .logo i { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #ffffff, #888888); display: block; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
@@ -57,8 +52,10 @@ body::before {
 .user-avatar { width: 30px; height: 30px; border-radius: 6px; background: #1f222e; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12px; }
 .dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 6px; min-width: 180px; z-index: 9999; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
 .dropdown.show { display: flex; }
-.dropdown a { width: 100%; text-align: left; padding: 10px 14px; border: none; background: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.dropdown button, .dropdown a { width: 100%; text-align: left; padding: 10px 14px; border: none; background: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 8px; font-family: 'Plus Jakarta Sans', sans-serif; }
+.dropdown button:hover { background: var(--surface-hover); }
 .dropdown a:hover { background: var(--surface-hover); color: var(--red); }
+.dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
 
 .header-title { margin-bottom: 32px; }
 .header-title h1 { font-size: 30px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -1px; }
@@ -102,12 +99,19 @@ tr:hover td { background: var(--surface-hover); }
 .money-cash { color: var(--green); }
 .money-bank { color: var(--purple); }
 .money-total { color: var(--text-primary); font-weight: 700; }
-
 .uptime-badge { background: transparent; border: 1px solid var(--border); color: var(--gold); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
 
 input[type="checkbox"] { appearance: none; width: 18px; height: 18px; border: 2px solid var(--border-light); border-radius: 4px; background: transparent; cursor: pointer; position: relative; outline: none; }
 input[type="checkbox"]:checked { background: #ffffff; border-color: #ffffff; }
 input[type="checkbox"]:checked::after { content: "✓"; position: absolute; top: -3px; left: 2px; color: var(--bg); font-size: 14px; font-weight: bold; }
+
+/* Premium Modal */
+dialog { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); border-radius: 16px; padding: 32px; width: min(400px, 92vw); box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+dialog::backdrop { background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
+dialog h2 { margin: 0 0 20px; font-size: 20px; font-weight: 700; letter-spacing: -0.5px;}
+dialog label { display: block; margin-bottom: 16px; color: var(--text-secondary); font-size: 13px; font-weight: 600; }
+dialog input { width: 100%; margin-top: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: white; outline: none; font-family: 'Plus Jakarta Sans', sans-serif;}
+dialog input:focus { border-color: var(--text-muted); }
 
 @media (max-width: 1300px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) {
@@ -133,12 +137,21 @@ input[type="checkbox"]:checked::after { content: "✓"; position: absolute; top:
         <button class="b pri" id="copy-script" type="button">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Script
         </button>
+        
+        <!-- 🔴 زر لوحة الإدارة -->
+        {% if my_key == 'admin' %}
+        <a href="/admin" class="b" style="color: var(--gold); border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.05);">Admin Panel</a>
+        {% endif %}
+
         <div class="user-menu">
             <div class="user-trigger" onclick="document.getElementById('uDropdown').classList.toggle('show')">
                 <div class="user-avatar">{{ my_key[:2]|upper if my_key else 'O' }}</div>
                 <div>{{ my_key | default('Overseer') }}</div>
             </div>
             <div class="dropdown" id="uDropdown">
+                <!-- 🔴 زر تغيير الباسورد -->
+                <button type="button" onclick="document.getElementById('resetModal').showModal()">Reset Password</button>
+                <div class="dropdown-divider"></div>
                 <a href="/logout">Sign Out</a>
             </div>
         </div>
@@ -242,6 +255,18 @@ input[type="checkbox"]:checked::after { content: "✓"; position: absolute; top:
     </div>
 </div>
 
+<!-- 🔴 مودال تغيير الباسورد -->
+<dialog id="resetModal">
+  <form method="dialog" id="resetForm">
+    <h2>Reset Password</h2>
+    <label>New Password<input type="password" name="newpass" id="newPass" required minlength="4"></label>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button class="b pri" value="ok" style="flex:1; justify-content:center;">Save</button>
+      <button class="b" value="x" formnovalidate style="flex:1; justify-content:center;">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 const MY_KEY = "{{ my_key | default('Overseer') }}";
 
@@ -252,6 +277,26 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
         row.style.display = name.includes(val) ? '' : 'none';
     });
 });
+
+// 🔴 دالة تغيير الباسورد
+document.getElementById('resetForm').onsubmit = async function(e) {
+    if (!e.submitter || e.submitter.value !== "ok") return;
+    e.preventDefault();
+    const newPass = document.getElementById("newPass").value;
+    if(newPass.length < 4) return;
+    try {
+        const res = await fetch('/api/reset_password', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ username: MY_KEY, new_password: newPass })
+        });
+        if(res.ok) { 
+            document.getElementById("resetModal").close(); 
+            document.getElementById("newPass").value = ""; 
+            alert("Password changed successfully!");
+        }
+    } catch(err) {}
+};
 
 document.getElementById("copy-script").addEventListener("click", function(e) {
     e.preventDefault();
