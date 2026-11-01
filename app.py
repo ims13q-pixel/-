@@ -114,6 +114,30 @@ def index():
 
     return render_template("index.html", my_key=my_key, accounts=display_accounts)
 
+# 🔴 مسار لوحة الإدارة
+@app.route("/admin")
+def admin_panel():
+    if session.get("user") != "admin": return "Access Denied", 403
+    users, passwords, discord_profiles, accounts = load_db()
+    visits = int(redis.get("visits") or 0) if redis else 0
+    normal_users = [{"username": u, "password": p} for u, p in passwords.items() if p != "DISCORD_OAUTH" and u != "admin"]
+    d_users = [{"username": u, "id": data["id"], "avatar": data["avatar"]} for u, data in discord_profiles.items()]
+    return render_template("admin.html", visits=visits, normal_users=normal_users, discord_users=d_users, total_accounts=len(accounts))
+
+# 🔴 مسار تغيير الباسورد
+@app.route("/api/reset_password", methods=["POST"])
+def reset_password():
+    data = request.get_json(force=True, silent=True) or {}
+    username = data.get("username")
+    new_password = data.get("new_password")
+    users, passwords, discord_profiles, _ = load_db()
+    if username in users:
+        users[username] = hashlib.sha256(new_password.encode()).hexdigest()
+        passwords[username] = new_password
+        save_db(users, passwords, discord_profiles, {})
+        return jsonify({"ok": True})
+    return jsonify({"error": "Not found"}), 404
+
 @app.route("/api/report", methods=["POST"])
 def report():
     data = request.get_json(force=True, silent=True) or {}
