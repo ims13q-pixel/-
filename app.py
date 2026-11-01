@@ -29,6 +29,23 @@ def save_db(u, p, d, a):
         redis.set("users", json.dumps(u)); redis.set("passwords", json.dumps(p))
         redis.set("discord_profiles", json.dumps(d)); redis.set("accounts", json.dumps(a))
 
+def send_discord_alert(name, status):
+    webhook = redis.get("discord_webhook") if redis else None
+    if not webhook: return
+    color = 16711680 if status == "OFFLINE" else 65280
+    payload = {
+        "embeds": [{
+            "title": f"Account {status}",
+            "description": f"Account: **{name}**",
+            "color": color,
+            "footer": {"text": "Farmledger Alerts"}
+        }]
+    }
+    try:
+        requests.post(webhook, json=payload, timeout=5)
+    except:
+        pass
+
 @app.before_request
 def count_visits():
     if request.path in ['/', '/login', '/register']:
@@ -74,47 +91,8 @@ def logout():
 @app.route("/")
 def index():
     if "user" not in session: return redirect(url_for("login"))
-    my_key = session["user"]
-    is_admin = (my_key == "admin")
-    now = time.time()
-    display_accounts = []
+    return render_template("index.html", my_key=session["user"])
 
-    _, _, _, accounts = load_db()
-
-    for name, a in accounts.items():
-        if not is_admin and a.get("key") != my_key: continue
-        is_online = (now - a.get("last_seen", 0)) < 60 
-        
-        cash = int(a.get("cash", 0) or 0)
-        bank = int(a.get("bank", 0) or 0)
-        total = cash + bank
-        
-        start_time = a.get("session_start_time", now)
-        start_money = a.get("session_start_money", total)
-        uptime_sec = int(now - start_time)
-        farmed = total - start_money
-        
-        if uptime_sec < 60: uptime_str = "< 1m"
-        else:
-            hours = uptime_sec // 3600; minutes = (uptime_sec % 3600) // 60
-            uptime_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
-        
-        acc_copy = a.copy()
-        acc_copy["name"] = name
-        acc_copy["online"] = is_online
-        acc_copy["total_level"] = int(a.get("total_level", 0) or 0)
-        acc_copy["total_money"] = total
-        acc_copy["cash"] = cash
-        acc_copy["bank"] = bank
-        acc_copy["uptime_str"] = uptime_str
-        acc_copy["farmed"] = farmed
-        
-        if "skills" not in acc_copy or not isinstance(acc_copy["skills"], dict): acc_copy["skills"] = {}
-        display_accounts.append(acc_copy)
-
-    return render_template("index.html", my_key=my_key, accounts=display_accounts)
-
-# 🔴 مسار لوحة الإدارة
 @app.route("/admin")
 def admin_panel():
     if session.get("user") != "admin": return "Access Denied", 403
@@ -124,7 +102,102 @@ def admin_panel():
     d_users = [{"username": u, "id": data["id"], "avatar": data["avatar"]} for u, data in discord_profiles.items()]
     return render_template("admin.html", visits=visits, normal_users=normal_users, discord_users=d_users, total_accounts=len(accounts))
 
-# 🔴 مسار تغيير الباسورد
+@app.route("/api/data")
+def api_data():
+    if "user" not in session: return jsonify({"error": "Unauthorized"}), 401
+    my_key = session["user"]
+    is_admin = (my_key == "admin")
+    now = time.time()
+    
+    _, _, _, accounts = load_db()
+    online_count = 0
+    total_cash = 0; total_bank = 0; total_farmed = 0
+    accs_list = []
+    
+    for name, a in accounts.items():
+        if not is_admin and a.get("key") != my_key: continue
+        
+        last_seen = a.get("last_seen", 0)
+        is_online = (now - last_seen) < 60 
+        if is_online: online_count += 1
+        
+        # Discord Alert Logic (Check if offline for > 3 mins and not notified)
+        if (now - last_seen) > 180 and not a.get("notified", False):
+            send_discord_alert(name, "OFFLINE")
+            accounts[name]["notified"] = True
+            save_db(*load_db()[:3], accounts) # Save notification state
+        elif is_online and a.get("notified", False):
+            accounts[name]["notified"] = False
+            save_db(*load_db()[:3], accounts)
+            send_discord_alert(name, "ONLINE")
+        
+        cash = int(a.get("cash", 0) or 0); bank = int(a.get("bank", 0) or 0); total = cash + bank
+        start_time = a.get("session_start_time", now); start_money = a.get("session_start_money", total)
+        uptime_sec = int(now - start_time); farmed = total - start_money
+        
+        total_cash += cash; total_bank += bank; total_farmed += farmed
+        
+        if uptime_sec < 60: uptime_str = "< 1m"
+        else:
+            hours = uptime_sec // 3600; minutes = (uptime_sec % 3600) // 60
+            uptime_str = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+            
+        accs_list.append({
+            "name": name, "online": is_online, "level": int(a.get("total_level", 0) or 0),
+            "cash": cash, "bank": bank, "total": total, "farmed": farmed,
+            "uptime": uptime_str, "pc": a.get("pc", "PC"), "skills": a.get("skills", {})
+        })
+        
+    return jsonify({
+        "online_count": online_count, "total_accounts": len(accs_list),
+        "total_cash": total_cash, "total_bank": total_bank,
+        "total_worth": total_cash + total_bank, "total_farmed": total_farmed, "accounts": accs_list
+    })
+
+@app.route("/api/save_webhook", methods=["POST"])
+def save_webhook():
+    if session.get("user") != "admin": return jsonify({"error": "Admin only"}), 403
+    data = request.get_json(force=True, silent=True) or {}
+    url = data.get("url", "")
+    if redis: redis.set("discord_webhook", url)
+    return jsonify({"ok": True})
+
+@app.route("/api/send_command", methods=["POST"])
+def send_command():
+    if "user" not in session: return jsonify({"error": "Unauthorized"}), 401
+    data = request.get_json(force=True, silent=True) or {}
+    target = data.get("target")
+    command = data.get("command")
+    if redis:
+        if target == "all":
+            _, _, _, accounts = load_db()
+            for acc_name in accounts.keys(): redis.set(f"cmd_{acc_name}", command, ex=300)
+        else:
+            redis.set(f"cmd_{target}", command, ex=300)
+    return jsonify({"ok": True})
+
+@app.route("/api/get_command")
+def get_command():
+    acc_name = request.args.get("name")
+    if not redis or not acc_name: return jsonify({"command": None})
+    cmd = redis.get(f"cmd_{acc_name}")
+    if cmd:
+        redis.delete(f"cmd_{acc_name}")
+        return jsonify({"command": cmd})
+    return jsonify({"command": None})
+
+@app.route("/api/delete", methods=["POST"])
+def delete_account():
+    data = request.get_json(force=True, silent=True) or {}
+    name = data.get("name")
+    users, passwords, discord_profiles, accounts = load_db()
+    if session.get("user") == "admin" or (name in accounts and accounts[name].get("key") == session.get("user")):
+        if name in accounts:
+            del accounts[name]
+            save_db(users, passwords, discord_profiles, accounts)
+            return jsonify({"ok": True})
+    return jsonify({"error": "Not found"}), 404
+
 @app.route("/api/reset_password", methods=["POST"])
 def reset_password():
     data = request.get_json(force=True, silent=True) or {}
@@ -147,15 +220,19 @@ def report():
     name = data.get("n", "Unknown"); now = time.time()
     cash = int(data.get("c", 0) or 0); bank = int(data.get("b", 0) or 0); total_money = cash + bank
     level = int(data.get("l", 0) or 0)
+    
     raw_skills = data.get("s", [])
     skills_dict = {}
     if isinstance(raw_skills, list):
         for sk in raw_skills:
             if isinstance(sk, dict) and "name" in sk: skills_dict[sk["name"]] = int(sk.get("level", 0))
+            
     if name not in accounts or (now - accounts[name].get("last_seen", 0)) > 120:
         if name not in accounts: accounts[name] = {}
         accounts[name]["session_start_time"] = now
         accounts[name]["session_start_money"] = total_money
+        accounts[name]["notified"] = False
+        
     accounts[name].update({
         "key": username_key, "pc": data.get("pc", "DDC 1"),
         "cash": cash, "bank": bank, "total_money": total_money, "total_level": level,
