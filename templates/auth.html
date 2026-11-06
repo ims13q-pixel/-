@@ -3,21 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Login - OVERSEER</title>
+<title>Login - Farmledger</title>
 <style>
-    body { background: #0a0b14; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .box { background: #12141f; padding: 40px; border-radius: 16px; border: 1px solid #252a3d; width: 100%; max-width: 350px; }
-    h2 { text-align: center; margin-top: 0; }
-    input { width: 100%; padding: 14px; margin-bottom: 15px; background: #0a0b14; border: 1px solid #252a3d; color: white; border-radius: 10px; box-sizing: border-box; }
-    button { width: 100%; padding: 14px; background: #7c8cff; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
-    .err { color: #ff6b7d; margin-bottom: 15px; text-align: center; display: none; }
-    a { color: #7c8cff; text-decoration: none; display: block; text-align: center; margin-top: 20px; }
-    .divider { display: flex; align-items: center; text-align: center; margin: 20px 0; color: #7d86a6; font-size: 12px; }
-    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #252a3d; }
+    body { background: #060608; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);}
+    .box { background: #0f1015; padding: 40px; border-radius: 16px; border: 1px solid #1f222e; width: 100%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    h2 { text-align: center; margin-top: 0; font-weight: 800; letter-spacing: -0.5px; font-size: 24px;}
+    input { width: 100%; padding: 14px; margin-bottom: 15px; background: #060608; border: 1px solid #1f222e; color: white; border-radius: 10px; box-sizing: border-box; outline: none; font-family: 'Plus Jakarta Sans', sans-serif;}
+    input:focus { border-color: #4b5263; }
+    button { width: 100%; padding: 14px; background: #ffffff; color: #000; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; transition: 0.2s;}
+    button:hover { background: #e2e2e2; }
+    .err { color: #ef4444; margin-bottom: 15px; text-align: center; display: none; font-size: 13px; font-weight: 600;}
+    a { color: #8f96a3; text-decoration: none; display: block; text-align: center; margin-top: 20px; font-size: 13px; font-weight: 500;}
+    a:hover { color: #fff; }
+    .divider { display: flex; align-items: center; text-align: center; margin: 20px 0; color: #4b5263; font-size: 12px; font-weight: 600;}
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1f222e; }
     .divider:not(:empty)::before { margin-right: .25em; }
     .divider:not(:empty)::after { margin-left: .25em; }
-    .discord-btn { background: #5865F2; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; color: white; padding: 14px; border-radius: 10px; font-weight: bold; }
-    .discord-btn:hover { background: #4752C4; }
+    .discord-btn { background: #5865F2; color: white; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px;}
+    .discord-btn:hover { background: #4752C4; color: white;}
 </style>
 </head>
 <body>
@@ -25,7 +28,7 @@
     <h2>{{ "Register" if mode == "register" else "Login" }}</h2>
     <div class="err" id="err"></div>
     <form id="form">
-        <input type="text" id="user" placeholder="Username" required>
+        <input type="text" id="user" placeholder="Username" required autocomplete="off">
         <input type="password" id="pass" placeholder="Password" required>
         <button type="submit">{{ "Create Account" if mode == "register" else "Sign In" }}</button>
     </form>
@@ -43,6 +46,9 @@
 <script>
     document.getElementById('form').onsubmit = async (e) => {
         e.preventDefault();
+        const errDiv = document.getElementById('err');
+        errDiv.style.display = 'none';
+        
         try {
             const res = await fetch(window.location.href, {
                 method: 'POST',
@@ -54,8 +60,14 @@
             });
             const data = await res.json();
             if (res.ok) window.location.href = '/';
-            else { document.getElementById('err').style.display = 'block'; document.getElementById('err').innerText = data.error; }
-        } catch (err) { document.getElementById('err').style.display = 'block'; document.getElementById('err').innerText = "Error"; }
+            else { 
+                errDiv.style.display = 'block'; 
+                errDiv.innerText = data.error || "Authentication Failed"; 
+            }
+        } catch (err) { 
+            errDiv.style.display = 'block'; 
+            errDiv.innerText = "Connection Error"; 
+        }
     };
 </script>
 </body>
