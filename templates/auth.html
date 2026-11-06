@@ -56,21 +56,16 @@
                 })
             });
             
-            // إذا السيرفر رجع خطأ 500، نعرض الخطأ الحقيقي
-            if (!res.ok && res.status === 500) {
-                const text = await res.text();
-                errDiv.style.display = 'block';
-                errDiv.innerText = "Server Error 500. Check Vercel Logs.";
-                console.error(text);
-                return;
-            }
+            const text = await res.text();
+            let data;
+            try { data = JSON.parse(text); } catch(e) { data = { error: text }; }
 
-            const data = await res.json();
             if (res.ok) {
                 window.location.href = '/';
             } else { 
                 errDiv.style.display = 'block'; 
-                errDiv.innerText = data.error || "Authentication Failed"; 
+                // 🔴 راح يعرض لك الخطأ الحقيقي هنا
+                errDiv.innerText = data.error || "Server Error"; 
             }
         } catch (err) { 
             errDiv.style.display = 'block'; 
