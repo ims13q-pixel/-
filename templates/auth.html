@@ -5,22 +5,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login - Farmledger</title>
 <style>
-    body { background: #060608; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);}
-    .box { background: #0f1015; padding: 40px; border-radius: 16px; border: 1px solid #1f222e; width: 100%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    h2 { text-align: center; margin-top: 0; font-weight: 800; letter-spacing: -0.5px; font-size: 24px;}
-    input { width: 100%; padding: 14px; margin-bottom: 15px; background: #060608; border: 1px solid #1f222e; color: white; border-radius: 10px; box-sizing: border-box; outline: none; font-family: 'Plus Jakarta Sans', sans-serif;}
+    body { background: #0B0E14; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-image: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);}
+    .box { background: #12161f; padding: 40px; border-radius: 16px; border: 1px solid #232936; width: 100%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    h2 { text-align: center; margin-top: 0; font-weight: 800; letter-spacing: -0.5px; font-size: 24px; color: #fff;}
+    input { width: 100%; padding: 14px; margin-bottom: 15px; background: #0B0E14; border: 1px solid #232936; color: white; border-radius: 10px; box-sizing: border-box; outline: none; font-family: 'Plus Jakarta Sans', sans-serif;}
     input:focus { border-color: #4b5263; }
     button { width: 100%; padding: 14px; background: #ffffff; color: #000; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 14px; transition: 0.2s;}
     button:hover { background: #e2e2e2; }
-    .err { color: #ef4444; margin-bottom: 15px; text-align: center; display: none; font-size: 13px; font-weight: 600;}
+    .err { color: #ef4444; margin-bottom: 15px; text-align: center; display: none; font-size: 13px; font-weight: 600; word-break: break-all;}
     a { color: #8f96a3; text-decoration: none; display: block; text-align: center; margin-top: 20px; font-size: 13px; font-weight: 500;}
     a:hover { color: #fff; }
     .divider { display: flex; align-items: center; text-align: center; margin: 20px 0; color: #4b5263; font-size: 12px; font-weight: 600;}
-    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #1f222e; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #232936; }
     .divider:not(:empty)::before { margin-right: .25em; }
     .divider:not(:empty)::after { margin-left: .25em; }
-    .discord-btn { background: #5865F2; color: white; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px;}
-    .discord-btn:hover { background: #4752C4; color: white;}
 </style>
 </head>
 <body>
@@ -34,8 +32,7 @@
     </form>
 
     <div class="divider">OR</div>
-    <a href="/auth/discord" class="discord-btn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg>
+    <a href="/auth/discord" style="background: #5865F2; color: white; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; text-decoration: none; padding: 14px; border-radius: 10px; font-weight: 700; font-size: 14px;">
         Login with Discord
     </a>
 
@@ -58,15 +55,26 @@
                     password: document.getElementById('pass').value
                 })
             });
+            
+            // إذا السيرفر رجع خطأ 500، نعرض الخطأ الحقيقي
+            if (!res.ok && res.status === 500) {
+                const text = await res.text();
+                errDiv.style.display = 'block';
+                errDiv.innerText = "Server Error 500. Check Vercel Logs.";
+                console.error(text);
+                return;
+            }
+
             const data = await res.json();
-            if (res.ok) window.location.href = '/';
-            else { 
+            if (res.ok) {
+                window.location.href = '/';
+            } else { 
                 errDiv.style.display = 'block'; 
                 errDiv.innerText = data.error || "Authentication Failed"; 
             }
         } catch (err) { 
             errDiv.style.display = 'block'; 
-            errDiv.innerText = "Connection Error"; 
+            errDiv.innerText = "Connection Error: " + err.message; 
         }
     };
 </script>
