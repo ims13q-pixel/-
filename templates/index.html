@@ -10,14 +10,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root {
-    --bg: #0B0E14; 
-    --surface: #12161f; 
-    --surface-hover: #1a1f2b; 
-    --border: #232936; 
-    --border-light: #323a4d;
-    --text-primary: #ffffff;
-    --text-secondary: #8f96a3;
-    --text-muted: #4b5263;
+    --bg: #0B0E14; --surface: #12161f; --surface-hover: #1a1f2b; --border: #232936; --border-light: #323a4d;
+    --text-primary: #ffffff; --text-secondary: #8f96a3; --text-muted: #4b5263;
     --green: #10b981; --purple: #8b5cf6; --blue: #3b82f6; --gold: #f59e0b; --red: #ef4444;
 }
 * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -335,14 +329,14 @@ async function fetchData() {
         chartData.push(data.total_worth);
         if (chartData.length > 30) chartData.shift(); 
         chartInstance.data.labels = chartData.map((_, i) => i);
-        chartInstance.data.datasets[0].data = chartData;
+        chartInstance.datasets[0].data = chartData;
         chartInstance.update();
         
     } catch (e) { console.error(e); }
     isUpdating = false;
 }
-// 🔴 تم تغيير التحديث إلى 10 ثواني بدل 3 ثواني لتوفير طلبات Redis
-setInterval(fetchData, 10000);
+// 🔴 تحديث كل 60 ثانية عشان توفير الطلبات
+setInterval(fetchData, 60000);
 document.addEventListener("DOMContentLoaded", fetchData);
 
 document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -444,8 +438,8 @@ local function n(s)
 end
 
 task.spawn(function()
-    -- 🔴 تم تغيير وقت الإرسال إلى 5 ثواني بدل ثانية لتوفير طلبات Redis
-    while task.wait(5) do 
+    -- 🔴 إرسال البيانات كل 60 ثانية بدل ثانية (توفير كبير)
+    while task.wait(60) do 
         local ca, ba, lv = 0, 0, 0
         local sk = {}
         local g = player:FindFirstChild("PlayerGui")
@@ -474,7 +468,7 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    while task.wait(10) do
+    while task.wait(60) do
         pcall(function()
             local res = r({ Url = cmdUrl .. "?name=" .. accountKey, Method = "GET" })
             if res.StatusCode == 200 then
