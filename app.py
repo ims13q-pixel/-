@@ -5,41 +5,55 @@ from upstash_redis import Redis
 app = Flask(__name__)
 app.secret_key = "axiom_secret_key_2024"
 
-# 🔴 إعدادات ديسكورد
 DISCORD_CLIENT_ID = "1457756445599858822"
 DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET", "K14al_OVQ7nRvIo6TQjJATxtI8Ky5cA3")
 DISCORD_REDIRECT_URI = "https://flame-ten-18.vercel.app/auth/discord/callback"
 
-# 🔴 الربط بقاعدة بيانات Vercel KV (Upstash)
 REDIS_URL = os.environ.get("KV_REST_API_URL") or os.environ.get("UPSTASH_REDIS_REST_URL")
 REDIS_TOKEN = os.environ.get("KV_REST_API_TOKEN") or os.environ.get("UPSTASH_REDIS_REST_TOKEN")
 redis = Redis(url=REDIS_URL, token=REDIS_TOKEN) if REDIS_URL and REDIS_TOKEN else None
 
+# 🔴 دالة محسنة: 4 طلبات في طلب واحد (توفير 75% من الـ Requests)
 def load_db():
     if redis:
-        u = redis.get("users"); p = redis.get("passwords"); d = redis.get("discord_profiles"); a = redis.get("accounts")
-        try: u_data = json.loads(u) if u else {"admin": hashlib.sha256("admin".encode()).hexdigest()}
-        except: u_data = {"admin": hashlib.sha256("admin".encode()).hexdigest()}
-        try: p_data = json.loads(p) if p else {"admin": "admin"}
-        except: p_data = {"admin": "admin"}
-        try: d_data = json.loads(d) if d else {}
-        except: d_data = {}
-        try: a_data = json.loads(a) if a else {}
-        except: a_data = {}
-        return (u_data, p_data, d_data, a_data)
+        try:
+            pipe = redis.pipeline()
+            pipe.get("users")
+            pipe.get("passwords")
+            pipe.get("discord_profiles")
+            pipe.get("accounts")
+            u, p, d, a = pipe.execute()
+            
+            u_data = json.loads(u) if u else {"admin": hashlib.sha256("admin".encode()).hexdigest()}
+            p_data = json.loads(p) if p else {"admin": "admin"}
+            d_data = json.loads(d) if d else {}
+            a_data = json.loads(a) if a else {}
+            return (u_data, p_data, d_data, a_data)
+        except Exception as e:
+            print(f"Redis Load Error: {e}")
+            return ({"admin": hashlib.sha256("admin".encode()).hexdigest()}, {"admin": "admin"}, {}, {})
     return ({"admin": hashlib.sha256("admin".encode()).hexdigest()}, {"admin": "admin"}, {}, {})
 
 def save_db(u, p, d, a):
     if redis:
-        redis.set("users", json.dumps(u)); redis.set("passwords", json.dumps(p))
-        redis.set("discord_profiles", json.dumps(d)); redis.set("accounts", json.dumps(a))
+        try:
+            pipe = redis.pipeline()
+            pipe.set("users", json.dumps(u))
+            pipe.set("passwords", json.dumps(p))
+            pipe.set("discord_profiles", json.dumps(d))
+            pipe.set("accounts", json.dumps(a))
+            pipe.execute()
+        except Exception as e:
+            print(f"Redis Save Error: {e}")
 
 def send_discord_alert(name, status):
-    webhook = redis.get("discord_webhook") if redis else None
-    if not webhook: return
-    color = 16711680 if status == "OFFLINE" else 65280
-    payload = {"embeds": [{"title": f"Account {status}", "description": f"Account: **{name}**", "color": color, "footer": {"text": "Farmledger Alerts"}}]}
-    try: requests.post(webhook, json=payload, timeout=5)
+    if not redis: return
+    try:
+        webhook = redis.get("discord_webhook")
+        if not webhook: return
+        color = 16711680 if status == "OFFLINE" else 65280
+        payload = {"embeds": [{"title": f"Account {status}", "description": f"Account: **{name}**", "color": color}]}
+        requests.post(webhook, json=payload, timeout=5)
     except: pass
 
 @app.before_request
@@ -93,14 +107,11 @@ def logout():
 @app.route("/")
 def index():
     if "user" not in session: return redirect(url_for("login"))
-    my_key = session["user"]
-    is_admin = (my_key == "admin")
-    now = time.time()
-    display_accounts = []
+    my_key = session["user"]; is_admin = (my_key == "admin"); now = time.time(); display_accounts = []
     _, _, _, accounts = load_db()
     for name, a in accounts.items():
         if not is_admin and a.get("key") != my_key: continue
-        is_online = (now - a.get("last_seen", 0)) < 60 
+        is_online = (now - a.get("last_seen", 0)) < 120 # زيادة وقت الأونلاين لـ دقيقتين
         cash = int(a.get("cash", 0) or 0); bank = int(a.get("bank", 0) or 0); total = cash + bank
         start_time = a.get("session_start_time", now); start_money = a.get("session_start_money", total)
         uptime_sec = int(now - start_time); farmed = total - start_money
@@ -122,9 +133,9 @@ def api_data():
     online_count = 0; total_cash = 0; total_bank = 0; total_farmed = 0; accs_list = []
     for name, a in accounts.items():
         if not is_admin and a.get("key") != my_key: continue
-        last_seen = a.get("last_seen", 0); is_online = (now - last_seen) < 60 
+        last_seen = a.get("last_seen", 0); is_online = (now - last_seen) < 120
         if is_online: online_count += 1
-        if (now - last_seen) > 180 and not a.get("notified", False):
+        if (now - last_seen) > 300 and not a.get("notified", False):
             send_discord_alert(name, "OFFLINE")
             accounts[name]["notified"] = True
         elif is_online and a.get("notified", False):
@@ -150,8 +161,8 @@ def send_command():
     if redis:
         if target == "all":
             _, _, _, accounts = load_db()
-            for acc_name in accounts.keys(): redis.set(f"cmd_{acc_name}", command, ex=300)
-        else: redis.set(f"cmd_{target}", command, ex=300)
+            for acc_name in accounts.keys(): redis.set(f"cmd_{acc_name}", command, ex=600)
+        else: redis.set(f"cmd_{target}", command, ex=600)
     return jsonify({"ok": True})
 
 @app.route("/api/get_command")
@@ -197,7 +208,7 @@ def report():
     if isinstance(raw_skills, list):
         for sk in raw_skills:
             if isinstance(sk, dict) and "name" in sk: skills_dict[sk["name"]] = int(sk.get("level", 0))
-    if name not in accounts or (now - accounts[name].get("last_seen", 0)) > 120:
+    if name not in accounts or (now - accounts[name].get("last_seen", 0)) > 300: # 5 دقائق
         if name not in accounts: accounts[name] = {}
         accounts[name]["session_start_time"] = now; accounts[name]["session_start_money"] = total_money; accounts[name]["notified"] = False
     accounts[name].update({"key": username_key, "pc": data.get("pc", "DDC 1"), "cash": cash, "bank": bank, "total_money": total_money, "total_level": level, "skills": skills_dict, "display_name": data.get("dn", name), "user_id": str(data.get("u", "")), "last_seen": now})
