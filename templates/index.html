@@ -10,13 +10,35 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root {
-    --bg: #060608; --surface: #0f1015; --surface-hover: #161821; --border: #1f222e; --border-light: #2d3142;
-    --text-primary: #ffffff; --text-secondary: #8f96a3; --text-muted: #4b5263;
-    --green: #10b981; --purple: #8b5cf6; --blue: #3b82f6; --gold: #f59e0b; --red: #ef4444;
+    /* اللون اللي طلبته: #0B0E14 */
+    --bg: #0B0E14; 
+    --surface: #12161f; 
+    --surface-hover: #1a1f2b; 
+    --border: #232936; 
+    --border-light: #323a4d;
+    
+    --text-primary: #ffffff;
+    --text-secondary: #8f96a3;
+    --text-muted: #4b5263;
+
+    --green: #10b981;
+    --purple: #8b5cf6;
+    --blue: #3b82f6;
+    --gold: #f59e0b;
+    --red: #ef4444;
 }
 * { box-sizing: border-box; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
 body { margin: 0; background: var(--bg); color: var(--text-primary); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; background: radial-gradient(circle at 15% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 40%), radial-gradient(circle at 85% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 40%), radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 50%); }
+
+/* خلفية متوهجة بلمسة زرقاء باردة */
+body::before { 
+    content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; 
+    background: 
+        radial-gradient(circle at 15% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
+}
+
 .w { max-width: 1480px; margin: 0 auto; padding: 40px 24px 80px; }
 .bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; }
 .logo { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; display: flex; align-items: center; gap: 12px; }
@@ -70,7 +92,7 @@ body::before { content: ''; position: fixed; top: 0; left: 0; width: 100vw; heig
 .toolbar input[type=search]:focus { border-color: var(--text-muted); background: var(--surface-hover); }
 .table-container { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: auto; max-height: 750px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-th { text-align: left; padding: 18px 24px; color: var(--text-secondary); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(15, 16, 21, 0.95); backdrop-filter: blur(10px); z-index: 10; text-transform: uppercase; letter-spacing: 1px; }
+th { text-align: left; padding: 18px 24px; color: var(--text-secondary); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(18, 22, 31, 0.95); backdrop-filter: blur(10px); z-index: 10; text-transform: uppercase; letter-spacing: 1px; }
 td { padding: 18px 24px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap; }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: var(--surface-hover); }
@@ -220,7 +242,6 @@ dialog input:focus { border-color: var(--text-muted); }
                 </tr>
             </thead>
             <tbody id="table-body">
-                <!-- 🔴 هنا كود Jinja اللي طلبت ما أشيله -->
                 {% for a in accounts %}
                 <tr class="account-row" data-level="{{ a.total_level or 0 }}" data-money="{{ a.total_money or 0 }}">
                     <td><input type="checkbox" class="row-checkbox" value="{{ a.name }}"></td>
@@ -252,7 +273,6 @@ dialog input:focus { border-color: var(--text-muted); }
                     <td><div class="money-col money-total">${{ "{:,.0f}".format(a.total_money or 0) }}</div></td>
                 </tr>
                 {% endfor %}
-                <!-- 🔴 نهاية كود Jinja -->
             </tbody>
         </table>
     </div>
@@ -321,11 +341,21 @@ async function fetchData() {
         const data = await res.json();
         if(data.error) return;
 
+        document.getElementById('stat-cash').innerText = '$' + Number(data.total_cash).toLocaleString();
+        document.getElementById('stat-bank').innerText = '$' + Number(data.total_bank).toLocaleString();
+        document.getElementById('stat-worth').innerText = '$' + Number(data.total_worth).toLocaleString();
+        document.getElementById('stat-farmed').innerText = '$' + Number(data.total_farmed).toLocaleString();
+        document.getElementById('stat-acc').innerText = data.total_accounts;
+        document.getElementById('stat-online').innerText = data.online_count;
+        document.getElementById('meta-acc').innerText = data.total_accounts;
+        document.getElementById('meta-live').innerText = data.online_count;
+
         chartData.push(data.total_worth);
         if (chartData.length > 30) chartData.shift(); 
         chartInstance.data.labels = chartData.map((_, i) => i);
         chartInstance.data.datasets[0].data = chartData;
         chartInstance.update();
+        
     } catch (e) { console.error(e); }
     isUpdating = false;
 }
@@ -410,7 +440,17 @@ local pcName = config.PC_NAME
 local player = game:GetService("Players").LocalPlayer
 local httpService = game:GetService("HttpService")
 
-local r = (syn and syn.request) or (http and http.request) or http_request or request
+local function getRequestFunction()
+    if syn and syn.request then return syn.request end
+    if http_request then return http_request end
+    if request then return request end
+    if fluxus and fluxus.request then return fluxus.request end
+    if krnl and krnl.request then return krnl.request end
+    if getgenv().request then return getgenv().request end
+    return nil
+end
+
+local r = getRequestFunction()
 if not r then warn("[OVERSEER] ❌ No HTTP function found!") return end
 
 local function n(s)
@@ -471,7 +511,7 @@ print("[OVERSEER] 🚀 Script running!")`;
     document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
-    try { document.execCommand('copy'); alert("Script copied!"); } catch (err) { alert("Copy failed."); }
+    try { document.execCommand('copy'); alert("Script copied successfully!"); } catch (err) { alert("Failed to copy script."); }
     document.body.removeChild(textArea);
 });
 </script>
